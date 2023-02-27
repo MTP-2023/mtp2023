@@ -1,0 +1,8 @@
+"ray[rllib]" tensorflow torch
+"ray[default]"
+-U "ray[air]"
+-U "ray[tune]"
+gym[all]
+gymnasium
+numpy==1.21
+tensorflow-probability
