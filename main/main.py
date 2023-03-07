@@ -10,6 +10,7 @@ from ray.rllib.env import EnvContext
 import ray
 from ray import air, tune
 from ray.rllib.env.env_context import EnvContext
+from ray.rllib.examples.env.stateless_cartpole import StatelessCartPole
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.tf.tf_modelv2 import TFModelV2
 from ray.rllib.models.tf.fcnet import FullyConnectedNetwork
@@ -79,7 +80,8 @@ if __name__ == "__main__":
         get_trainable_cls(args.run)
         .get_default_config()
         # or "corridor" if registered above
-        .environment(AvalancheEnv, env_config={"needed_flips": 2})
+        #.environment(AvalancheEnv, env_config={"needed_flips": 2})
+        .environment(StatelessCartPole)
         .framework(args.framework)
         .rollouts(num_rollout_workers=1)
         .training(
