@@ -2,7 +2,8 @@
 "ray[default]"
 -U "ray[air]"
 -U "ray[tune]"
-gym[all]
+gym[all]~=0.26.2
 gymnasium
-numpy==1.21
+numpy~=1.24.2
 tensorflow-probability
+ray~=2.3.0
