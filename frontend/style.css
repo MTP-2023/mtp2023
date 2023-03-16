@@ -1,0 +1,39 @@
+.row {
+  display: flex;
+}
+
+.displacement {
+  margin-left: 36px;
+}
+
+body {
+  background-color: #c0ffbf;
+
+  min-height: 100%;
+}
+
+.button {
+  width: 36px;
+}
+
+#buttonHolder {
+  width: max-content;
+  margin-left: 36px;
+}
+
+.leftMarble,
+.rightMarble {
+  position: relative;
+}
+
+.leftMarble .marble {
+  position: absolute;
+  left: 0;
+  top: 30px;
+}
+
+.rightMarble .marble {
+  position: absolute;
+  right: 0;
+  top: 30px;
+}
