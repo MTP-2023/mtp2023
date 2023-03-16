@@ -33,16 +33,23 @@ class GameBoardEnv(gym.Env):
         self.marbles_left = config["marbles_left"]
         self.refill = config["refill"]
 
-        self.observation_space = Box(low=0, high=2, shape=(self.width, self.height), dtype=np.int8)
+        self.observation_space = Dict({
+            "game_board": Box(low=0, high=2, shape=(self.width, self.height), dtype=np.int8),
+            "marbles_left": Discrete(config["marbles_left"])
+        })
+
         self.n_choices = 2*self.width
         self.action_space = Discrete(self.n_choices)
 
-
-        default_board = [[0,1,0,1,0,1,0,0],
+        if config["board"]:
+            self.game_board = config["board"]
+        else:
+            self.game_board = [[0,1,0,1,0,1,0,0],
                          [1,0,1,0,1,0,1,0],
                          [0,1,0,1,0,1,0,0],
                          [1,0,1,0,1,0,1,0]]
-        self.observation_space = default_board
+        
+        #self.observation_space["game_board"] = default_board
         # define custom observation space structure
         
         # Set the seed. This is only used for the final (reach goal) reward.
@@ -71,79 +78,114 @@ class GameBoardEnv(gym.Env):
         # iterate over each row and recalculate game board status
         
         start_col = action + 1
-        input_board = self.observation_space
-        print(input_board)
+        input_board = self.game_board
         self.marbles_left -= 1
 
-        # format: list of tuples where (current_row, col_idx) of a marble rolling down
-        active_marbles = [(0, start_col)]
+        # test print
+        print("INPUT", input_board)
+
+        # format: list of items where [current_row, col_idx] of a marble rolling down
+        active_marbles = [[0, start_col]]
 
         while len(active_marbles) > 0:
-            # get variales for next update step
-            row_idx, col_idx = active_marbles[0]
-            row = input_board[row_idx]
+            print(active_marbles)
+            marble_update_queue = sorted(active_marbles, key=lambda element: (element[0], element[1]))
+            #print(marble_update_queue)
+            # iterate over each active (= falling) marble
+            for marble in marble_update_queue:
+                # get variales for currently updating marble
+                row_idx, col_idx = marble
+                row = input_board[row_idx]
 
-            # check if switch position saves the marble
-            if row[col_idx]  == 1:
-                # save marble in position
-                row[col_idx] += 1
-                active_marbles.pop(0)
-            # check if marble causes a switch toggle
-            elif row[col_idx] == 0:
-                switch_col = col_idx + 1
-                # identify field which is impacted by input
-                if row_idx % 2 == 0:
-                    sum_l = col_idx * 2 - 1
-                    if sum_l % 4 == 3:
-                        switch_col = col_idx - 1
-                else:
-                    sum_l = col_idx * 2 - 1
-                    if sum_l % 4 == 1:
-                        switch_col = col_idx - 1
-                # update board status
-                row[col_idx] = 1
+                # check if switch position saves the marble
+                if row[col_idx]  == 1:
+                    # save marble in position
+                    row[col_idx] += 1
+                    active_marbles.remove(marble)
 
-                # check if another marble is activated by the switch toggle
-                if row[switch_col] == 2:
-                    activated_marble = (row_idx, switch_col)
+                # check if marble causes a switch toggle
+                elif row[col_idx] == 0:
+                    switch_col = col_idx + 1
+                    # identify field which is impacted by input
+                    if row_idx % 2 == 0:
+                        sum_l = col_idx * 2 - 1
+                        if sum_l % 4 == 3:
+                            switch_col = col_idx - 1
+                    else:
+                        sum_l = col_idx * 2 - 1
+                        if sum_l % 4 == 1:
+                            switch_col = col_idx - 1
+                    # update board status
+                    row[col_idx] = 1
+
+                    # check if another marble is activated by the switch toggle
+                    if row[switch_col] == 2:
+                        activated_marble = [row_idx, switch_col]
+                        active_marbles.append(activated_marble)
+
+                    # set value of the switch's second part to 0
+                    row[switch_col] = 0
+
+                    # update marble status
+                    active_marbles[active_marbles.index(marble)][0] = row_idx + 1
+
+                # check if marble hits another marble
+                else: # = row[col_idx] == 2
+                    new_col = col_idx + 1
+                    if row_idx % 2 == 0:
+                        sum_l = col_idx*2 - 1
+                        if sum_l % 4 == 3:
+                            new_col = col_idx - 1
+                    else:
+                        sum_l = col_idx * 2 - 1
+                        if sum_l % 4 == 1:
+                            new_col = col_idx - 1
+
+                    # add the other marble to active marbles
+                    activated_marble = [row_idx, col_idx]
                     active_marbles.append(activated_marble)
-                row[switch_col] = 0
 
-                # update marble status
-                active_marbles[0] = (row_idx + 1, col_idx)
-            else: # = row[col_idx] == 2 = if marbles falls on another marble add action here
-                new_col = col_idx + 1
-                if row_idx % 2 == 0:
-                    sum_l = col_idx*2 - 1
-                    if sum_l % 4 == 3:
-                        new_col = col_idx - 1
-                else:
-                    sum_l = col_idx * 2 - 1
-                    if sum_l % 4 == 1:
-                        new_col = col_idx - 1
+                    # update switch status
+                    row[col_idx] = 0
+                    row[new_col] = 1
 
-                activated_marble = (row_idx, col_idx)
-                col_idx = new_col
-                row[col_idx] = 1
-                active_marbles[0] = (row_idx + 1, new_col)
+                    # update marble position
+                    active_marbles[active_marbles.index(marble)] = [row_idx + 1, new_col]
 
-            # remove active marble if it reaches the bottom
-            if len(active_marbles) > 0 and active_marbles[0][0] == len(input_board):
-                active_marbles.pop(0)
+                # remove active marbles if they reach the bottom
+                active_marbles = [marble for marble in active_marbles if marble[0] < self.height]
                 # check if marble should be added to available marbles
                 if self.refill:
                     self.marbles_left += 1
-                
-        print(self.observation_space)
-        return self.observation_space, 0, False, False, None
+
+        # test print
+        print("FINAL", input_board)
+
+        result = {
+            "game_board": input_board,
+            "marbles_left": self.marbles_left
+        }
+
+        # to be changed for actual agent training
+        return result, 0, False, False, None
     
 default_config = {
     "width": 3, 
     "height": 2,
     "marbles_left": 10,
-    "refill": False
+    "refill": False,
+    # remove to use default board
+    "board": [[0,1,0,0,1,1,0,0],
+            [0,1,0,1,1,0,0,1],
+            [0,1,0,1,0,1,0,0],
+            [1,0,1,0,1,0,1,0]]
 }
 test = GameBoardEnv(default_config)
-test.step(1)
+# config throws
+throws = [1,2,3,5,5,5]
+# perform simulation
+for throw in throws:
+    print("NEXT STEP, THROW", throw)
+    test.step(throw)
 
    
