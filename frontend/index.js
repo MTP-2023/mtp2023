@@ -23,9 +23,14 @@ const generateRandomBoard = (width, height) => {
   return board;
 };
 
+let fallenMarbles = 0;
+let availableMarbles = 10;
+
 let startBoard = generateRandomBoard(4, 4);
 
 const width = startBoard[0].length;
+
+const availableMarbleHolder = document.getElementById("availableMarblesHolder");
 
 const buttonHolder = document.getElementById("buttonHolder");
 
@@ -85,9 +90,18 @@ const getSwitches = (startBoard) => {
 };
 
 const holder = document.getElementById("holder");
+const fallenMarblesHolder = document.getElementById("fallenMarblesHolder");
 
 const render = (startBoard) => {
   const switches = getSwitches(startBoard);
+  availableMarbleHolder.innerHTML = "";
+
+  for (let i = 0; i < availableMarbles; i++) {
+    const marble = document.createElement("img");
+    marble.src = "./assets/marble.gif";
+    marble.classList.add("marble");
+    availableMarbleHolder.appendChild(marble);
+  }
 
   holder.innerHTML = "";
 
@@ -112,6 +126,13 @@ const render = (startBoard) => {
     }
     holder.appendChild(row);
   }
+  fallenMarblesHolder.innerHTML = "";
+  for (let i = 0; i < fallenMarbles; i++) {
+    const marble = document.createElement("img");
+    marble.src = "./assets/marble.gif";
+    marble.classList.add("marble");
+    fallenMarblesHolder.appendChild(marble);
+  }
 };
 
 render(startBoard);
@@ -121,6 +142,9 @@ const buttons = document.querySelectorAll(".button");
 buttons.forEach((button, index) => {
   button.addEventListener("click", async () => {
     console.log("click", index);
+    if (!availableMarbles) return;
+    availableMarbles--;
+
     const result = await fetch("http://127.0.0.1:8000/interpret", {
       method: "POST",
       headers: {
@@ -135,6 +159,7 @@ buttons.forEach((button, index) => {
       .then((data) => {
         let currentFrame = data.boards.length - 1;
         startBoard = data.boards[currentFrame];
+        fallenMarbles += data.marbles_dropped;
         render(startBoard);
         // for (let i = 1; i <= data.boards.length; i++) {
         //   setTimeout(() => {
