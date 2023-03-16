@@ -7,6 +7,7 @@ def run(start_col: int, input_board: list, return_intermediate_data = False):
 
     board_states = []
     marble_positions = []
+    marbles_dropped = 0
 
     while len(active_marbles) > 0:
         marble_positions.append(copy.deepcopy(active_marbles))
@@ -80,6 +81,7 @@ def run(start_col: int, input_board: list, return_intermediate_data = False):
                 active_marbles[active_marbles.index(marble)] = [row_idx + 1, new_col]
 
             # remove active marbles if they reach the bottom
+            marbles_dropped += len([marble for marble in active_marbles if marble[0] == len(input_board)])
             active_marbles = [marble for marble in active_marbles if marble[0] < len(input_board)]
             # check if marble should be added to available marbles
             #if self.refill:
@@ -89,6 +91,6 @@ def run(start_col: int, input_board: list, return_intermediate_data = False):
 
     if return_intermediate_data: 
         print(marble_positions)
-        return {"boards": board_states, "marbles": marble_positions}
+        return {"boards": board_states, "marbles": marble_positions, "marbles_dropped": marbles_dropped}
     else:
         return board_states[-1]
