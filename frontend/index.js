@@ -133,8 +133,17 @@ buttons.forEach((button, index) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        startBoard = data;
+        let currentFrame = data.boards.length - 1;
+        startBoard = data.boards[currentFrame];
         render(startBoard);
+        // for (let i = 1; i <= data.boards.length; i++) {
+        //   setTimeout(() => {
+        //     console.log("timeout");
+        //     currentFrame++;
+        //     startBoard = data.boards[currentFrame];
+        //     render(startBoard);
+        //   }, 1000 * i);
+        // }
       });
   });
 });
