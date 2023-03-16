@@ -1,10 +1,18 @@
-def run(start_col: int, input_board: list):  
+import copy
+
+def run(start_col: int, input_board: list, return_intermediate_data = False):  
     start_col += 1 
     # format: list of items where [current_row, col_idx] of a marble rolling down
     active_marbles = [[0, start_col]]
 
+    board_states = []
+    marble_positions = []
+
     while len(active_marbles) > 0:
-        print(active_marbles)
+        marble_positions.append(copy.deepcopy(active_marbles))
+        board_states.append(copy.deepcopy(input_board))
+
+        #print(active_marbles)
         marble_update_queue = sorted(active_marbles, key=lambda element: (element[0], element[1]))
         #print(marble_update_queue)
         # iterate over each active (= falling) marble
@@ -21,26 +29,29 @@ def run(start_col: int, input_board: list):
 
             # check if marble causes a switch toggle
             elif row[col_idx] == 0:
-                switch_col = col_idx + 1
-                # identify field which is impacted by input
-                if row_idx % 2 == 0:
-                    sum_l = col_idx * 2 - 1
-                    if sum_l % 4 == 3:
-                        switch_col = col_idx - 1
+                if col_idx in [0, len(input_board[0])-1]:
+                    pass
                 else:
-                    sum_l = col_idx * 2 - 1
-                    if sum_l % 4 == 1:
-                        switch_col = col_idx - 1
-                # update board status
-                row[col_idx] = 1
+                    switch_col = col_idx + 1
+                    # identify field which is impacted by input
+                    if row_idx % 2 == 0:
+                        sum_l = col_idx * 2 - 1
+                        if sum_l % 4 == 3:
+                            switch_col = col_idx - 1
+                    else:
+                        sum_l = col_idx * 2 - 1
+                        if sum_l % 4 == 1:
+                            switch_col = col_idx - 1
+                    # update board status
+                    row[col_idx] = 1
 
-                # check if another marble is activated by the switch toggle
-                if row[switch_col] == 2:
-                    activated_marble = [row_idx, switch_col]
-                    active_marbles.append(activated_marble)
+                    # check if another marble is activated by the switch toggle
+                    if row[switch_col] == 2:
+                        activated_marble = [row_idx, switch_col]
+                        active_marbles.append(activated_marble)
 
-                # set value of the switch's second part to 0
-                row[switch_col] = 0
+                    # set value of the switch's second part to 0
+                    row[switch_col] = 0
 
                 # update marble status
                 active_marbles[active_marbles.index(marble)][0] = row_idx + 1
@@ -74,4 +85,10 @@ def run(start_col: int, input_board: list):
             #if self.refill:
                 #self.marbles_left += 1
 
-    return input_board
+    board_states.append(input_board.copy())
+
+    if return_intermediate_data: 
+        print(marble_positions)
+        return {"boards": board_states, "marbles": marble_positions}
+    else:
+        return board_states[-1]

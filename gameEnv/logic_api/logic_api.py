@@ -35,5 +35,5 @@ async def root():
 
 @app.post("/interpret/")
 async def runSimulation(gameBoard: SimulationDTO):
-    updatedBoard = run(gameBoard.marble_throw, gameBoard.board)
-    return updatedBoard
+    updatedStates = run(gameBoard.marble_throw, gameBoard.board, return_intermediate_data = True)
+    return updatedStates
