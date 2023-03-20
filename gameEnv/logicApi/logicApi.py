@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 sys.path.append('../')
 from simulation.simulate import run
+from boardGenerator.generate import generate_random_board
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -33,6 +34,10 @@ class SimulationDTO(BaseModel):
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+@app.get("/randomboard")
+async def randomBoard(width: int = 4, height: int = 4):
+    return generate_random_board(width, height)
 
 
 @app.post("/interpret/")
