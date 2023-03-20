@@ -5,9 +5,11 @@ import sys
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+
 sys.path.append('../')
 from simulation.simulate import run
 from fastapi.middleware.cors import CORSMiddleware
+
 
 
 app = FastAPI()
