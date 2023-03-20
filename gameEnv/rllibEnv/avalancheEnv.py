@@ -6,7 +6,10 @@ import numpy as np
 import json
 import sys
 sys.path.append('../')
-from gameEnv.simulation.simulate import run
+sys.path.append('../../')
+from simulation.simulate import run
+# maybe change this import to be based on received game variant name later
+from gameVariants.baseline.reward import baselineReward
 
 class GameBoardEnv(gym.Env):
     """Example of a custom env in which you have to walk down a corridor.
@@ -27,29 +30,21 @@ class GameBoardEnv(gym.Env):
         # })
         self.observation_space = Box(low=0, high=2, shape=(self.height, self.width), dtype=int)
 
-        self.n_choices = 2*self.width
+        self.n_choices = 2*config["width"]
+        print("CHOICES", self.n_choices)
         self.action_space = Discrete(self.n_choices)
 
         self.current_board = np.array(self.training_states[self.training_index]["start_board"])
         self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
-        print(self.current_board, type(self.current_board))
-        print(self.goal_board, type(self.current_board))
-
-        """
-        if config["board"]:
-            self.game_board = config["board"]
-        else:
-            self.game_board = [[0,1,0,1,0,1,0,0],
-                         [1,0,1,0,1,0,1,0],
-                         [0,1,0,1,0,1,0,0],
-                         [1,0,1,0,1,0,1,0]]"""
+        #print(self.current_board, type(self.current_board))
+        #print(self.goal_board, type(self.current_board))
         
         # Set the seed. This is only used for the final (reach goal) reward.
         #self.reset(default=True)
 
     # implement how the game board initialization should work
     def reset(self, seed=None, options=None):
-        print("reset")
+        #print("reset")
         #random.seed(seed)
         #self.cur_pos = 0
         #return [self.cur_pos], {}
@@ -68,7 +63,7 @@ class GameBoardEnv(gym.Env):
         return self.current_board, {}
 
     def step(self, action):
-        print("step")
+        #print("step")
         assert action in range(self.n_choices), action
 
         # iterate over each row and recalculate game board status
@@ -76,57 +71,24 @@ class GameBoardEnv(gym.Env):
         input_board = self.current_board
 
         # test print
-        print("INPUT", input_board)
-
+        #print("INPUT", input_board)
+        #print("ACTION", action)
         input_board = run(action, input_board)
         self.n_steps += 1
 
         # test print
-        print("FINAL", input_board)
+        #print("FINAL", input_board)
 
         # game variant dependencies:
         # final states
         # rewards
 
         if self.variant == "baseline":
-            reward, done = baselineReward(input_board, self.n_steps)
+            reward, done = baselineReward(self)
 
 
-        result = {
-            "game_board": input_board
-        }
+
 
         # to be changed for actual agent training
-        return input_board, reward, done, False, None
+        return input_board, reward, done, False, {}
 
-    def baselineReward(inputBoard, n_steps):
-        print("reward")
-        done = True
-        reward = 0
-        for i in range(self.goal_board.shape[0]):
-            for j in range(self.goal_board.shape[1]):
-                if self.goal_board[i][j] == 2 or self.goal_board[i][j+1] == 2:
-                    if inputBoard[i][j] != 2 and inputBoard[i][j+1] != 2:
-                        done = False
-                        break
-            if not done:
-                break
-        if done:
-            reward = -self.n_steps
-        return reward, done
-
-
-# f = open('default_config.json')
-# 
-# default_config = json.load(f)
-# 
-# # TESTING
-# test = GameBoardEnv(default_config)
-# # config throws
-# throws = [1,2,3,5,5,5]
-# # perform simulation
-# for throw in throws:
-#     print("NEXT STEP, THROW", throw)
-#     test.step(throw)
-# 
-# f.close()

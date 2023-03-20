@@ -47,7 +47,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-path = "../gameVariants/" + args.variant
+path = "../../gameVariants/" + args.variant
 training_path = path + "/training/" + args.train_on
 
 schema = json.load(open(path+"/env_schema.json"))
@@ -66,9 +66,10 @@ print(env_setup)
 ray.init()
 
 config = PPOConfig()
-config.rollouts(num_rollout_workers=1)
+config.rollouts(num_rollout_workers=4)
 config = config.environment(GameBoardEnv, env_config=env_setup)
 
 algo = config.build()
-train = algo.train()
-print(train)
+for i in range(20):
+    train = algo.train()
+    print("BEGIN", train, i)
