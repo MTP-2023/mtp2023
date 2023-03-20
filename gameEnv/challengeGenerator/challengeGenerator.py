@@ -1,6 +1,13 @@
 import random
 from gameEnv.simulation.simulate import run
 
+
+# board = start board
+# marbleCount = marbles that should stay in the board
+# turnlimit = how many turns in one game can be played
+# availableMarbels = how many marbles are there in total
+# width = width of the board
+
 def generateGoalStatesWithFallthrough(board, marbleCount, turnlimit, availableMarbles, width):
     while True:
         board = generateBoard(board, marbleCount, turnlimit, availableMarbles, width)
@@ -8,8 +15,9 @@ def generateGoalStatesWithFallthrough(board, marbleCount, turnlimit, availableMa
             break
 
     return board
-def generateBoard(board, marbleCount, turnlimit, availableMarbles, width):
 
+
+def generateBoard(board, marbleCount, turnlimit, availableMarbles, width):
     for i in turnlimit:
         move = random.randint(0, width)
         board = run(move, board, False)
@@ -17,6 +25,7 @@ def generateBoard(board, marbleCount, turnlimit, availableMarbles, width):
             lastValid = board
 
     return lastValid
+
 
 def isValid(board, marbleCount):
     count = 0

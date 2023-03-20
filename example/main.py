@@ -22,6 +22,8 @@ from ray.tune.registry import get_trainable_cls
 from ray.rllib.algorithms.ppo import PPOConfig
 import warnings
 
+from ray import tune
+
 tf1, tf, tfv = try_import_tf()
 torch, nn = try_import_torch()
 
@@ -73,6 +75,7 @@ if __name__ == "__main__":
             # or "corridor" if registered above
             # set render_env to true, if a live visualization of the training process is required
             .environment(env="CartPole-v1")#, render_env=True)
+            #.environment(env="ConnectFour-v0")
             .framework(args.framework)
             .rollouts(num_rollout_workers=1)
             .training(
@@ -102,6 +105,7 @@ if __name__ == "__main__":
             # Use GPUs iff `RLLIB_NUM_GPUS` env var set to > 0.
             .resources(num_gpus=args.use_gpus)#int(os.environ.get("RLLIB_NUM_GPUS", "0")))
     )
+
 
     stop = {
         "training_iteration": args.stop_iters,
