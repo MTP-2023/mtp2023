@@ -1,3 +1,11 @@
 .switch img {
   filter: grayscale(100%) contrast(10) blur(0.5px);
 }
+
+.row {
+  display: flex;
+}
+
+.row--displace {
+  margin-left: 36px;
+}

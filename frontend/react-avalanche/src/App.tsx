@@ -7,8 +7,6 @@ function App() {
     <div className="App">
       <BoardProvider>
         <Board />
-        <Board />
-        <Board />
       </BoardProvider>
     </div>
   );
