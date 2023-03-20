@@ -1,0 +1,50 @@
+.row {
+  display: flex;
+}
+
+.displacement {
+  margin-left: 36px;
+}
+
+body {
+  background-color: #c0ffbf;
+
+  min-height: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+}
+
+.button {
+  width: 36px;
+}
+
+#buttonHolder {
+  width: max-content;
+}
+
+.leftMarble,
+.rightMarble {
+  position: relative;
+}
+
+.leftMarble .marble {
+  position: absolute;
+  left: 0;
+  top: 30px;
+}
+
+.rightMarble .marble {
+  position: absolute;
+  right: 0;
+  top: 30px;
+}
+
+.player {
+  display: flex;
+}
