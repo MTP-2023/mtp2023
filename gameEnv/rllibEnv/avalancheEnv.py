@@ -80,13 +80,31 @@ class GameBoardEnv(gym.Env):
         # final states
         # rewards
 
+        if self.variant == "baseline":
+            reward, done = baselineReward(input_board, self.n_steps)
+
+
         result = {
             "game_board": input_board
         }
 
         # to be changed for actual agent training
-        return result, 0, False, False, None
+        return result, reward, done, False, None
 
+    def baselineReward(inputBoard, n_steps):
+        done = True
+        reward = 0
+        for i in range(self.goal_board.shape[0]):
+            for j in range(self.goal_board.shape[1]):
+                if self.goal_board[i][j] == 2 or self.goal_board[i][j+1] == 2:
+                    if inputBoard[i][j] != 2 and inputBoard[i][j+1] != 2:
+                        done = False
+                        break
+            if not done:
+                break
+        if done:
+            reward = -self.n_steps
+        return reward, done
 
 
 f = open('default_config.json')
