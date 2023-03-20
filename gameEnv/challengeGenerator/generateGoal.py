@@ -1,6 +1,6 @@
 import random
 from gameEnv.simulation.simulate import run
-
+import copy
 
 # board = start board produced by generator
 # marbleCount = marbles that should stay in the board
@@ -13,7 +13,6 @@ def generateGoalState(board, marbleCount, turnlimit, availableMarbles, width, fa
         goalBoard = generateBoard(board, marbleCount, turnlimit, availableMarbles, width, fallthrough)
         if goalBoard is not None:
             break
-        print("making new board")
 
     return goalBoard
 def generateBoard(board, marbleCount, turnlimit, availableMarbles, width, fallthrough):
@@ -25,20 +24,22 @@ def generateBoard(board, marbleCount, turnlimit, availableMarbles, width, fallth
             return lastValid
 
         board = run(move, board, True)["boards"][-1]
-    if isValid(board, marbleCount):
-        lastValid = board
+        if isValid(board, marbleCount):
+            lastValid = copy.deepcopy(board)
 
     return lastValid
 
 def isValid(board, marbleCount):
     count = 0
     for i in range(len(board[0])):
-        if board[0][i] not in range(0, 1):
+        if board[0][i] > 1:
             return False
     for i in range(len(board)):
         for j in range(len(board[0])):
-            if board[i][j] not in range(0, 1):
+            if board[i][j] > 1:
                 count += 1
     if count is not marbleCount:
         return False
+    print("ValidState with " + str(count) + " marbles")
+    print(board)
     return True
