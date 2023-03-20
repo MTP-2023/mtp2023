@@ -44,3 +44,7 @@ body {
   right: 0;
   top: 30px;
 }
+
+.player {
+  display: flex;
+}
