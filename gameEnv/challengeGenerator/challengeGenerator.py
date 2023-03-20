@@ -8,32 +8,34 @@ from gameEnv.simulation.simulate import run
 # availableMarbels = how many marbles are there in total
 # width = width of the board
 
-def generateGoalStatesWithFallthrough(board, marbleCount, turnlimit, availableMarbles, width):
+def generateGoalStates(board, marbleCount, turnlimit, availableMarbles, width, fallthrough):
     while True:
-        board = generateBoard(board, marbleCount, turnlimit, availableMarbles, width)
+        board = generateBoard(board, marbleCount, turnlimit, availableMarbles, width, fallthrough)
         if board is not None:
             break
 
     return board
+def generateBoard(board, marbleCount, turnlimit, availableMarbles, width, fallthrough):
 
-
-def generateBoard(board, marbleCount, turnlimit, availableMarbles, width):
     for i in turnlimit:
         move = random.randint(0, width)
-        board = run(move, board, False)
+        result = run(move, board, True)
+        if fallthrough and result["marbles_dropped"] > 0:
+            return lastValid
+
+        board = run(move, board, True)["boards"][-1]
         if isValid(board, marbleCount):
             lastValid = board
 
     return lastValid
 
-
 def isValid(board, marbleCount):
     count = 0
-    for i in board[0].length:
+    for i in range(board[0].len):
         if board[0][i] not in range(0, 1):
             return False
-    for i in board.length:
-        for j in board[0].length:
+    for i in range(board.len):
+        for j in range(board[0].len):
             if board[0][i] not in range(0, 1):
                 count += 1
     if count is not marbleCount:
