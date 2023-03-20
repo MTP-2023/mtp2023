@@ -1,31 +1,21 @@
 import random
 
+def add_random_switch():
+    switch = [0, 0]
+    r = random.randint(0,1)
+    switch[r] = 1
+    return switch
 
-def generate_random_board(width,heigth):
-
+def generate_random_board(width, height):
     board = []
-    for i in range(heigth):
+    for i in range(height):
         row = []
         if i%2 == 0:
             row.append(0)
-            for j in range(width-1):
-                r = random.randint(0,1)
-                if r == 0:
-                    row.append(0)
-                    row.append(1)
-                else:
-                    row.append(1)
-                    row.append(0)
+            row.append([add_random_switch() for _ in range(width-1)])
             row.append(0)
         else:
-            for j in range(width):
-                r = random.randint(0,1)
-                if r == 0:
-                    row.append(0)
-                    row.append(1)
-                else:
-                    row.append(1)
-                    row.append(0)
+            row = [add_random_switch() for _ in range(width)]
         board.append(row)
    
     return board

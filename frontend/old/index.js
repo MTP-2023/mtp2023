@@ -103,7 +103,7 @@ const render = (board, marbles) => {
 
   for (let i = 0; i < availableMarbles; i++) {
     const marble = document.createElement("img");
-    marble.src = "../assets/marble.gif";
+    marble.src = "./assets/marble.gif";
     marble.classList.add("marble");
     availableMarbleHolder.appendChild(marble);
   }
@@ -120,12 +120,12 @@ const render = (board, marbles) => {
       currentSwitch.innerHTML = `<div class="switch"">
     ${
       switches[i][j] === "left marble"
-        ? '<div class="leftMarble"><img class="marble" src="../assets/marble.gif"><img src="../assets/left.gif" /></div>'
+        ? '<div class="leftMarble"><img class="marble" src="./assets/marble.gif"><img src="./assets/left.gif" /></div>'
         : switches[i][j] === "right marble"
-        ? '<div class="rightMarble"><img class="marble" src="../assets/marble.gif"><img src="../assets/right.gif" /></div>'
+        ? '<div class="rightMarble"><img class="marble" src="./assets/marble.gif"><img src="./assets/right.gif" /></div>'
         : switches[i][j] === "left"
-        ? '<img src="../assets/left.gif "/>'
-        : '<img src="../assets/right.gif "/>'
+        ? '<img src="./assets/left.gif "/>'
+        : '<img src="./assets/right.gif "/>'
     }
   </div>`;
       row.appendChild(currentSwitch);
@@ -133,7 +133,7 @@ const render = (board, marbles) => {
     if (i % 2 == 0) {
       if (marbles[i] && marbles[i][0] !== undefined) {
         const marble = document.createElement("img");
-        marble.src = "../assets/marble.gif";
+        marble.src = "./assets/marble.gif";
         marble.classList.add("marble");
         document.querySelector();
       }
@@ -142,7 +142,7 @@ const render = (board, marbles) => {
       holder.appendChild(row);
       if (marbles[i] && marbles[i][0] !== undefined) {
         const marble = document.createElement("img");
-        marble.src = "../assets/marble.gif";
+        marble.src = "./assets/marble.gif";
         marble.classList.add("marble");
         holder.appendChild(marble);
       }
@@ -151,7 +151,7 @@ const render = (board, marbles) => {
   fallenMarblesHolder.innerHTML = "";
   for (let i = 0; i < fallenMarbles; i++) {
     const marble = document.createElement("img");
-    marble.src = "../assets/marble.gif";
+    marble.src = "./assets/marble.gif";
     marble.classList.add("marble");
     fallenMarblesHolder.appendChild(marble);
   }
