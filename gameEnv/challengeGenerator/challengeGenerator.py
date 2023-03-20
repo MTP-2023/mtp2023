@@ -2,7 +2,7 @@ import random
 from gameEnv.simulation.simulate import run
 
 
-# board = start board
+# board = start board produced by generator
 # marbleCount = marbles that should stay in the board
 # turnlimit = how many turns in one game can be played
 # availableMarbels = how many marbles are there in total
