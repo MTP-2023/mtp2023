@@ -11,7 +11,7 @@ const Switcher: React.FC<switcher> = ({ left, right }) => {
   if (left === 1) {
     return (
       <div className="switch">
-        <img src={leftImg} />;
+        <img src={leftImg} />
       </div>
     );
   }
@@ -20,6 +20,24 @@ const Switcher: React.FC<switcher> = ({ left, right }) => {
     return (
       <div className="switch">
         <img src={rightImg} />
+      </div>
+    );
+  }
+
+  if (left === 2) {
+    return (
+      <div className="switch">
+        <img src={leftImg} />
+        <div className="ball ball--left"></div>
+      </div>
+    );
+  }
+
+  if (right === 2) {
+    return (
+      <div className="switch">
+        <img src={rightImg} />
+        <div className="ball ball--right"></div>
       </div>
     );
   }
