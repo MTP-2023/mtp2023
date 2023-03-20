@@ -28,7 +28,7 @@ tf1, tf, tfv = try_import_tf()
 torch, nn = try_import_torch()
 
 
-from rllibEnv import avalancheEnv
+from avalancheEnv import GameBoardEnv
 import json
 import jsonschema
 
@@ -46,24 +46,29 @@ parser.add_argument(
     help="The name of the json file which contains training scenarios."
 )
 
-ray.init()
-
 args = parser.parse_args()
 path = "../gameVariants/" + args.variant
 training_path = path + "/training/" + args.train_on
 
-schema = json.load(path+"/env_schema.json")
+schema = json.load(open(path+"/env_schema.json"))
 
 # load all train examples into a list
-env_setup = json.load(training_path)
+env_setup = json.load(open(training_path + ".json"))
 try:
     jsonschema.validate(env_setup, schema)
 except Exception as e:
     print(e)
 
 env_setup["variant"] = args.variant
+
+print(env_setup)
+
+ray.init()
+
 config = PPOConfig()
-config = config.environment(avalancheEnv.GameBoardEnv, env_config=env_setup)
+config.rollouts(num_rollout_workers=1)
+config = config.environment(GameBoardEnv, env_config=env_setup)
 
 algo = config.build()
 train = algo.train()
+print(train)

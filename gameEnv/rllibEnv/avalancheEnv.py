@@ -1,12 +1,12 @@
 import gymnasium as gym
 from ray.rllib.env.env_context import EnvContext
-from gym.spaces import Discrete, Box, Dict
+from gymnasium.spaces import Discrete, Box, Dict
 import random
 import numpy as np
 import json
 import sys
 sys.path.append('../')
-from simulation.simulate import run
+from gameEnv.simulation.simulate import run
 
 class GameBoardEnv(gym.Env):
     """Example of a custom env in which you have to walk down a corridor.
@@ -19,16 +19,21 @@ class GameBoardEnv(gym.Env):
         self.width = config["width"]*2+2
         self.height = config["height"]*2
         self.training_states = config["training_states"]
+        
+        print(self.training_states)
 
-        self.observation_space = Dict({
-            "game_board": Box(low=0, high=2, shape=(self.width, self.height), dtype=np.int8)
-        })
+        # self.observation_space = Dict({
+        #     "game_board": Box(low=0, high=2, shape=(self.width, self.height), dtype=np.int8)
+        # })
+        self.observation_space = Box(low=0, high=2, shape=(self.height, self.width), dtype=int)
 
         self.n_choices = 2*self.width
         self.action_space = Discrete(self.n_choices)
 
-        self.current_board = self.training_states[self.training_index]["start_board"]
-        self.goal_board = self.training_states[self.training_index]["goal_board"]
+        self.current_board = np.array(self.training_states[self.training_index]["start_board"])
+        self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
+        print(self.current_board, type(self.current_board))
+        print(self.goal_board, type(self.current_board))
 
         """
         if config["board"]:
@@ -43,7 +48,8 @@ class GameBoardEnv(gym.Env):
         #self.reset(default=True)
 
     # implement how the game board initialization should work
-    def reset(self, seed=None, default = False, preset = None):
+    def reset(self, seed=None, options=None):
+        print("reset")
         #random.seed(seed)
         #self.cur_pos = 0
         #return [self.cur_pos], {}
@@ -57,15 +63,17 @@ class GameBoardEnv(gym.Env):
             self.training_index = 0
 
         # reset env to next challenge
-        self.current_board = self.training_states[self.training_index]["start_board"]
-        self.goal_board = self.training_states[self.training_index]["goal_board"]
+        self.current_board = np.array(self.training_states[self.training_index]["start_board"])
+        self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
+        return self.current_board, {}
 
     def step(self, action):
+        print("step")
         assert action in range(self.n_choices), action
 
         # iterate over each row and recalculate game board status
         
-        input_board = self.game_board
+        input_board = self.current_board
 
         # test print
         print("INPUT", input_board)
@@ -89,9 +97,10 @@ class GameBoardEnv(gym.Env):
         }
 
         # to be changed for actual agent training
-        return result, reward, done, False, None
+        return input_board, reward, done, False, None
 
     def baselineReward(inputBoard, n_steps):
+        print("reward")
         done = True
         reward = 0
         for i in range(self.goal_board.shape[0]):
@@ -107,17 +116,17 @@ class GameBoardEnv(gym.Env):
         return reward, done
 
 
-f = open('default_config.json')
-
-default_config = json.load(f)
-
-# TESTING
-test = GameBoardEnv(default_config)
-# config throws
-throws = [1,2,3,5,5,5]
-# perform simulation
-for throw in throws:
-    print("NEXT STEP, THROW", throw)
-    test.step(throw)
-
-f.close()
+# f = open('default_config.json')
+# 
+# default_config = json.load(f)
+# 
+# # TESTING
+# test = GameBoardEnv(default_config)
+# # config throws
+# throws = [1,2,3,5,5,5]
+# # perform simulation
+# for throw in throws:
+#     print("NEXT STEP, THROW", throw)
+#     test.step(throw)
+# 
+# f.close()
