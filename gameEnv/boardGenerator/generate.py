@@ -8,7 +8,6 @@ def add_random_switch():
     return switch
 
 def generate_random_board(switches, row_pairs):
-    #width = 2 + (2 * switches)
     height = 2 * row_pairs
     board = []
     for i in range(height):
@@ -17,10 +16,10 @@ def generate_random_board(switches, row_pairs):
             row.append(0)
             row += list(itertools.chain(*[add_random_switch() for _ in range(switches)]))
             row.append(0)
-            print(row)
+           
         else:
             row = list(itertools.chain(*[add_random_switch() for _ in range(switches+1)]))
-            print(row)
+        
         board.append(row)
    
     return board
