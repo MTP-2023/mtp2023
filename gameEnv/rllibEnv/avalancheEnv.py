@@ -39,6 +39,7 @@ class GameBoardEnv(gym.Env):
 
         self.current_board = np.array(self.training_states[self.training_index]["start_board"])
         self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
+        self.max_steps = self.training_states[self.training_index]["max_turns"]
         #print(self.current_board, type(self.current_board))
         #print(self.goal_board, type(self.current_board))
         
@@ -63,6 +64,7 @@ class GameBoardEnv(gym.Env):
         # reset env to next challenge
         self.current_board = np.array(self.training_states[self.training_index]["start_board"])
         self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
+        self.max_steps = self.training_states[self.training_index]["max_turns"]
 
         obs = {
             "current": self.current_board,

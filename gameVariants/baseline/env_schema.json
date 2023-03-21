@@ -26,7 +26,8 @@
       "type": "object",
       "required": [
         "start_board",
-        "goal_board"
+        "goal_board",
+        "max_turns"
       ],
       "properties": {
         "start_board": {
@@ -48,6 +49,11 @@
             }
           },
           "description": "Define the goal state of the game board (must be aligned with width and height properties)."
+        },
+        "max_turn": {
+          "type": "integer",
+          "description": "The maximum number of turns the agent is allowed to take in this challenge.",
+          "minimum": 1
         }
       }
     }
