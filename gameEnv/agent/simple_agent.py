@@ -15,6 +15,7 @@ class SimpleAgent:
         self.height = data['height']
         self.width = data['width']
 
+
         for i in range(len(arraydata)):
             self.startboards.append(arraydata[i]['start_board'])
             self.endboards.append(arraydata[i]['goal_board'])
