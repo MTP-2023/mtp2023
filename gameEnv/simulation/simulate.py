@@ -90,7 +90,7 @@ def run(start_col: int, input_board: list, return_intermediate_data = False):
     board_states.append(input_board.copy())
 
     if return_intermediate_data: 
-        print(marble_positions)
+        #print(marble_positions)
         return {"boards": board_states, "marbles": marble_positions, "marbles_dropped": marbles_dropped}
     else:
         return board_states[-1]
