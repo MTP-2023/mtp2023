@@ -10,6 +10,7 @@ def generateGoalStatesWithFallthrough(board, marbleCount, turnlimit, availableMa
             break
 
     return board
+
 def generateBoard(board, marbleCount, turnlimit, availableMarbles, width):
     lastValid = board
     for i in range(turnlimit):
@@ -37,6 +38,7 @@ start_board = [[0,1,0,0,1,1,0,0],
             [0,1,0,1,1,0,0,1],
             [0,1,0,1,0,1,0,0],
             [1,0,1,0,1,0,1,0]]
+
 
 goal_board = generateGoalStatesWithFallthrough(start_board, 3, 4, 0, 6)
 print(goal_board)
