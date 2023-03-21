@@ -17,6 +17,7 @@ if __name__ == "__main__":
 
         max_turns = 10
         randomBoard = generateRandom.generate_random_board(width, height)
+        print("Generating boards with max_turns ", max_turns)
         goal = generateGoal.generateGoalState(copy.deepcopy(randomBoard), marbleCount, max_turns, 42, width*2, False)
 
         print(randomBoard)
@@ -24,5 +25,5 @@ if __name__ == "__main__":
         dict["training_states"].append({"start_board": randomBoard, "goal_board": goal, "max_turns": max_turns})
     json_object = json.dumps(dict, indent=4)
 
-    with open("../../gameVariants/baseline/training/generationTest" + ".json", "w") as outfile:
+    with open("../../gameVariants/baseline/training/generationTest2" + ".json", "w") as outfile:
         outfile.write(json_object)

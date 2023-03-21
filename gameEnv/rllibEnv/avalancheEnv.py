@@ -59,7 +59,7 @@ class GameBoardEnv(gym.Env):
         if self.training_index < len(self.training_states) - 1:
             self.training_index += 1
         else:
-            print("RESET: All challenges played.")
+            #print("RESET: All challenges played.")
             self.training_index = 0
 
         # reset env to next challenge
