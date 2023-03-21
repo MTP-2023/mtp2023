@@ -1,7 +1,9 @@
 def baselineReward(self, inputBoard):
         done = True
+        if self.n_steps > self.max_steps:
+            return -1, done
+
         i = 0
-        
         while i < self.height:
             j = 0
             if i%2 == 0:
@@ -16,6 +18,6 @@ def baselineReward(self, inputBoard):
                 break
             i += 1
 
-        reward = - self.n_steps if done else 0
+        reward = (1 + self.max_steps - self.n_steps) if done else 0
 
         return reward, done

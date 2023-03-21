@@ -39,6 +39,7 @@ class GameBoardEnv(gym.Env):
 
         self.current_board = np.array(self.training_states[self.training_index]["start_board"])
         self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
+        self.max_steps = self.training_states[self.training_index]["max_turns"]
         #print(self.current_board, type(self.current_board))
         #print(self.goal_board, type(self.current_board))
         
@@ -58,11 +59,13 @@ class GameBoardEnv(gym.Env):
         if self.training_index < len(self.training_states) - 1:
             self.training_index += 1
         else:
+            print("RESET: All challenges played.")
             self.training_index = 0
 
         # reset env to next challenge
         self.current_board = np.array(self.training_states[self.training_index]["start_board"])
         self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
+        self.max_steps = self.training_states[self.training_index]["max_turns"]
 
         obs = {
             "current": self.current_board,

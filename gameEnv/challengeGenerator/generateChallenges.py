@@ -8,23 +8,21 @@ if __name__ == "__main__":
     width = 3
     height = 2
     marbleCount = 3
-    for i in range(5):
+    dict = {
+        "width": width,
+        "height": height,
+        "training_states": []
+    }
+    for i in range(50):
 
-        #width and height
+        max_turns = 10
         randomBoard = generateRandom.generate_random_board(width, height)
-        goal = generateGoal.generateGoalState(copy.deepcopy(randomBoard), marbleCount, 10, 42, width*2, False)
+        goal = generateGoal.generateGoalState(copy.deepcopy(randomBoard), marbleCount, max_turns, 42, width*2, False)
 
-        dict = {
-            "width": width,
-            "height": height,
-            "marbles_left": 10,
-            "start": randomBoard,
-            "goal": goal
-
-        }
         print(randomBoard)
         print(goal)
-        json_object = json.dumps(dict, indent=4)
+        dict["training_states"].append({"start_board": randomBoard, "goal_board": goal, "max_turns": max_turns})
+    json_object = json.dumps(dict, indent=4)
 
-        with open("challenges" + str(i+1) + ".json", "w") as outfile:
-            outfile.write(json_object)
+    with open("../../gameVariants/baseline/training/generationTest" + ".json", "w") as outfile:
+        outfile.write(json_object)

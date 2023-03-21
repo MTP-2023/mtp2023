@@ -1,5 +1,7 @@
 import random
-from gameEnv.simulation.simulate import run
+import sys
+sys.path.append("../")
+from simulation.simulate import run
 import copy
 
 # board = start board produced by generator

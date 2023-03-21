@@ -61,7 +61,7 @@ except Exception as e:
 
 env_setup["variant"] = args.variant
 
-print(env_setup)
+#print(env_setup)
 
 ray.init()
 
@@ -70,6 +70,6 @@ config.rollouts(num_rollout_workers=4)
 config = config.environment(GameBoardEnv, env_config=env_setup)
 
 algo = config.build()
-for i in range(20):
+for i in range(50):
     train = algo.train()
     print("BEGIN", train, i)
