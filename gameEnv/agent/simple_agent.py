@@ -1,4 +1,7 @@
 import json
+
+import self as self
+
 from gameEnv.simulation.simulate import run
 import copy
 
@@ -14,10 +17,10 @@ class SimpleAgent:
         self.height = data['height']
         self.width = data['width']
 
-    def heuristic_simple(self, board):
+    def heuristic_simple(self,board):
         correctmarbles = 0
         goalmarbles = 0
-        winpercentage = 0.0
+
         i = 0
         while i < self.height:
             j = 0
@@ -26,7 +29,7 @@ class SimpleAgent:
                 while j < self.width - 1:
                     if self.endboard[i][j] == 2 or self.endboard[i][j + 1] == 2:
                         goalmarbles += 1
-                        if self.startboard[i][j] == 2 or self.startboard[i][j + 1] == 2:
+                        if board[i][j] == 2 or board[i][j + 1] == 2:
                             correctmarbles += 1
 
                     j += 2
@@ -39,11 +42,12 @@ class SimpleAgent:
         return dictA
 
     def step(self, board):
+        simple = self
         maxreward = 0
         bestmove = 0
         for i in range(self.width * 2):
             result = run(i, copy.deepcopy(board), True)
-            current = self.heuristic_simple(self, result)["correctmarbles"]
+            current = simple.heuristic_simple(result)["correctmarbles"]
 
             if current > maxreward:
                 maxreward = current
@@ -52,5 +56,12 @@ class SimpleAgent:
         return bestmove
 
     if __name__ == "__main__":
+        __init__(self)
+        for i in range(30):
+            move = step(self, self.startboard)
+            run(move, self.startboard, False)
+            if heuristic_simple(self, self.startboard)['winpercentage'] == 1.0:
+                print('Done ' + str(i) + 'steps')
+                break
 
-        pass
+        print(heuristic_simple(self, self.startboard)['winpercentage'])
