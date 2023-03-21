@@ -1,7 +1,4 @@
 import json
-
-import self as self
-
 from gameEnv.simulation.simulate import run
 import copy
 
@@ -17,24 +14,27 @@ class SimpleAgent:
         self.height = data['height']
         self.width = data['width']
 
-    def heuristic_simple(self,board):
+    def heuristic_simple(self, board):
         correctmarbles = 0
         goalmarbles = 0
-
         i = 0
-        while i < self.height:
+        while i < self.height * 2:
             j = 0
+            test = 1
             if i % 2 == 0:
                 j = 1
-                while j < self.width - 1:
-                    if self.endboard[i][j] == 2 or self.endboard[i][j + 1] == 2:
-                        goalmarbles += 1
-                        if board[i][j] == 2 or board[i][j + 1] == 2:
-                            correctmarbles += 1
+                test = 0
+            while j < (self.width * 2) + (1 * test):
+                if self.endboard[i][j] == 2 or self.endboard[i][j + 1] == 2:
+                    goalmarbles += 1
 
-                    j += 2
+                    if board[i][j] == 2 or board[i][j + 1] == 2:
+                        correctmarbles += 1
+
+                j += 2
 
             i += 1
+
 
         winpercentage = correctmarbles / goalmarbles
 
@@ -46,7 +46,7 @@ class SimpleAgent:
         maxreward = 0
         bestmove = 0
         for i in range(self.width * 2):
-            result = run(i, copy.deepcopy(board), True)
+            result = run(i, copy.deepcopy(board), True)["boards"][-1]
             current = simple.heuristic_simple(result)["correctmarbles"]
 
             if current > maxreward:
@@ -55,13 +55,15 @@ class SimpleAgent:
 
         return bestmove
 
-    if __name__ == "__main__":
-        __init__(self)
-        for i in range(30):
-            move = step(self, self.startboard)
-            run(move, self.startboard, False)
-            if heuristic_simple(self, self.startboard)['winpercentage'] == 1.0:
-                print('Done ' + str(i) + 'steps')
-                break
 
-        print(heuristic_simple(self, self.startboard)['winpercentage'])
+if __name__ == "__main__":
+
+    agent = SimpleAgent()
+    for i in range(30):
+        move = agent.step(agent.startboard)
+        run(move, agent.startboard, False)
+        if agent.heuristic_simple(agent.startboard)['winpercentage'] == 1.0:
+            print(i)
+            break
+
+    print(agent.heuristic_simple(agent.startboard)['winpercentage'])
