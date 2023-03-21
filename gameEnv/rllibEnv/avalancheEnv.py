@@ -23,15 +23,18 @@ class GameBoardEnv(gym.Env):
         self.height = config["height"]*2
         self.training_states = config["training_states"]
         
-        print(self.training_states)
+        #print(self.training_states)
 
         # self.observation_space = Dict({
         #     "game_board": Box(low=0, high=2, shape=(self.width, self.height), dtype=np.int8)
         # })
-        self.observation_space = Box(low=0, high=2, shape=(self.height, self.width), dtype=int)
+        self.observation_space = Dict({
+            "current": Box(low=0, high=2, shape=(self.height, self.width), dtype=int),
+            "goal": Box(low=0, high=2, shape=(self.height, self.width), dtype=int)
+        })
 
         self.n_choices = 2*config["width"]
-        print("CHOICES", self.n_choices)
+        #print("CHOICES", self.n_choices)
         self.action_space = Discrete(self.n_choices)
 
         self.current_board = np.array(self.training_states[self.training_index]["start_board"])
@@ -60,7 +63,13 @@ class GameBoardEnv(gym.Env):
         # reset env to next challenge
         self.current_board = np.array(self.training_states[self.training_index]["start_board"])
         self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
-        return self.current_board, {}
+
+        obs = {
+            "current": self.current_board,
+            "goal": self.goal_board
+        }
+
+        return obs, {}
 
     def step(self, action):
         #print("step")
@@ -84,11 +93,13 @@ class GameBoardEnv(gym.Env):
         # rewards
 
         if self.variant == "baseline":
-            reward, done = baselineReward(self)
+            reward, done = baselineReward(self, input_board)
 
-
-
+        obs = {
+            "current": input_board,
+            "goal": self.goal_board
+        }
 
         # to be changed for actual agent training
-        return input_board, reward, done, False, {}
+        return obs, reward, done, False, {}
 
