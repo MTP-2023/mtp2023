@@ -74,7 +74,8 @@ ray.init()
 config = PPOConfig()
 config.rollouts(num_rollout_workers=4)
 #config = config.training(model={"custom_model": "my_model"})
-config.training(lr=tune.grid_search([0.0001, 0.0002, 0.00001]), clip_param=tune.grid_search([0.1, 0.2, 0.3, 0.4]))
+#config.training(lr=tune.grid_search([0.0001, 0.0002, 0.00001]), clip_param=tune.grid_search([0.1, 0.2, 0.3, 0.4]))
+config = config.training(lr=0.0002, clip_param=0.3)
 config = config.environment(GameBoardEnv, env_config=env_setup)
 
 stop = {
@@ -82,11 +83,12 @@ stop = {
         #"episode_reward_mean": 0.8,
     }
 
-tune.Tuner(
-    "PPO",
-    run_config=air.RunConfig(stop=stop, local_dir="./results", name="PPO_no_model_gen_test2_new_rewards"),
-    param_space=config.to_dict(),
-).fit()
+# tune.Tuner(
+#     "PPO",
+#     run_config=air.RunConfig(stop=stop, local_dir="./results", name="PPO_no_model_gen_test2_new_rewards_big_grid_search",
+#                              checkpoint_config=air.CheckpointConfig(num_to_keep=1, checkpoint_at_end=True)),
+#     param_space=config.to_dict(),
+# ).fit()
 
 #algo = config.build()
 # for i in range(100):

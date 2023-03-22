@@ -25,5 +25,5 @@ if __name__ == "__main__":
         dict["training_states"].append({"start_board": randomBoard, "goal_board": goal, "max_turns": max_turns})
     json_object = json.dumps(dict, indent=4)
 
-    with open("../../gameVariants/baseline/training/generationTest2" + ".json", "w") as outfile:
+    with open("../../gameVariants/baseline/training/generationTest3" + ".json", "w") as outfile:
         outfile.write(json_object)
