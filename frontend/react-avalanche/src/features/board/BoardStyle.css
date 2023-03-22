@@ -93,3 +93,34 @@
 .navigation button:hover {
   color: #ccc;
 }
+
+.board__dimensions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.board__dimensions button {
+  padding: 0.2rem 0.4rem;
+  background-color: transparent;
+  height: 32px;
+  width: 32px;
+  font-size: 1.8rem;
+
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.board__dimensions .container {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.board__dimensions button:hover {
+  color: #ccc;
+}

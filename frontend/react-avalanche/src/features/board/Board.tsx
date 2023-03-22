@@ -7,6 +7,8 @@ import {
   FaChevronCircleLeft,
   FaChevronCircleRight,
   FaFastForward,
+  FaMinus,
+  FaPlus,
 } from "react-icons/fa";
 
 const Board = () => {
@@ -17,6 +19,10 @@ const Board = () => {
     errorStart,
     handleMarbleDrop,
     handleBoardChange,
+    increaseHeight,
+    decreaseHeight,
+    increaseWidth,
+    decreaseWidth,
   } = useBoard();
 
   if (loadingStart) return <div>Loading...</div>;
@@ -101,6 +107,28 @@ const Board = () => {
 
   return (
     <div className="board">
+      <div className="board__dimensions">
+        <div className="container">
+          <button onClick={() => decreaseHeight()}>
+            <FaMinus />
+          </button>
+          <p>Rows: {currentBoard.length}</p>
+          <button onClick={() => increaseHeight()}>
+            <FaPlus />
+          </button>
+        </div>
+
+        <div className="container">
+          <button onClick={() => decreaseWidth()}>
+            <FaMinus />
+          </button>
+          <p>Columns: {currentBoard[0].length}</p>
+          <button onClick={() => increaseWidth()}>
+            <FaPlus />
+          </button>
+        </div>
+      </div>
+
       <div className="navigation">
         <button onClick={() => handleBoardChange("back")}>
           <FaChevronCircleLeft />

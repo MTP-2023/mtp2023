@@ -11,6 +11,8 @@ const useBoardContext = () => {
   const [loadingDrop, setLoadingDrop] = React.useState<boolean>(false);
   const [errorDrop, setErrorDrop] = React.useState<boolean>(false);
   const [boardIndex, setBoardIndex] = React.useState<number>(0);
+  const [width, setWidth] = React.useState<number>(3);
+  const [height, setHeight] = React.useState<number>(2);
 
   React.useEffect(() => {
     setCurrentBoard(boards[boardIndex]);
@@ -32,8 +34,24 @@ const useBoardContext = () => {
   }, []);
 
   React.useEffect(() => {
-    getBoard(3, 2);
-  }, []);
+    getBoard(width, height);
+  }, [width, height]);
+
+  const increaseWidth = () => {
+    setWidth((prev) => prev + 1);
+  };
+
+  const decreaseWidth = () => {
+    if (width > 3) setWidth((prev) => prev - 1);
+  };
+
+  const increaseHeight = () => {
+    setHeight((prev) => prev + 1);
+  };
+
+  const decreaseHeight = () => {
+    if (height > 2) setHeight((prev) => prev - 1);
+  };
 
   const handleMarbleDrop = async (column: number) => {
     if (loadingDrop) return;
@@ -85,6 +103,10 @@ const useBoardContext = () => {
     setCurrentMarbles,
     handleMarbleDrop,
     handleBoardChange,
+    increaseWidth,
+    decreaseWidth,
+    increaseHeight,
+    decreaseHeight,
   };
 };
 
@@ -99,6 +121,10 @@ const initialState: UseBoardContextType = {
   errorStart: false,
   handleMarbleDrop: (column: number) => Promise.resolve(),
   handleBoardChange: (action: string) => Promise.resolve(),
+  increaseHeight: () => {},
+  decreaseHeight: () => {},
+  increaseWidth: () => {},
+  decreaseWidth: () => {},
 };
 
 export const BoardContext =
@@ -125,6 +151,10 @@ type useBoardType = {
   setCurrentMarbles: (marbles: [[]]) => void;
   handleMarbleDrop: (column: number) => void;
   handleBoardChange: (action: string) => void;
+  increaseHeight: () => void;
+  decreaseHeight: () => void;
+  increaseWidth: () => void;
+  decreaseWidth: () => void;
 };
 
 export const useBoard = (): useBoardType => {
@@ -137,6 +167,10 @@ export const useBoard = (): useBoardType => {
     errorStart,
     handleMarbleDrop,
     handleBoardChange,
+    increaseHeight,
+    decreaseHeight,
+    increaseWidth,
+    decreaseWidth,
   } = React.useContext(BoardContext);
   return {
     currentBoard,
@@ -147,5 +181,9 @@ export const useBoard = (): useBoardType => {
     errorStart,
     handleMarbleDrop,
     handleBoardChange,
+    increaseHeight,
+    decreaseHeight,
+    increaseWidth,
+    decreaseWidth,
   };
 };
