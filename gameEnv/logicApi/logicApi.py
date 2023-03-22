@@ -39,6 +39,12 @@ async def root():
 async def randomBoard(width: int = 4, height: int = 4):
     return generate_random_board(width, height)
 
+@app.get("/staticboard")
+async def staticBoard():
+    return [[0,0,1,1,0,1,0,0],
+        [1,0,0,1,1,0,1,0],
+        [0,1,0,0,1,0,1,0],
+        [1,0,1,0,1,0,0,1]]
 
 @app.post("/interpret/")
 async def runSimulation(gameBoard: SimulationDTO):
