@@ -1,40 +1,64 @@
 import React from "react";
-import leftImg from "../../assets/left.gif";
 import "./BoardStyle.css";
 import Switcher from "./components/switcher/Switcher";
+import MarblePos from "./components/marble_state_row/MarblePos";
 import { useBoard } from "./context/BoardContext";
 
 const Board = () => {
-  const { board, loadingStart, errorStart, handleMarbleDrop } = useBoard();
+  const { currentBoard, currentMarbles, loadingStart, errorStart, handleMarbleDrop, handleBoardChange } = useBoard();
 
   if (loadingStart) return <div>Loading...</div>;
 
   if (errorStart) return <div>Error</div>;
 
+  const marbleRows: (string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined)[] = [];
+
   const buildedBoard = [];
 
-  for (let row = 0; row < board.length; row++) {
+  //console.log(currentBoard, currentMarbles)
+
+  for (let row = 0; row < currentBoard.length; row++) {
+    const marbleRow = [];
+    // build marbles html
+    for(let col = 0; col < currentBoard[row].length; col += 1) {
+      let exists = false;
+      if (currentMarbles.length > 0 && currentMarbles[0].length > 0) {
+        for (let marble of currentMarbles){
+          //console.log("CHECK", currentMarbles, marble)
+          if (marble[0] == row && marble[1] == col) {
+            //print("FOUND", marble)
+            exists = true;
+            break;
+          }
+        }
+      }
+      const obj = <MarblePos key = {col} state = {exists}/>;
+      // console.log(exists, obj);
+      marbleRow.push(obj);
+    }
+    marbleRows.push(marbleRow);
+
     const buildedRow = [];
     let key = 0;
     if (row % 2 === 0) {
-      for (let col = 1; col < board[row].length - 1; col += 2) {
+      for (let col = 1; col < currentBoard[row].length - 1; col += 2) {
         key++;
         buildedRow.push(
           <Switcher
             key={key}
-            left={board[row][col]}
-            right={board[row][col + 1]}
+            left={currentBoard[row][col]}
+            right={currentBoard[row][col + 1]}
           />
         );
       }
     } else {
-      for (let col = 0; col < board[row].length; col += 2) {
+      for (let col = 0; col < currentBoard[row].length; col += 2) {
         key++;
         buildedRow.push(
           <Switcher
             key={key}
-            left={board[row][col]}
-            right={board[row][col + 1]}
+            left={currentBoard[row][col]}
+            right={currentBoard[row][col + 1]}
           />
         );
       }
@@ -44,7 +68,7 @@ const Board = () => {
 
   const buttons = [];
 
-  for (let i = 1; i < board[0].length - 1; i++) {
+  for (let i = 1; i < currentBoard[0].length - 1; i++) {
     buttons.push(
       <button onClick={() => handleMarbleDrop(i - 1)} key={i}>
         {i}
@@ -52,8 +76,17 @@ const Board = () => {
     );
   }
 
+  //console.log(marbleRows, buildedBoard)
+
   return (
     <div className="board">
+
+      <div className="navigation">
+        <button onClick={() => handleBoardChange("back")}>Prev</button>
+        <button onClick={() => handleBoardChange("forward")}>Next</button>
+        <button onClick={() => handleBoardChange("last")}>Final</button>
+      </div>
+
       <div className="board__switches__row--displace board__buttons">
         {buttons.map((button, index) => (
           <div key={index}>{button}</div>
@@ -62,6 +95,8 @@ const Board = () => {
 
       <div className="board__switches">
         {buildedBoard.map((row, index) => (
+          <React.Fragment>
+            <div className="marble_row" key={"marble"+index}>{marbleRows[index]}</div>
           <div
             key={index}
             className={`board__switches__row ${
@@ -70,6 +105,7 @@ const Board = () => {
           >
             {row}
           </div>
+          </React.Fragment>
         ))}
       </div>
     </div>

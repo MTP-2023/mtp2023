@@ -55,3 +55,14 @@
   right: 0;
   top: 30px;
 }
+
+.marble_row {
+  min-height: 20px;
+  overflow: hidden;
+  display: flex;
+}
+
+.marbleRowElement {
+  width: 12.5%;
+  text-align: center;
+}

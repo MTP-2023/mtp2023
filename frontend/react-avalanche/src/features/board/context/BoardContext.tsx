@@ -2,17 +2,24 @@ import React from "react";
 import { calculateBoard, fetchBoard } from "../../../api/publicApi";
 
 const useBoardContext = () => {
-  const [board, setBoard] = React.useState<[[]]>([[]]);
+  const [boards, setBoards] = React.useState<[[[]]]>([[[]]]);
+  const [currentBoard, setCurrentBoard] = React.useState<[[]]>([[]]);
+  const [marbles, setMarbles] = React.useState<[[[]]]>([[[]]]);
+  const [currentMarbles, setCurrentMarbles] = React.useState<[[]]>([[]]);
   const [loadingStart, setLoadingStart] = React.useState<boolean>(false);
   const [errorStart, setError] = React.useState<boolean>(false);
   const [loadingDrop, setLoadingDrop] = React.useState<boolean>(false);
   const [errorDrop, setErrorDrop] = React.useState<boolean>(false);
+  const [boardIndex, setBoardIndex] = React.useState<number>(0);
 
   const getBoard = React.useCallback(async (width: number, height: number) => {
     setLoadingStart(true);
     try {
       const data = await fetchBoard(width, height);
-      setBoard(data);
+      //console.log(data)
+      setCurrentBoard(data);
+      setCurrentMarbles([[]]);
+      setBoardIndex(0);
     } catch (e) {
       setError(true);
     }
@@ -26,12 +33,42 @@ const useBoardContext = () => {
   const handleMarbleDrop = async (column: number) => {
     setLoadingDrop(true);
     try {
-      const newBoard = await calculateBoard(board, column);
+      const newBoard = await calculateBoard(currentBoard, column);
       console.log(newBoard);
       const boards = newBoard.boards;
-      setBoard(boards[boards.length - 1]);
+      setBoards(boards);
+      setCurrentBoard(boards[0]);
+      const marbles = newBoard.marbles;
+      marbles.push([]);
+      console.log(marbles)
+      setMarbles(marbles);
+      setCurrentMarbles(marbles[0]);
+      const boardIndex = 0;
+      setBoardIndex(boardIndex);
     } catch (e) {
       setErrorDrop(true);
+    }
+    setLoadingDrop(false);
+  };
+
+  const handleBoardChange = async (action: string) => {
+    setLoadingDrop(true);
+    try {
+      if (action == "back" && boardIndex > 0) {
+        console.log("prev")
+        setBoardIndex(boardIndex-1);
+        
+      } else if (action == "forward" && boardIndex < boards.length-1) {
+        console.log("next")
+        setBoardIndex(boardIndex+1);
+      } else if (action == "last") {
+        console.log("last")
+        setBoardIndex(boards.length-1);
+      }
+      setCurrentBoard(boards[boardIndex]);
+      setCurrentMarbles(marbles[boardIndex]);
+    } catch (e) {
+      console.log("Board change failed")
     }
     setLoadingDrop(false);
   };
@@ -39,20 +76,26 @@ const useBoardContext = () => {
   return {
     loadingStart,
     errorStart,
-    board,
-    setBoard,
+    currentBoard,
+    setCurrentBoard,
+    currentMarbles,
+    setCurrentMarbles,
     handleMarbleDrop,
+    handleBoardChange
   };
 };
 
 type UseBoardContextType = ReturnType<typeof useBoardContext>;
 
 const initialState: UseBoardContextType = {
-  board: [[]],
-  setBoard: () => {},
+  currentBoard: [[]],
+  setCurrentBoard: () => {},
+  currentMarbles: [[]],
+  setCurrentMarbles: () => {},
   loadingStart: false,
   errorStart: false,
   handleMarbleDrop: (column: number) => Promise.resolve(),
+  handleBoardChange: (action: string) => Promise.resolve()
 };
 
 export const BoardContext =
@@ -73,13 +116,16 @@ export const BoardProvider: React.FC<BoardProps> = ({ children }) => {
 type useBoardType = {
   loadingStart: boolean;
   errorStart: boolean;
-  board: [[]];
-  setBoard: (board: [[]]) => void;
+  currentBoard: [[]];
+  setCurrentBoard: (board: [[]]) => void;
+  currentMarbles : [[]];
+  setCurrentMarbles: (marbles: [[]]) => void;
   handleMarbleDrop: (column: number) => void;
+  handleBoardChange: (action: string) => void;
 };
 
 export const useBoard = (): useBoardType => {
-  const { board, setBoard, loadingStart, errorStart, handleMarbleDrop } =
+  const { currentBoard, setCurrentBoard, currentMarbles, setCurrentMarbles, loadingStart, errorStart, handleMarbleDrop, handleBoardChange } =
     React.useContext(BoardContext);
-  return { board, setBoard, loadingStart, errorStart, handleMarbleDrop };
+  return { currentBoard, setCurrentBoard, currentMarbles, setCurrentMarbles, loadingStart, errorStart, handleMarbleDrop, handleBoardChange };
 };
