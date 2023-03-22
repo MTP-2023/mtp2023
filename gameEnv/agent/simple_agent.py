@@ -7,7 +7,7 @@ from gameVariants.baseline.reward import simple_agent_reward
 class SimpleAgent:
 
     def __init__(self):
-        with open('../../gameVariants/baseline/training/generationTest.json') as json_file:
+        with open('../../gameVariants/baseline/training/generationTest2.json') as json_file:
             data = json.load(json_file)
         arraydata = data['training_states']
         self.startboards = []

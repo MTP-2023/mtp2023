@@ -14,6 +14,7 @@ class Node:
         self.wins = 0
         self.move = 0
         self.createdChildren = []
+        self.depth = 0
 
     def select_child(self, exploration_constant):
         log_total = math.log(sum(child.visits for child in self.children))
@@ -30,6 +31,7 @@ class Node:
 
     def expand(self, state):
         child = Node(state, parent=self)
+        child.depth = self.depth + 1
         self.children.append(child)
 
         return child
@@ -48,10 +50,10 @@ def mcts(root_state, max_iterations, exploration_constant, goalstate, width, hei
             node = node.select_child(exploration_constant)
             state = node.state
         if not node.visits:
-            result = simulate(state, width, height, max_steps, i, goalstate)
+            result = simulate(state, width, height, max_steps, node.depth, goalstate)
             node.update(result)
             continue
-        if is_terminal(state, width, height, goalstate, i+1, max_steps):
+        if is_terminal(state, width, height, goalstate, node.depth, max_steps):
             result = evaluate(state, goalstate)
             node.update(result)
             continue
@@ -59,16 +61,16 @@ def mcts(root_state, max_iterations, exploration_constant, goalstate, width, hei
         while move in node.createdChildren:
             move = random.randint(0, width)
         node.createdChildren.append(move)
-        state = generate_child_state(state, width)
+        state = generate_child_state(copy.deepcopy(state), width)
         if state:
             #print("adding child", move)
-            node = node.expand(copy.deepcopy(state))
+            node = node.expand(state)
             node.move = move
-            result = simulate(state, width, height, max_steps, i, goalstate)
+            result = simulate(copy.deepcopy(state), width, height, max_steps, node.depth, goalstate)
             node.update(result)
             #print(node.state)
             continue
-    print(len(root_node.children))
+    #print(len(root_node.children))
     best_child = max(root_node.children, key=lambda child: child.visits)
     return best_child.move
 
@@ -86,18 +88,20 @@ def simulate(state, width, height, max_steps, i, goalstate):
 def is_terminal(state, width, height, goal_board, stepsTaken, maxSteps):
     # Return True if the given state is terminal (i.e., the game is over), False otherwise
     done = True
-
+    #print(stepsTaken)
+    #print(maxSteps)
     if stepsTaken == maxSteps:
         return True
 
     i = 0
+    #print(state)
     while i < height:
         j = 0
         test = 1
         if i % 2 == 0:
             j = 1
             test = 0
-        while j < width + (1 * test):
+        while j < width + (2 * test):
             if goal_board[i][j] == 2 or goal_board[i][j + 1] == 2:
                 if state[i][j] != 2 and state[i][j + 1] != 2:
                     done = False
@@ -163,12 +167,13 @@ if __name__ == "__main__":
         endboard = endboards[j]
         max_step = max_steps[j]
         for i in range(max_step):
-            move = mcts(copy.deepcopy(startboard), 40, math.sqrt(2), endboard, width, height, max_step - i)
-            print("making move", move)
+            move = mcts(copy.deepcopy(startboard), 1000, math.sqrt(2), endboard, width, height, max_step - i)
             run(move, startboard, False)
-            if is_terminal(startboards, width, height, endboard, i, max_step):
+            if evaluate(startboard, endboard):
                 print("Solved in ", i, "steps")
+                totalwins += 1
                 break
+        #print("challenge", j, "failed")
     print('totalwins ', totalwins, 'out of', j + 1)
     percent = totalwins / (j + 1)
     print('percent', percent)
