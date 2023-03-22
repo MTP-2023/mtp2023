@@ -56,6 +56,10 @@
   top: 30px;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .marble_row {
   min-height: 20px;
   overflow: hidden;
@@ -63,6 +67,29 @@
 }
 
 .marbleRowElement {
-  width: 12.5%;
+  width: 36px;
   text-align: center;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.navigation button {
+  padding: 0.2rem 0.4rem;
+  background-color: transparent;
+  height: 32px;
+  width: 32px;
+  font-size: 1.8rem;
+
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.navigation button:hover {
+  color: #ccc;
 }

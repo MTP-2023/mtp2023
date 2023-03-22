@@ -12,6 +12,11 @@ const useBoardContext = () => {
   const [errorDrop, setErrorDrop] = React.useState<boolean>(false);
   const [boardIndex, setBoardIndex] = React.useState<number>(0);
 
+  React.useEffect(() => {
+    setCurrentBoard(boards[boardIndex]);
+    setCurrentMarbles(marbles[boardIndex]);
+  }, [boardIndex]);
+
   const getBoard = React.useCallback(async (width: number, height: number) => {
     setLoadingStart(true);
     try {
@@ -31,6 +36,8 @@ const useBoardContext = () => {
   }, []);
 
   const handleMarbleDrop = async (column: number) => {
+    if (loadingDrop) return;
+    if (boardIndex != boards.length - 1) return;
     setLoadingDrop(true);
     try {
       const newBoard = await calculateBoard(currentBoard, column);
@@ -40,7 +47,7 @@ const useBoardContext = () => {
       setCurrentBoard(boards[0]);
       const marbles = newBoard.marbles;
       marbles.push([]);
-      console.log(marbles)
+      console.log(marbles);
       setMarbles(marbles);
       setCurrentMarbles(marbles[0]);
       const boardIndex = 0;
@@ -52,25 +59,21 @@ const useBoardContext = () => {
   };
 
   const handleBoardChange = async (action: string) => {
-    setLoadingDrop(true);
-    try {
-      if (action == "back" && boardIndex > 0) {
-        console.log("prev")
-        setBoardIndex(boardIndex-1);
-        
-      } else if (action == "forward" && boardIndex < boards.length-1) {
-        console.log("next")
-        setBoardIndex(boardIndex+1);
-      } else if (action == "last") {
-        console.log("last")
-        setBoardIndex(boards.length-1);
-      }
-      setCurrentBoard(boards[boardIndex]);
-      setCurrentMarbles(marbles[boardIndex]);
-    } catch (e) {
-      console.log("Board change failed")
+    if (action == "back" && boardIndex > 0) {
+      console.log("prev");
+      console.log(boardIndex);
+      console.log(boards);
+      setBoardIndex((prev) => prev - 1);
+    } else if (action == "forward" && boardIndex < boards.length - 1) {
+      console.log("next");
+      console.log(boardIndex);
+      console.log(boards);
+      setBoardIndex((prev) => prev + 1);
+    } else if (action == "last") {
+      console.log("last");
+      console.log(boardIndex);
+      setBoardIndex(boards.length - 1);
     }
-    setLoadingDrop(false);
   };
 
   return {
@@ -81,7 +84,7 @@ const useBoardContext = () => {
     currentMarbles,
     setCurrentMarbles,
     handleMarbleDrop,
-    handleBoardChange
+    handleBoardChange,
   };
 };
 
@@ -95,7 +98,7 @@ const initialState: UseBoardContextType = {
   loadingStart: false,
   errorStart: false,
   handleMarbleDrop: (column: number) => Promise.resolve(),
-  handleBoardChange: (action: string) => Promise.resolve()
+  handleBoardChange: (action: string) => Promise.resolve(),
 };
 
 export const BoardContext =
@@ -118,14 +121,31 @@ type useBoardType = {
   errorStart: boolean;
   currentBoard: [[]];
   setCurrentBoard: (board: [[]]) => void;
-  currentMarbles : [[]];
+  currentMarbles: [[]];
   setCurrentMarbles: (marbles: [[]]) => void;
   handleMarbleDrop: (column: number) => void;
   handleBoardChange: (action: string) => void;
 };
 
 export const useBoard = (): useBoardType => {
-  const { currentBoard, setCurrentBoard, currentMarbles, setCurrentMarbles, loadingStart, errorStart, handleMarbleDrop, handleBoardChange } =
-    React.useContext(BoardContext);
-  return { currentBoard, setCurrentBoard, currentMarbles, setCurrentMarbles, loadingStart, errorStart, handleMarbleDrop, handleBoardChange };
+  const {
+    currentBoard,
+    setCurrentBoard,
+    currentMarbles,
+    setCurrentMarbles,
+    loadingStart,
+    errorStart,
+    handleMarbleDrop,
+    handleBoardChange,
+  } = React.useContext(BoardContext);
+  return {
+    currentBoard,
+    setCurrentBoard,
+    currentMarbles,
+    setCurrentMarbles,
+    loadingStart,
+    errorStart,
+    handleMarbleDrop,
+    handleBoardChange,
+  };
 };

@@ -3,15 +3,36 @@ import "./BoardStyle.css";
 import Switcher from "./components/switcher/Switcher";
 import MarblePos from "./components/marble_state_row/MarblePos";
 import { useBoard } from "./context/BoardContext";
+import {
+  FaChevronCircleLeft,
+  FaChevronCircleRight,
+  FaFastForward,
+} from "react-icons/fa";
 
 const Board = () => {
-  const { currentBoard, currentMarbles, loadingStart, errorStart, handleMarbleDrop, handleBoardChange } = useBoard();
+  const {
+    currentBoard,
+    currentMarbles,
+    loadingStart,
+    errorStart,
+    handleMarbleDrop,
+    handleBoardChange,
+  } = useBoard();
 
   if (loadingStart) return <div>Loading...</div>;
 
   if (errorStart) return <div>Error</div>;
 
-  const marbleRows: (string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined)[] = [];
+  const marbleRows: (
+    | string
+    | number
+    | boolean
+    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+    | React.ReactFragment
+    | React.ReactPortal
+    | null
+    | undefined
+  )[] = [];
 
   const buildedBoard = [];
 
@@ -20,10 +41,10 @@ const Board = () => {
   for (let row = 0; row < currentBoard.length; row++) {
     const marbleRow = [];
     // build marbles html
-    for(let col = 0; col < currentBoard[row].length; col += 1) {
+    for (let col = 0; col < currentBoard[row].length; col += 1) {
       let exists = false;
       if (currentMarbles.length > 0 && currentMarbles[0].length > 0) {
-        for (let marble of currentMarbles){
+        for (let marble of currentMarbles) {
           //console.log("CHECK", currentMarbles, marble)
           if (marble[0] == row && marble[1] == col) {
             //print("FOUND", marble)
@@ -32,7 +53,7 @@ const Board = () => {
           }
         }
       }
-      const obj = <MarblePos key = {col} state = {exists}/>;
+      const obj = <MarblePos key={col} state={exists} />;
       // console.log(exists, obj);
       marbleRow.push(obj);
     }
@@ -80,11 +101,18 @@ const Board = () => {
 
   return (
     <div className="board">
-
       <div className="navigation">
-        <button onClick={() => handleBoardChange("back")}>Prev</button>
-        <button onClick={() => handleBoardChange("forward")}>Next</button>
-        <button onClick={() => handleBoardChange("last")}>Final</button>
+        <button onClick={() => handleBoardChange("back")}>
+          <FaChevronCircleLeft />
+        </button>
+
+        <button onClick={() => handleBoardChange("forward")}>
+          <FaChevronCircleRight />
+        </button>
+
+        <button onClick={() => handleBoardChange("last")}>
+          <FaFastForward />
+        </button>
       </div>
 
       <div className="board__switches__row--displace board__buttons">
@@ -96,15 +124,17 @@ const Board = () => {
       <div className="board__switches">
         {buildedBoard.map((row, index) => (
           <React.Fragment>
-            <div className="marble_row" key={"marble"+index}>{marbleRows[index]}</div>
-          <div
-            key={index}
-            className={`board__switches__row ${
-              index % 2 === 0 && "board__switches__row--displace"
-            }`}
-          >
-            {row}
-          </div>
+            <div className="marble_row" key={"marble" + index}>
+              {marbleRows[index]}
+            </div>
+            <div
+              key={index}
+              className={`board__switches__row ${
+                index % 2 === 0 && "board__switches__row--displace"
+              }`}
+            >
+              {row}
+            </div>
           </React.Fragment>
         ))}
       </div>
