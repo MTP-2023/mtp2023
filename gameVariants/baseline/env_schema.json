@@ -1,0 +1,61 @@
+{
+  "$id": "baseline",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GameEnv",
+  "type": "object",
+  "properties": {
+    "width": {
+      "type": "integer",
+      "description": "Define the # of switches in the first row of the game board. The second row automatically contains #+1 switches.",
+      "minimum": 1
+    },
+    "height": {
+      "type": "integer",
+      "description": "Define the number of row-pairs of the game board. E.g., setting the default setting of two means that there are four rows in total.",
+      "minimum": 1
+    },
+    "training_states": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/training_item"
+      }
+    }
+  },
+  "$defs": {
+    "training_item": {
+      "type": "object",
+      "required": [
+        "start_board",
+        "goal_board",
+        "max_turns"
+      ],
+      "properties": {
+        "start_board": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "description": "Define the initial state of the game board (must be aligned with width and height properties)."
+        },
+        "goal_board": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "description": "Define the goal state of the game board (must be aligned with width and height properties)."
+        },
+        "max_turn": {
+          "type": "integer",
+          "description": "The maximum number of turns the agent is allowed to take in this challenge.",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}
