@@ -96,7 +96,7 @@ class GameBoardEnv(gym.Env):
         # rewards
 
         if self.variant == "baseline":
-            reward, done = baselineReward(self, input_board)
+            reward, done = baselineReward(self.n_steps, self.max_steps, self.height, self.width, self.goal_board, input_board)
 
         obs = {
             "current": input_board,

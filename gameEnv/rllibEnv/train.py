@@ -34,14 +34,18 @@ import json
 import jsonschema
 from model import CustomModel
 
+#we use argparse so you can configure the training settings from the command line call of the script like so:
+#python train.py --variant baseline --train_on generationTest2
 parser = argparse.ArgumentParser()
 
+#argument to set which game variant/rules you want to train an agent for
 parser.add_argument(
     "--variant",
     default="baseline",
     help="The name of the variant has to match the respective folder name."
 )
 
+#argument to set the training scenarios for the agent
 parser.add_argument(
     "--train_on",
     default="test",
@@ -52,39 +56,54 @@ args = parser.parse_args()
 path = "../../gameVariants/" + args.variant
 training_path = path + "/training/" + args.train_on
 
+#we use a json schema to check if all the training scenarios are formatted correctly
 schema = json.load(open(path+"/env_schema.json"))
 
-# load all train examples into a list
+# load all train examples into a list and validate them
 env_setup = json.load(open(training_path + ".json"))
 try:
     jsonschema.validate(env_setup, schema)
 except Exception as e:
     print(e)
 
+#we use this to pass the game variant selection to the environment
 env_setup["variant"] = args.variant
 
 #print(env_setup)
 
+#register custom model from model.py
 ModelCatalog.register_custom_model(
     "my_model", CustomModel
 )
 
+#initialize ray
 ray.init()
 
+#initialize our optimization algorithm (PPO in this case)
 config = PPOConfig()
+#configure the algorithm's settings
 config.rollouts(num_rollout_workers=4)
+#uncomment to use the custom model
 #config = config.training(model={"custom_model": "my_model"})
-config.training(lr=tune.grid_search([0.0001, 0.0002, 0.00001]), clip_param=tune.grid_search([0.1, 0.2, 0.3, 0.4]))
+#this shows how to define a grid search over various parameters
+#config.training(lr=tune.grid_search([0.0001, 0.0002, 0.00001]), clip_param=tune.grid_search([0.1, 0.2, 0.3, 0.4]))
+config = config.training(lr=0.0002, clip_param=0.3)
+#configuring the game environment
 config = config.environment(GameBoardEnv, env_config=env_setup)
 
+#stopping conditions, these are assumed to be increasing by ray tune (meaning we can't use metrics we want to decrease, e.g. episode length, as stopping criteria)
 stop = {
-        "training_iteration": 300,
-        #"episode_reward_mean": 0.8,
+        #"training_iteration": 500,
+        "episode_reward_mean": 2,
     }
 
+#start a training run, make sure you indicate the correct optimization algorithm
+#local dir and name define where training results and checkpoints are saved to
+#checkpoint config defines if and when checkpoints are saved
 tune.Tuner(
     "PPO",
-    run_config=air.RunConfig(stop=stop, local_dir="./results", name="PPO_no_model_gen_test2_new_rewards"),
+    run_config=air.RunConfig(stop=stop, local_dir="./results", name="PPO_no_model_gen_test3_newer_rewards",
+                             checkpoint_config=air.CheckpointConfig(num_to_keep=1, checkpoint_at_end=True)),
     param_space=config.to_dict(),
 ).fit()
 
