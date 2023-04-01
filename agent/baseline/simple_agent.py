@@ -4,7 +4,7 @@ import copy
 import sys
 sys.path.append('../../')
 from gameVariants.baseline.reward import simple_agent_reward
-from gameEnv.simulation.simulate import run
+from gameResources.simulation.simulate import run
 
 
 class SimpleAgent:

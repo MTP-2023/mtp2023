@@ -8,8 +8,8 @@ import sys
 
 sys.path.append("../../")
 from gameVariants.baseline.reward import baselineReward
-from gameEnv.simulation.simulate import run
-from gameEnv.rllibEnv import avalancheEnv
+from gameResources.simulation.simulate import run
+from agent.rl import avalancheEnv
 from collections import OrderedDict
 
 # policy = Policy.from_checkpoint(
