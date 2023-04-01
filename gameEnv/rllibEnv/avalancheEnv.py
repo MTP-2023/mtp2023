@@ -5,10 +5,11 @@ import random
 import numpy as np
 import json
 import sys
-sys.path.append('../')
+#sys.path.append('../')
 sys.path.append('../../')
 from gameEnv.simulation.simulate import run
 # maybe change this import to be based on received game variant name later
+
 from gameVariants.baseline.reward import baselineReward
 
 class GameBoardEnv(gym.Env):
