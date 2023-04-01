@@ -1,0 +1,6 @@
+Variant Name: Baseline
+
+Description: A goal board is provided which specifies which switches should hold a marble in the end.
+A start board is provided which should satisfy the goal after throwing marbles into the game.
+
+Not relevant: switch positions (left or right), marble colors, marble count
