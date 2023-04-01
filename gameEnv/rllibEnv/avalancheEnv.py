@@ -7,7 +7,7 @@ import json
 import sys
 sys.path.append('../')
 sys.path.append('../../')
-from simulation.simulate import run
+from gameEnv.simulation.simulate import run
 # maybe change this import to be based on received game variant name later
 from gameVariants.baseline.reward import baselineReward
 
