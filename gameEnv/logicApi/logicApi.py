@@ -30,15 +30,12 @@ class SimulationDTO(BaseModel):
     marble_throw: int
     board: list
 
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
+# request new random board
 @app.get("/randomboard")
 async def randomBoard(width: int = 4, height: int = 4):
     return generate_random_board(width, height)
 
+# get some fixed board
 @app.get("/staticboard")
 async def staticBoard():
     return [[0,0,1,1,0,1,0,0],
@@ -46,6 +43,7 @@ async def staticBoard():
         [0,1,0,0,1,0,1,0],
         [1,0,1,0,1,0,0,1]]
 
+# request to simulate a throw, return game board and marble states
 @app.post("/interpret/")
 async def runSimulation(gameBoard: SimulationDTO):
     updatedStates = run(gameBoard.marble_throw, gameBoard.board, return_intermediate_data = True)
