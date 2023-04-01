@@ -1,0 +1,126 @@
+.switch img {
+  filter: grayscale(100%) contrast(10) blur(0.5px);
+}
+
+.board__switches__row {
+  display: flex;
+}
+
+.board__switches__row--displace {
+  margin-left: 36px;
+}
+
+.board__buttons {
+  margin-bottom: 0.4rem;
+  display: flex;
+}
+
+.board__buttons button {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px;
+  border-style: solid;
+  border-color: #000;
+  border-radius: 100%;
+  transition: all 0.15s ease-in-out;
+}
+
+.board__buttons button:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.switch {
+  position: relative;
+}
+
+.ball {
+  width: 24px;
+  height: 24px;
+  border-radius: 100%;
+  background-color: #000;
+  position: absolute;
+  z-index: 20;
+  filter: blur(0.6px);
+}
+
+.ball--left {
+  left: 0;
+  top: 30px;
+}
+
+.ball--right {
+  right: 0;
+  top: 30px;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.marble_row {
+  min-height: 20px;
+  overflow: hidden;
+  display: flex;
+}
+
+.marbleRowElement {
+  width: 36px;
+  text-align: center;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.navigation button {
+  padding: 0.2rem 0.4rem;
+  background-color: transparent;
+  height: 32px;
+  width: 32px;
+  font-size: 1.8rem;
+
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.navigation button:hover {
+  color: #ccc;
+}
+
+.board__dimensions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.board__dimensions button {
+  padding: 0.2rem 0.4rem;
+  background-color: transparent;
+  height: 32px;
+  width: 32px;
+  font-size: 1.8rem;
+
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.board__dimensions .container {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.board__dimensions button:hover {
+  color: #ccc;
+}
