@@ -32,9 +32,7 @@ import json
 import jsonschema
 from model import CustomModel
 
-import sys
-sys.path.append('../../')
-from gameEnv.rllibEnv.avalancheEnv import GameBoardEnv
+from avalancheEnv import GameBoardEnv
 
 
 #we use argparse so you can configure the training settings from the command line call of the script like so:
