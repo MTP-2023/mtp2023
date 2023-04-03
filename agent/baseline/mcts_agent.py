@@ -43,60 +43,70 @@ class Node:
         self.wins += result
 
 
+def propagate(node, result):
+    while (node.parent):
+        node.update(result)
+        node = node.parent
+
+
 def mcts(root_state, max_iterations, exploration_constant, goalstate, width, height, max_steps):
     root_node = Node(root_state)
     for i in range(max_iterations):
         node = root_node
         state = root_state
-        while node.children:
+        while len(node.children) == width:
             node = node.select_child(exploration_constant)
             state = node.state
-        if not node.visits:
-            result = simulate(state, width, height, max_steps, node.depth, goalstate)
-            node.update(result)
+        if evaluate(node.state, goalstate) == 1:
+            #print("found a winner")
+            propagate(node, 100)
             continue
-        if is_terminal(state, width, height, goalstate, node.depth, max_steps):
-            result = evaluate(state, goalstate)
-            node.update(result)
-            continue
-        move = random.randint(0, width)
-        while move in node.createdChildren:
-            move = random.randint(0, width)
-        node.createdChildren.append(move)
-        state = generate_child_state(copy.deepcopy(state), width)
-        if state:
-            #print("adding child", move)
-            node = node.expand(state)
-            node.move = move
-            result = simulate(copy.deepcopy(state), width, height, max_steps, node.depth, goalstate)
-            node.update(result)
-            #print(node.state)
-            continue
-    #print(len(root_node.children))
+        child = createChild(node)
+        result = simulate(copy.deepcopy(child.state), width, height, max_steps, node.depth, goalstate)
+        propagate(child, result)
+    # print(len(root_node.children))
+    #for child in root_node.children:
+        #print("child visists", child.visits)
     best_child = max(root_node.children, key=lambda child: child.visits)
     return best_child.move
+
+
+def createChild(root):
+    move = random.randint(0, width)
+    while move in root.createdChildren:
+        move = random.randint(0, width)
+    root.createdChildren.append(move)
+    newState = run(move, copy.deepcopy(root.state), False)
+    child = Node(newState, root)
+    child.move = move
+    child.depth = root.depth + 1
+    root.children.append(child)
+    return child
 
 
 def simulate(state, width, height, max_steps, i, goalstate):
     # Play out a random game from the given state and return the result
     # For example, if it's a game, make random moves until the game is over and return the winner
-    while not is_terminal(state, width, height, goalstate, i+1, max_steps) and i < max_steps:
+    while not is_terminal(state, width, height, goalstate, i + 1, max_steps) and i < max_steps:
         run(random.randint(0, width), copy.deepcopy(state), False)
         i += 1
 
-    return is_terminal(state, width, height, goalstate, i+1, max_steps)
+    result = evaluate(state, goalstate)
+    #if result == 1:
+        #print("simulated win")
+    return result
 
 
 def is_terminal(state, width, height, goal_board, stepsTaken, maxSteps):
     # Return True if the given state is terminal (i.e., the game is over), False otherwise
     done = True
-    #print(stepsTaken)
-    #print(maxSteps)
+    # print(stepsTaken)
+    # print(maxSteps)
     if stepsTaken == maxSteps:
         return True
 
     i = 0
-    #print(state)
+    # print(state)
     while i < height:
         j = 0
         test = 1
@@ -118,6 +128,8 @@ def is_terminal(state, width, height, goal_board, stepsTaken, maxSteps):
 def evaluate(state, goal_board):
     # Evaluate the given state and return a score between 0 and 1 that represents the player's chance of winning
     i = 0
+    requiredMarbles = 0
+    correctMarbles = 0
     done = True
     while i < height:
         j = 0
@@ -127,13 +139,18 @@ def evaluate(state, goal_board):
             test = 0
         while j < width + (1 * test):
             if goal_board[i][j] == 2 or goal_board[i][j + 1] == 2:
+                requiredMarbles += 1
                 if state[i][j] != 2 and state[i][j + 1] != 2:
                     done = False
                     break
+                else:
+                    correctMarbles += 1
             j += 2
         if not done:
             break
         i += 1
+    # result = correctMarbles / requiredMarbles
+    # return result
     return 1 if done else 0
 
 
@@ -170,13 +187,13 @@ if __name__ == "__main__":
         max_step = max_steps[j]
         for i in range(max_step):
             move = mcts(copy.deepcopy(startboard), 1000, math.sqrt(2), endboard, width, height, max_step - i)
+            # print("making move", move)
             run(move, startboard, False)
             if evaluate(startboard, endboard):
                 print("Solved in ", i, "steps")
                 totalwins += 1
                 break
-        #print("challenge", j, "failed")
+        print("finished challenge", j)
     print('totalwins ', totalwins, 'out of', j + 1)
     percent = totalwins / (j + 1)
     print('percent', percent)
-
