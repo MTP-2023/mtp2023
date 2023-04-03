@@ -1,5 +1,7 @@
 import json
-from gameEnv.simulation.simulate import run
+import sys
+sys.path.append('../../')
+from gameResources.simulation.simulate import run
 import copy
 import random
 import math

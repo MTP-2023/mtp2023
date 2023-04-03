@@ -4,12 +4,15 @@ from gymnasium.spaces import Discrete, Box, Dict
 import random
 import numpy as np
 import json
+import importlib
 import sys
-sys.path.append('../')
+#sys.path.append('../')
 sys.path.append('../../')
-from gameEnv.simulation.simulate import run
+from gameResources.simulation.simulate import run
+
 # maybe change this import to be based on received game variant name later
-from gameVariants.baseline.reward import baselineReward
+
+#from gameVariants.baseline.reward import baselineReward
 
 class GameBoardEnv(gym.Env):
     """Example of a custom env in which you have to walk down a corridor.
@@ -40,6 +43,8 @@ class GameBoardEnv(gym.Env):
         self.current_board = np.array(self.training_states[self.training_index]["start_board"])
         self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
         self.max_steps = self.training_states[self.training_index]["max_turns"]
+        reward_module = "gameVariants." + config["variant"] + ".reward"
+        self.reward_module = importlib.import_module(reward_module)
         #print(self.current_board, type(self.current_board))
         #print(self.goal_board, type(self.current_board))
         
@@ -95,8 +100,9 @@ class GameBoardEnv(gym.Env):
         # final states
         # rewards
 
-        if self.variant == "baseline":
-            reward, done = baselineReward(self.n_steps, self.max_steps, self.height, self.width, self.goal_board, input_board)
+        #if self.variant == "baseline":
+        #    reward, done = baselineReward(self.n_steps, self.max_steps, self.height, self.width, self.goal_board, input_board)
+        reward, done = self.reward_module.reward(self.n_steps, self.max_steps, self.height, self.width, self.goal_board, input_board)
 
         obs = {
             "current": input_board,
