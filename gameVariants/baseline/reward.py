@@ -1,4 +1,4 @@
-def baselineReward(n_steps, max_steps, height, width, goal_board, inputBoard):
+def reward(n_steps, max_steps, height, width, goal_board, inputBoard):
         done = True
         if n_steps > max_steps:
             return -1, done

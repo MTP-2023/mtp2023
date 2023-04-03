@@ -28,11 +28,12 @@ from ray.rllib.algorithms.algorithm import Algorithm
 tf1, tf, tfv = try_import_tf()
 torch, nn = try_import_torch()
 
-
-from avalancheEnv import GameBoardEnv
 import json
 import jsonschema
 from model import CustomModel
+
+from avalancheEnv import GameBoardEnv
+
 
 #we use argparse so you can configure the training settings from the command line call of the script like so:
 #python train.py --variant baseline --train_on generationTest2
