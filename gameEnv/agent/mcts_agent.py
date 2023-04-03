@@ -1,4 +1,6 @@
 import json
+import time
+
 from gameEnv.simulation.simulate import run
 import copy
 import random
@@ -49,6 +51,8 @@ def propagate(node, result):
 
 def mcts(root_state, max_iterations, exploration_constant, goalstate, width, height, max_steps):
     root_node = Node(root_state)
+    startTime = time.time_ns()
+    # while time.time_ns - startTime < maxTime / 1000000000:
     for i in range(max_iterations):
         node = root_node
         state = root_state
@@ -56,15 +60,15 @@ def mcts(root_state, max_iterations, exploration_constant, goalstate, width, hei
             node = node.select_child(exploration_constant)
             state = node.state
         if evaluate(node.state, goalstate) == 1:
-            #print("found a winner")
+            # print("found a winner")
             propagate(node, 100)
             continue
         child = createChild(node)
         result = simulate(copy.deepcopy(child.state), width, height, max_steps, node.depth, goalstate)
         propagate(child, result)
     # print(len(root_node.children))
-    #for child in root_node.children:
-        #print("child visists", child.visits)
+    # for child in root_node.children:
+    # print("child visists", child.visits)
     best_child = max(root_node.children, key=lambda child: child.visits)
     return best_child.move
 
@@ -90,8 +94,8 @@ def simulate(state, width, height, max_steps, i, goalstate):
         i += 1
 
     result = evaluate(state, goalstate)
-    #if result == 1:
-        #print("simulated win")
+    # if result == 1:
+    # print("simulated win")
     return result
 
 
@@ -184,7 +188,8 @@ if __name__ == "__main__":
         endboard = endboards[j]
         max_step = max_steps[j]
         for i in range(max_step):
-            move = mcts(copy.deepcopy(startboard), 1000, math.sqrt(2), endboard, width, height, max_step - i)
+            # move = mcts(copy.deepcopy(startboard), 1000, math.sqrt(2), endboard, width, height, max_step - i)
+            move = mcts(copy.deepcopy(startboard), 1000, 1, endboard, width, height, max_step - i)
             # print("making move", move)
             run(move, startboard, False)
             if evaluate(startboard, endboard):
