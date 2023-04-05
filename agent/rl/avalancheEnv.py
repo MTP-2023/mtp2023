@@ -1,5 +1,6 @@
 import gymnasium as gym
 from ray.rllib.env.env_context import EnvContext
+from ray.rllib.env.apis.task_settable_env import TaskSettableEnv, TaskType
 from gymnasium.spaces import Discrete, Box, Dict
 import random
 import numpy as np
@@ -14,17 +15,20 @@ from gameResources.simulation.simulate import run
 
 #from gameVariants.baseline.reward import baselineReward
 
-class GameBoardEnv(gym.Env):
+class GameBoardEnv(TaskSettableEnv):
     """Example of a custom env in which you have to walk down a corridor.
     You can configure the length of the corridor via the env config."""
 
     def __init__(self, config: EnvContext):
+        self.task_level = 0
         self.variant = config["variant"]
         self.n_steps = 0
         self.training_index = 0
         self.width = config["width"]*2+2
         self.height = config["height"]*2
-        self.training_states = config["training_states"]
+        self.training_levels = config["training_levels"]
+        self.training_states = self.training_levels[0]
+
         
         #print(self.training_states)
 
@@ -111,4 +115,12 @@ class GameBoardEnv(gym.Env):
 
         # to be changed for actual agent training
         return obs, reward, done, False, {}
+
+    def get_task(self):
+        return self.task_level
+
+    def set_task(self, task):
+        self.task_level = task
+        self.training_states = self.training_levels[task]
+        self.training_index = 0
 

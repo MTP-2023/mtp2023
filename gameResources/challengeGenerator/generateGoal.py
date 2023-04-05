@@ -7,7 +7,7 @@ import copy
 # board = start board produced by generator
 # marbleCount = marbles that should stay in the board
 # turnlimit = how many turns in one game can be played
-# availableMarbels = how many marbles are there in total
+# availableMarbles = how many marbles are there in total
 # width = width of the input space
 # fallthrough = when true, no marbles are allowed to fall through the board
 

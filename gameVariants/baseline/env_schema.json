@@ -14,11 +14,12 @@
       "description": "Define the number of row-pairs of the game board. E.g., setting the default setting of two means that there are four rows in total.",
       "minimum": 1
     },
-    "training_states": {
+    "training_levels": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/training_item"
-      }
+        "$ref": "#/$defs/level"
+      },
+      "description": "An array of levels ordered by difficulty, each containing an array of training items."
     }
   },
   "$defs": {
@@ -56,6 +57,13 @@
           "minimum": 1
         }
       }
+    },
+    "level": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/training_item"
+      },
+      "description": "An array of training items of the same difficulty."
     }
   }
 }

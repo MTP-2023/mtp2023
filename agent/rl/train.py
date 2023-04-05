@@ -33,6 +33,7 @@ import jsonschema
 from model import CustomModel
 
 from avalancheEnv import GameBoardEnv
+from curriculum_function import curriculum_fn
 
 
 #we use argparse so you can configure the training settings from the command line call of the script like so:
@@ -53,6 +54,18 @@ parser.add_argument(
     help="The name of the json file which contains training scenarios."
 )
 
+parser.add_argument(
+    "--stop_reward",
+    default=2,
+    help="The reward we stop training at."
+)
+
+parser.add_argument(
+    "--curriculum_threshold",
+    default=-0.3,
+    help="The reward we go to the next level at."
+)
+
 args = parser.parse_args()
 path = "../../gameVariants/" + args.variant
 training_path = path + "/training/" + args.train_on
@@ -69,6 +82,7 @@ except Exception as e:
 
 #we use this to pass the game variant selection to the environment
 env_setup["variant"] = args.variant
+env_setup["curriculum_threshold"] = args.curriculum_threshold
 
 #print(env_setup)
 
@@ -90,7 +104,7 @@ config.rollouts(num_rollout_workers=4)
 #config.training(lr=tune.grid_search([0.0001, 0.0002, 0.00001]), clip_param=tune.grid_search([0.1, 0.2, 0.3, 0.4]))
 config = config.training(lr=0.0002, clip_param=0.3)
 #configuring the game environment
-config = config.environment(GameBoardEnv, env_config=env_setup)
+config = config.environment(GameBoardEnv, env_config=env_setup, env_task_fn=curriculum_fn)
 
 #stopping conditions, these are assumed to be increasing by ray tune (meaning we can't use metrics we want to decrease, e.g. episode length, as stopping criteria)
 stop = {
@@ -103,7 +117,7 @@ stop = {
 #checkpoint config defines if and when checkpoints are saved
 tune.Tuner(
     "PPO",
-    run_config=air.RunConfig(stop=stop, local_dir="./results", name="PPO_no_model_gen_test3_newer_rewards",
+    run_config=air.RunConfig(stop=stop, local_dir="./results", name="PPO_curriculum_text",
                              checkpoint_config=air.CheckpointConfig(num_to_keep=1, checkpoint_at_end=True)),
     param_space=config.to_dict(),
 ).fit()
