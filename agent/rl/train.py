@@ -66,6 +66,11 @@ parser.add_argument(
     help="The reward we go to the next level at."
 )
 
+parser.add_argument(
+    "--results_folder",
+    help="Folder name which shouuld contain the results of the training run."
+)
+
 args = parser.parse_args()
 path = "../../gameVariants/" + args.variant
 training_path = path + "/training/" + args.train_on
@@ -82,9 +87,7 @@ except Exception as e:
 
 #we use this to pass the game variant selection to the environment
 env_setup["variant"] = args.variant
-env_setup["curriculum_threshold"] = args.curriculum_threshold
-
-#print(env_setup)
+env_setup["curriculum_threshold"] = float(args.curriculum_threshold)
 
 #register custom model from model.py
 ModelCatalog.register_custom_model(
@@ -115,14 +118,10 @@ stop = {
 #start a training run, make sure you indicate the correct optimization algorithm
 #local dir and name define where training results and checkpoints are saved to
 #checkpoint config defines if and when checkpoints are saved
-tune.Tuner(
-    "PPO",
-    run_config=air.RunConfig(stop=stop, local_dir="./results", name="PPO_curriculum_text",
-                             checkpoint_config=air.CheckpointConfig(num_to_keep=1, checkpoint_at_end=True)),
-    param_space=config.to_dict(),
-).fit()
 
-#algo = config.build()
-# for i in range(100):
-#     train = algo.train()
-#     print(pretty_print("BEGIN", train, i))
+tune.Tuner(
+        "PPO",
+        run_config=air.RunConfig(stop=stop, local_dir="./results", name=args.results_folder,
+                                checkpoint_config=air.CheckpointConfig(num_to_keep=1, checkpoint_at_end=True)),
+        param_space=config.to_dict(),
+    ).fit()
