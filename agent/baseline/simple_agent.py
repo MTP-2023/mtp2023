@@ -3,7 +3,7 @@ import copy
 
 import sys
 sys.path.append('../../')
-from gameVariants.baseline.reward import simple_agent_reward
+from gameVariants.baseline.reward import simple_agent_metrics
 from gameResources.simulation.simulate import run
 
 
@@ -12,21 +12,21 @@ class SimpleAgent:
     def __init__(self):
         with open('../../gameVariants/baseline/training/generationTest2.json') as json_file:
             data = json.load(json_file)
-        arraydata = data['training_states']
-        self.startboards = []
-        self.endboards = []
+            arraydata = data['training_levels'][0]
+        self.start_boards = []
+        self.goal_boards = []
         self.max_steps = []
         self.height = data['height']
         self.width = data['width']
 
 
         for i in range(len(arraydata)):
-            self.startboards.append(arraydata[i]['start_board'])
-            self.endboards.append(arraydata[i]['goal_board'])
+            self.start_boards.append(arraydata[i]['start_board'])
+            self.goal_boards.append(arraydata[i]['goal_board'])
             self.max_steps.append(arraydata[i]['max_turns'])
 
-        self.startboard = 0
-        self.endboard = 0
+        self.current_board = 0
+        self.goal_board = 0
         self.max_step = 0
 
     #def heuristic_simple(self, board):
@@ -70,10 +70,10 @@ class SimpleAgent:
         maxreward = 0
         bestmove = 0
         for i in range(self.width * 2):
-            result = run(i, copy.deepcopy(board), True)["boards"][-1]
+            self.current_board = run(i, copy.deepcopy(board), True)["boards"][-1]
             # print('result ', result)
             #current = simple.heuristic_simple(result)["reward"]
-            current = simple_agent_reward(self,result)["reward"]
+            current = simple_agent_metrics(self)["reward"]
             # print('current', current)
 
             # maxreward = baselineReward(self, board)
@@ -91,22 +91,22 @@ if __name__ == "__main__":
 
     agent = SimpleAgent()
     totalwins = 0
-    for j in range(len(agent.startboards)):
-        agent.startboard = agent.startboards[j]
-        agent.endboard = agent.endboards[j]
+    for j in range(len(agent.start_boards)):
+        agent.current_board = agent.start_boards[j]
+        agent.goal_board = agent.goal_boards[j]
         agent.max_step = agent.max_steps[j]
         for i in range(agent.max_step):
             # agent.max_step
-            move = agent.step(agent.startboard)
-            run(move, agent.startboard, False)
+            move = agent.step(agent.current_board)
+            run(move, agent.current_board, False)
             #if agent.heuristic_simple(agent.startboard)['winpercentage'] == 1.0:
-            if simple_agent_reward(agent,agent.startboard)['winpercentage'] == 1.0:
+            if simple_agent_metrics(agent)['fulfilled'] == 1.0:
                 print(i, " steps")
                 totalwins += 1
                 break
 
         #print(agent.heuristic_simple(agent.startboard)['winpercentage'])
-        print(simple_agent_reward(agent,agent.startboard)['winpercentage'])
+        print(simple_agent_metrics(agent)['fulfilled'])
 
     print('totalwins ', totalwins, 'out of', j + 1)
     percent = totalwins / (j + 1)
