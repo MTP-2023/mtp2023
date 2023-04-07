@@ -68,11 +68,16 @@ parser.add_argument(
 
 parser.add_argument(
     "--results_folder",
-    help="Folder name which shouuld contain the results of the training run."
+    help="Folder name which should contain the results of the training run."
 )
 
 args = parser.parse_args()
+
+# quick and dirty addition for baseline_strict (TO BE CHANGED)
+var = args.variant
 path = "../../gameVariants/" + args.variant
+if var == "baseline_strict":
+    path = "../../gameVariants/baseline"
 training_path = path + "/training/" + args.train_on
 
 #we use a json schema to check if all the training scenarios are formatted correctly
