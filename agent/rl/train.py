@@ -105,7 +105,7 @@ ray.init()
 #initialize our optimization algorithm (PPO in this case)
 config = PPOConfig()
 #configure the algorithm's settings
-config.rollouts(num_rollout_workers=4)
+config.rollouts(num_rollout_workers=1)
 #uncomment to use the custom model
 #config = config.training(model={"custom_model": "my_model"})
 #this shows how to define a grid search over various parameters
@@ -117,7 +117,7 @@ config = config.environment(GameBoardEnv, env_config=env_setup, env_task_fn=curr
 #stopping conditions, these are assumed to be increasing by ray tune (meaning we can't use metrics we want to decrease, e.g. episode length, as stopping criteria)
 stop = {
         #"training_iteration": 500,
-        "episode_reward_mean": 2,
+        "episode_reward_mean": float(args.stop_reward),
     }
 
 #start a training run, make sure you indicate the correct optimization algorithm
