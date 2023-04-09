@@ -11,7 +11,8 @@ import copy
 # width = width of the input space
 # fallthrough = when true, no marbles are allowed to fall through the board
 
-def generateGoalState(board, marbleCount, turnlimit, availableMarbles, width, fallthrough):
+def generateGoalState(startboard, marbleCount, turnlimit, availableMarbles, width, fallthrough):
+    board = copy.deepcopy(startboard)
     print("GenerateGoalState")
     while True:
         goalBoard = generateBoard(board, marbleCount, turnlimit, availableMarbles, width, fallthrough)

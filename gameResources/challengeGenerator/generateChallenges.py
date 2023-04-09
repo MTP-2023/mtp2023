@@ -1,5 +1,3 @@
-import copy
-
 import sys
 sys.path.append('../')
 from boardGenerator.generate import generate_random_board
@@ -20,7 +18,7 @@ if __name__ == "__main__":
         max_turns = 10
         randomBoard = generate_random_board(width, height)
         print("Generating boards with max_turns ", max_turns)
-        goal = generateGoalState(copy.deepcopy(randomBoard), marbleCount, max_turns, 42, width*2, False)
+        goal = generateGoalState(randomBoard, marbleCount, max_turns, 42, width*2, False)
 
         print(randomBoard)
         print(goal)
