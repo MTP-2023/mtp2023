@@ -74,10 +74,14 @@ parser.add_argument(
 args = parser.parse_args()
 
 # quick and dirty addition for baseline_strict (TO BE CHANGED)
-var = args.variant
-path = "../../gameVariants/" + args.variant
-if var == "baseline_strict":
+# list of variants that use the same json format as the baseline variant and, thus, do not have dedicated training folders 
+baseline_adapted_variants = ['baseline_strict']
+
+if args.variant in "baseline_strict":
     path = "../../gameVariants/baseline"
+else:
+    path = "../../gameVariants/" + args.variant
+
 training_path = path + "/training/" + args.train_on
 
 #we use a json schema to check if all the training scenarios are formatted correctly
