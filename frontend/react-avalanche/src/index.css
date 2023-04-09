@@ -36,9 +36,6 @@ body {
   line-height: 1.5;
   text-rendering: optimizeSpeed;
   background-color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* Make images easier to work with */

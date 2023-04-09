@@ -36,6 +36,10 @@
   position: relative;
 }
 
+.switch .ball {
+  opacity: 1;
+}
+
 .ball {
   width: 24px;
   height: 24px;
@@ -123,4 +127,8 @@
 
 .board__dimensions button:hover {
   color: #ccc;
+}
+
+.challenge__board--goal .switch {
+  opacity: 0.5;
 }

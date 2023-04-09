@@ -1,0 +1,19 @@
+.navbar {
+  padding: 0.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.navbar__items {
+  display: flex;
+
+  text-decoration: none;
+  list-style-type: none;
+  gap: 1rem;
+}
+
+.navbar__items li a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 1.2rem;
+}

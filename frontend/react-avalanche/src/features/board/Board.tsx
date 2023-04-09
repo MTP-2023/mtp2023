@@ -7,27 +7,26 @@ import {
   FaChevronCircleLeft,
   FaChevronCircleRight,
   FaFastForward,
-  FaMinus,
-  FaPlus,
 } from "react-icons/fa";
 
-const Board = () => {
-  const {
-    currentBoard,
-    currentMarbles,
-    loadingStart,
-    errorStart,
-    handleMarbleDrop,
-    handleBoardChange,
-    increaseHeight,
-    decreaseHeight,
-    increaseWidth,
-    decreaseWidth,
-  } = useBoard();
+type BoardProps = {
+  className?: string;
+  currentBoard: number[][] | undefined;
+  currentMarbles: number[][] | undefined;
+};
 
-  if (loadingStart) return <div>Loading...</div>;
+const Board: React.FC<BoardProps> = ({
+  className,
+  currentBoard,
+  currentMarbles,
+}) => {
+  let { handleMarbleDrop } = useBoard();
 
-  if (errorStart) return <div>Error</div>;
+  if (!currentBoard || !currentMarbles) {
+    return <div>loading...</div>;
+  }
+
+  console.log("current", currentBoard.length, currentMarbles);
 
   const marbleRows: (
     | string
@@ -44,12 +43,18 @@ const Board = () => {
 
   //console.log(currentBoard, currentMarbles)
 
+  console.log(currentBoard.length);
+
   for (let row = 0; row < currentBoard.length; row++) {
     const marbleRow = [];
     // build marbles html
     for (let col = 0; col < currentBoard[row].length; col += 1) {
       let exists = false;
-      if (currentMarbles.length > 0 && currentMarbles[0].length > 0) {
+      if (
+        currentMarbles &&
+        currentMarbles.length > 0 &&
+        currentMarbles[0].length > 0
+      ) {
         for (let marble of currentMarbles) {
           //console.log("CHECK", currentMarbles, marble)
           if (marble[0] == row && marble[1] == col) {
@@ -64,6 +69,7 @@ const Board = () => {
       marbleRow.push(obj);
     }
     marbleRows.push(marbleRow);
+    console.log("current", currentBoard, currentMarbles);
 
     const buildedRow = [];
     let key = 0;
@@ -93,62 +99,12 @@ const Board = () => {
     buildedBoard.push(buildedRow);
   }
 
-  const buttons = [];
-
-  for (let i = 1; i < currentBoard[0].length - 1; i++) {
-    buttons.push(
-      <button onClick={() => handleMarbleDrop(i - 1)} key={i}>
-        {i}
-      </button>
-    );
-  }
+  console.log("curente", currentBoard);
 
   //console.log(marbleRows, buildedBoard)
 
   return (
-    <div className="board">
-      <div className="board__dimensions">
-        <div className="container">
-          <button onClick={() => decreaseHeight()}>
-            <FaMinus />
-          </button>
-          <p>Rows: {currentBoard.length}</p>
-          <button onClick={() => increaseHeight()}>
-            <FaPlus />
-          </button>
-        </div>
-
-        <div className="container">
-          <button onClick={() => decreaseWidth()}>
-            <FaMinus />
-          </button>
-          <p>Columns: {currentBoard[0].length}</p>
-          <button onClick={() => increaseWidth()}>
-            <FaPlus />
-          </button>
-        </div>
-      </div>
-
-      <div className="navigation">
-        <button onClick={() => handleBoardChange("back")}>
-          <FaChevronCircleLeft />
-        </button>
-
-        <button onClick={() => handleBoardChange("forward")}>
-          <FaChevronCircleRight />
-        </button>
-
-        <button onClick={() => handleBoardChange("last")}>
-          <FaFastForward />
-        </button>
-      </div>
-
-      <div className="board__switches__row--displace board__buttons">
-        {buttons.map((button, index) => (
-          <div key={index}>{button}</div>
-        ))}
-      </div>
-
+    <div className={`board ${className}`}>
       <div className="board__switches">
         {buildedBoard.map((row, index) => (
           <React.Fragment>
