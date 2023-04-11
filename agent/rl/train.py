@@ -68,11 +68,20 @@ parser.add_argument(
 
 parser.add_argument(
     "--results_folder",
-    help="Folder name which shouuld contain the results of the training run."
+    help="Folder name which should contain the results of the training run."
 )
 
 args = parser.parse_args()
-path = "../../gameVariants/" + args.variant
+
+# quick and dirty addition for baseline_strict (TO BE CHANGED)
+# list of variants that use the same json format as the baseline variant and, thus, do not have dedicated training folders 
+baseline_adapted_variants = ['baseline_strict']
+
+if args.variant in "baseline_strict":
+    path = "../../gameVariants/baseline"
+else:
+    path = "../../gameVariants/" + args.variant
+
 training_path = path + "/training/" + args.train_on
 
 #we use a json schema to check if all the training scenarios are formatted correctly
@@ -100,7 +109,7 @@ ray.init()
 #initialize our optimization algorithm (PPO in this case)
 config = PPOConfig()
 #configure the algorithm's settings
-config.rollouts(num_rollout_workers=4)
+config.rollouts(num_rollout_workers=1)
 #uncomment to use the custom model
 #config = config.training(model={"custom_model": "my_model"})
 #this shows how to define a grid search over various parameters
@@ -112,7 +121,7 @@ config = config.environment(GameBoardEnv, env_config=env_setup, env_task_fn=curr
 #stopping conditions, these are assumed to be increasing by ray tune (meaning we can't use metrics we want to decrease, e.g. episode length, as stopping criteria)
 stop = {
         #"training_iteration": 500,
-        "episode_reward_mean": 2,
+        "episode_reward_mean": float(args.stop_reward),
     }
 
 #start a training run, make sure you indicate the correct optimization algorithm
