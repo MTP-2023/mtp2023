@@ -130,4 +130,4 @@ dmypy.json
 frontend/react-avalanche/package-lock.json
 
 # API key for wandb
-agent/rl/wandb_api.key.txt
+agent/rl/wandb_api_key.txt
