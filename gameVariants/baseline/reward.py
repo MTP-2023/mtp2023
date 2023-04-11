@@ -55,9 +55,7 @@ def simple_agent_metrics(self):
 
     fulfilled = correct_marbles / goal_marbles
 
-    dictA = {#'correctmarbles': correctmarbles, 
-             #'goalmarbles': goalmarbles, 
-             'fulfilled': fulfilled,
+    dictA = {'fulfilled': fulfilled,
              'reward': reward}
     return dictA
 

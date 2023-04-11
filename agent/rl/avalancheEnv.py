@@ -84,34 +84,18 @@ class GameBoardEnv(TaskSettableEnv):
         return obs, {}
 
     def step(self, action):
-        #print("step")
         assert action in range(self.n_choices), action
 
-        # iterate over each row and recalculate game board status
-        
-        #input_board = self.current_board
-
-        # test print
-        #print("INPUT", input_board)
-        #print("ACTION", action)
-        #input_board = run(action, input_board)
         self.current_board = run(action, self.current_board)
         self.n_steps += 1
-
-        # test print
-        #print("FINAL", input_board)
 
         # game variant dependencies:
         # final states
         # rewards
 
-        #if self.variant == "baseline":
-        #    reward, done = baselineReward(self.n_steps, self.max_steps, self.height, self.width, self.goal_board, input_board)
-        #reward, done = self.reward_module.reward(self, input_board)
         reward, done = self.reward_module.reward(self)
 
         obs = {
-            #"current": input_board,
             "current": self.current_board,
             "goal": self.goal_board
         }
