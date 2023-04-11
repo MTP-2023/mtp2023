@@ -1,12 +1,15 @@
-export const fetchBoard = async (width: number = 5, height: number = 5) => {
+export const fetchBoard = async (
+  width: number = 5,
+  height: number = 5
+): Promise<number[][]> => {
   const response = await fetch(
     `http://127.0.0.1:8000/randomboard?width=${width}&height=${height}`
   );
-  const data = await response.json();
-  return data;
+
+  return await response.json();
 };
 
-export const calculateBoard = async (board: [[]], index: number) => {
+export const calculateBoard = async (board: number[][], index: number) => {
   const response = await fetch("http://127.0.0.1:8000/interpret", {
     method: "POST",
     headers: {
@@ -17,5 +20,10 @@ export const calculateBoard = async (board: [[]], index: number) => {
       board: board,
     }),
   });
+  return await response.json();
+};
+
+export const fetchChallenge = async () => {
+  const response = await fetch("http://127.0.0.1:8000/defaultchallenge");
   return await response.json();
 };

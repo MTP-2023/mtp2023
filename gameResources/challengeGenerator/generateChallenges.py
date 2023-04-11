@@ -1,5 +1,3 @@
-import copy
-
 import sys
 sys.path.append('../')
 from boardGenerator.generate import generate_random_board

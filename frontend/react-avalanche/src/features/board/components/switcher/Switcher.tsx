@@ -3,8 +3,8 @@ import leftImg from "../../../../assets/left.gif";
 import rightImg from "../../../../assets/right.gif";
 
 export type switcher = {
-  left: 0 | 1 | 2;
-  right: 0 | 1 | 2;
+  left: number;
+  right: number;
 };
 
 const Switcher: React.FC<switcher> = ({ left, right }) => {

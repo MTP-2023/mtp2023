@@ -1,0 +1,18 @@
+.challenge {
+  position: relative;
+}
+
+.frontBoard {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0.5;
+}
+
+.backBoard {
+  opacity: 0.5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
