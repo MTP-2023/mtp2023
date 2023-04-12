@@ -20,7 +20,7 @@ if __name__ == "__main__":
         for i in range(100):
             randomBoard = generate_random_board(width, height)
             print("Generating boards with max_turns ", max_turns)
-            goal = generateGoalState(copy.deepcopy(randomBoard), minMarbles, maxMarbles, max_turns, 42, width*2, False)
+            goal = generateGoalState(randomBoard, minMarbles, maxMarbles, max_turns, 42, width*2, False)
             print(randomBoard)
             print(goal)
             training_states.append({"start_board": randomBoard, "goal_board": goal, "max_turns": max_turns})
