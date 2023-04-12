@@ -5,6 +5,7 @@ import { Outlet, Route, Routes } from "react-router";
 import Navbar from "./features/navigation/Components/Navbar/Navbar";
 import SandboxScreen from "./features/sandbox/screens/SandboxScreen/SandboxScreen";
 import ChallengeScreen from "./features/challenge/screens/ChallengeScreen/ChallengeScreen";
+import { ChallengeProvider } from "./features/challenge/ChallengeContext";
 
 function Layout() {
   return (
@@ -21,7 +22,14 @@ function App() {
     <div className="App">
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<SandboxScreen />} />
+          <Route
+            index
+            element={
+              <BoardProvider>
+                <SandboxScreen />
+              </BoardProvider>
+            }
+          />
           <Route
             path="sandbox"
             element={
@@ -30,7 +38,14 @@ function App() {
               </BoardProvider>
             }
           />
-          <Route path="challenge" element={<ChallengeScreen />} />
+          <Route
+            path="challenge"
+            element={
+              <ChallengeProvider>
+                <ChallengeScreen />
+              </ChallengeProvider>
+            }
+          />
         </Route>
       </Routes>
     </div>

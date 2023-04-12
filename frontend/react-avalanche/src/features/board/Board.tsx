@@ -11,8 +11,8 @@ import {
 
 type BoardProps = {
   className?: string;
-  currentBoard: number[][] | undefined;
-  currentMarbles: number[][] | undefined;
+  currentBoard: number[][];
+  currentMarbles: number[][];
 };
 
 const Board: React.FC<BoardProps> = ({
@@ -20,12 +20,6 @@ const Board: React.FC<BoardProps> = ({
   currentBoard,
   currentMarbles,
 }) => {
-  let { handleMarbleDrop } = useBoard();
-
-  if (!currentBoard || !currentMarbles) {
-    return <div>loading...</div>;
-  }
-
   console.log("current", currentBoard.length, currentMarbles);
 
   const marbleRows: (

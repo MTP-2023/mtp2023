@@ -1,5 +1,5 @@
 import React from "react";
-import { useBoard } from "../../context/BoardContext";
+import { sizeControlsType, useBoard } from "../../context/BoardContext";
 import {
   FaChevronCircleLeft,
   FaChevronCircleRight,
@@ -8,15 +8,20 @@ import {
   FaPlus,
 } from "react-icons/fa";
 
-const BoardSizeController = () => {
-  const {
-    currentBoard,
+interface BoardSimulationNavigatorProps {
+  currentBoard: number[][];
+  sizeControls: sizeControlsType;
+}
+
+const BoardSizeController: React.FC<BoardSimulationNavigatorProps> = ({
+  sizeControls: {
     increaseHeight,
     decreaseHeight,
     increaseWidth,
     decreaseWidth,
-  } = useBoard();
-  if (!currentBoard || currentBoard.length === 0) return <div>Loading...</div>;
+  },
+  currentBoard,
+}) => {
   return (
     <div>
       <div className="board__dimensions">

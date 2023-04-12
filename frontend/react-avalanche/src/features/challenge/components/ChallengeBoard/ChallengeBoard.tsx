@@ -1,24 +1,28 @@
 import React from "react";
 import { useChallenge } from "../../ChallengeContext";
 import Board from "../../../board/Board";
+import useHandleBoard from "../../../board/hooks/useHandleBoard";
+import BoardDropper from "../../../board/components/BoardDropper/BoardDropper";
+import { Challenge } from "../../domain";
 
-const ChallengeBoard = () => {
-  const challengeState = useChallenge();
+interface ChallengeBoardProps {
+  challenge: Challenge;
+  currentMarbles: number[][];
+  currentBoard: number[][];
+}
+const ChallengeBoard: React.FC<ChallengeBoardProps> = ({
+  challenge,
+  currentMarbles,
+  currentBoard,
+}) => {
   return (
-    <div>
-      {challengeState.challenge && (
-        <>
-          <Board
-            currentMarbles={[]}
-            currentBoard={challengeState.challenge.start}
-          />
-          <Board
-            className="challenge__board--goal"
-            currentMarbles={[]}
-            currentBoard={challengeState.challenge.goal}
-          />
-        </>
-      )}
+    <div className="challenge">
+      <Board currentMarbles={currentMarbles} currentBoard={currentBoard} />
+      <Board
+        className="challenge__board--goal"
+        currentMarbles={[]}
+        currentBoard={challenge.goal}
+      />
     </div>
   );
 };
