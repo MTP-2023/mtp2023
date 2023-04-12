@@ -24,6 +24,6 @@ export const calculateBoard = async (board: number[][], index: number) => {
 };
 
 export const fetchChallenge = async () => {
-  const response = await fetch("http://127.0.0.1:8000/defaultchallenge");
+  const response = await fetch("http://127.0.0.1:8000/challenge");
   return await response.json();
 };
