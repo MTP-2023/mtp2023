@@ -72,6 +72,11 @@ parser.add_argument(
     help="Folder name which shouuld contain the results of the training run."
 )
 
+parser.add_argument(
+    "--log_as",
+    help="Define the name of the run which will be displayed in WandB."
+)
+
 args = parser.parse_args()
 path = "../../gameVariants/" + args.variant
 training_path = path + "/training/" + args.train_on
@@ -134,6 +139,7 @@ tune.Tuner(
                                         entity="mtp2023_avalanche",
                                         project="wandb_test_runs",
                                         group="first_test",
+                                        name=args.log_as
                                     )]
                                 ),
                                 param_space=config.to_dict(),
