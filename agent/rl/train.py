@@ -1,7 +1,4 @@
 import argparse
-import gym
-from gym.core import ActType, ObsType
-from gym.spaces import Discrete, Box
 import numpy as np
 import os
 import random
