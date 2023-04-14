@@ -130,7 +130,7 @@ tune.Tuner(
         run_config=air.RunConfig(stop=stop, 
                                     local_dir="./results", 
                                     name=args.results_folder,
-                                    checkpoint_config=air.CheckpointConfig(num_to_keep=1, checkpoint_at_end=True),
+                                    checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
                                     callbacks=[
                                     # adjust the entries here to conform to your wandb environment
                                     # cf. https://docs.wandb.ai/ and https://docs.ray.io/en/master/tune/examples/tune-wandb.html
