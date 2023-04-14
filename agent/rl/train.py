@@ -21,6 +21,7 @@ from ray.rllib.algorithms import ppo
 from ray.rllib.algorithms.ppo import PPOConfig
 from ray.rllib.algorithms.dqn import DQNConfig
 from ray.rllib.algorithms.algorithm import Algorithm
+from ray.air.integrations.wandb import WandbLoggerCallback
 
 tf1, tf, tfv = try_import_tf()
 torch, nn = try_import_torch()
@@ -66,6 +67,11 @@ parser.add_argument(
 parser.add_argument(
     "--results_folder",
     help="Folder name which should contain the results of the training run."
+)
+
+parser.add_argument(
+    "--log_as",
+    help="Define the name of the run which will be displayed in WandB."
 )
 
 args = parser.parse_args()
@@ -127,7 +133,20 @@ stop = {
 
 tune.Tuner(
         "PPO",
-        run_config=air.RunConfig(stop=stop, local_dir="./results", name=args.results_folder,
-                                checkpoint_config=air.CheckpointConfig(num_to_keep=1, checkpoint_at_end=True)),
-        param_space=config.to_dict(),
+        run_config=air.RunConfig(stop=stop, 
+                                    local_dir="./results", 
+                                    name=args.results_folder,
+                                    checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
+                                    callbacks=[
+                                    # adjust the entries here to conform to your wandb environment
+                                    # cf. https://docs.wandb.ai/ and https://docs.ray.io/en/master/tune/examples/tune-wandb.html
+                                    WandbLoggerCallback(
+                                        api_key_file="wandb_api_key.txt",
+                                        entity="mtp2023_avalanche",
+                                        project="wandb_test_runs",
+                                        group="first_test",
+                                        name=args.log_as
+                                    )]
+                                ),
+                                param_space=config.to_dict(),
     ).fit()

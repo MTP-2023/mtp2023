@@ -128,3 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 frontend/react-avalanche/package-lock.json
+
+# API key for wandb
+agent/rl/wandb_api_key.txt

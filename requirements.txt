@@ -10,3 +10,4 @@ numpy~=1.24.2
 tensorflow-probability
 ray~=2.3.0
 fastapi[all]
+wandb
