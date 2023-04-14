@@ -12,6 +12,14 @@ const useChallengeContext = () => {
     try {
       setChallengeLoading(true);
       const data = await fetchChallenge();
+      console.log("data", data);
+      for(let i = 0; i < data.start.length; i++){
+        for(let j = 0; j < data.start[i].length; j++){
+          if(data.start[i][j] === 2){
+            data.start[i][j] = 1;
+          }
+        }
+      }
       setChallenge(data);
     } catch (e) {
       setChallengeError(true);

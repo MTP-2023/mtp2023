@@ -5,14 +5,23 @@ import "./SandboxScreen.css";
 import BoardSimulationNavigator from "../../../board/components/BoardSimulationNavigator/BoardSimulationNavigator";
 import BoardSizeController from "../../../board/components/BoardSizeController/BoardSizeController";
 import BoardDropper from "../../../board/components/BoardDropper/BoardDropper";
+import useHandleBoard from "../../../board/hooks/useHandleBoard";
 
 const SandboxScreen = () => {
-  const { currentBoard, currentMarbles, handleMarbleDrop } = useBoard();
+  const { currentBoard: start, sizeControls } = useBoard();
+
+  if (!start) return null;
+
+  const { currentBoard, currentMarbles, handleMarbleDrop, handleBoardChange } =
+    useHandleBoard(start);
 
   return (
-    <div className="sandbox">
-      <BoardSizeController />
-      <BoardSimulationNavigator />
+    <div className="center">
+      <BoardSizeController
+        currentBoard={currentBoard}
+        sizeControls={sizeControls}
+      />
+      <BoardSimulationNavigator handleBoardChange={handleBoardChange} />
       <BoardDropper
         currentBoard={currentBoard}
         handleMarbleDrop={handleMarbleDrop}

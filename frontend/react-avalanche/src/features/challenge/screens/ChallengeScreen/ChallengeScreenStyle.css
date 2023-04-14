@@ -2,17 +2,27 @@
   position: relative;
 }
 
-.frontBoard {
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0.5;
-}
-
-.backBoard {
+.challenge__board--goal {
   opacity: 0.5;
   position: absolute;
   left: 0;
   top: 0;
   z-index: 100;
+}
+
+.challenge__board--goal .switch img {
+  opacity: 0;
+}
+
+.won {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  font-size: 4rem;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
 }

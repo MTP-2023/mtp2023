@@ -19,8 +19,8 @@ tags_metadata = [
         "description": "Request a predefined, empty game board of default size.",
     },
     {
-        "name": "defaultchallenge",
-        "description": "Request a challenge of the baseline game variant.",
+        "name": "challenge",
+        "description": "Request a challenge with given parameters.",
     },
     {
         "name": "interpret",
@@ -64,10 +64,10 @@ async def staticBoard():
         [0,1,0,0,1,0,1,0],
         [1,0,1,0,1,0,0,1]]
 
-@app.get("/defaultchallenge", tags=["defaultchallenge"])
-async def returnChallenge(width: int = default_width, height: int = default_height, marbleCount: int = 3, max_turns: int = 10, fallthrough: bool = False):
+@app.get("/challenge", tags=["challenge"])
+async def returnChallenge(width: int = default_width, height: int = default_height, minMarbles: int = 3, maxMarbles: int = 3, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
     start_board = generate_random_board(width, height)
-    goal_board = generateGoalState(start_board, marbleCount, max_turns, 42, width*2, fallthrough)
+    goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)
 
     return {
         "start": start_board,

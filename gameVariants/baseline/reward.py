@@ -1,16 +1,16 @@
-def reward(n_steps, max_steps, height, width, goal_board, inputBoard):
+def reward(env):
         done = True
-        if n_steps > max_steps:
+        if env.n_steps > env.max_steps:
             return -1, done
 
         i = 0
-        while i < height:
+        while i < env.height:
             j = 0
             if i%2 == 0:
                 j = 1
-            while j < width - 1:
-                if goal_board[i][j] == 2 or goal_board[i][j+1] == 2:
-                    if inputBoard[i][j] != 2 and inputBoard[i][j+1] != 2:
+            while j < env.width - 1:
+                if env.goal_board[i][j] == 2 or env.goal_board[i][j+1] == 2:
+                    if env.current_board[i][j] != 2 and env.current_board[i][j+1] != 2:
                         done = False
                         break
                 j+=2
@@ -18,9 +18,46 @@ def reward(n_steps, max_steps, height, width, goal_board, inputBoard):
                 break
             i += 1
 
-        reward = (1 + max_steps - n_steps) if done else 0
+        reward = (1 + env.max_steps - env.n_steps) if done else 0
 
         return reward, done
+     
+
+def simple_agent_metrics(self):
+    correct_marbles = 0
+    goal_marbles = 0
+    reward = 0
+    i = 0
+    while i < self.height * 2:
+        j = 0
+        test = 1
+        if i % 2 == 0:
+            j = 1
+            test = 0
+        while j < (self.width * 2) + (1 * test):
+            if self.current_board[i][j] == 2 or self.current_board[i][j + 1] == 2:
+                for k in range(i, self.height * 2):
+                    if self.goal_board[i][j] == 2 or self.goal_board[i][j + 1] == 2:
+                        reward += 0.1
+            if self.goal_board[i][j] == 2 or self.goal_board[i][j + 1] == 2:
+                goal_marbles += 1
+
+                if self.current_board[i][j] == 2 or self.current_board[i][j + 1] == 2:
+                    correct_marbles += 1
+                    reward += (i * 2)
+                    # reward = baselineReward(self, board)
+                # else:
+                #    reward -= 0.1
+
+            j += 2
+
+        i += 1
+
+    fulfilled = correct_marbles / goal_marbles
+
+    dictA = {'fulfilled': fulfilled,
+             'reward': reward}
+    return dictA
 
 # Note for new baseline reward:
 #   ...IN PROGRESS...
@@ -50,39 +87,3 @@ def reward(n_steps, max_steps, height, width, goal_board, inputBoard):
 #        return -1, done
 # if game is done and needed steps are less then max step return (1 + self.max_steps - self.n_steps)
 # return
-
-def simple_agent_reward(self, board):
-    correctmarbles = 0
-    goalmarbles = 0
-    reward = 0
-    i = 0
-    while i < self.height * 2:
-        j = 0
-        test = 1
-        if i % 2 == 0:
-            j = 1
-            test = 0
-        while j < (self.width * 2) + (1 * test):
-            if board[i][j] == 2 or board[i][j + 1] == 2:
-                for k in range(i, self.height * 2):
-                    if self.endboard[i][j] == 2 or self.endboard[i][j + 1] == 2:
-                        reward += 0.1
-            if self.endboard[i][j] == 2 or self.endboard[i][j + 1] == 2:
-                goalmarbles += 1
-
-                if board[i][j] == 2 or board[i][j + 1] == 2:
-                    correctmarbles += 1
-                    reward += (i * 2)
-                    # reward = baselineReward(self, board)
-                # else:
-                #    reward -= 0.1
-
-            j += 2
-
-        i += 1
-
-    winpercentage = correctmarbles / goalmarbles
-
-    dictA = {'correctmarbles': correctmarbles, 'goalmarbles': goalmarbles, 'winpercentage': winpercentage,
-             'reward': reward}
-    return dictA

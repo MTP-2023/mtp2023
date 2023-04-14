@@ -6,8 +6,13 @@ import {
 } from "react-icons/fa";
 import { useBoard } from "../../context/BoardContext";
 
-const BoardSimulationNavigator = () => {
-  const { handleBoardChange } = useBoard();
+interface BoardSimulationNavigatorProps {
+  handleBoardChange: (action: string) => void;
+}
+
+const BoardSimulationNavigator: React.FC<BoardSimulationNavigatorProps> = ({
+  handleBoardChange,
+}) => {
   return (
     <div className="navigation">
       <button onClick={() => handleBoardChange("back")}>
