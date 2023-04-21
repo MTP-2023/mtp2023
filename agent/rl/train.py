@@ -1,5 +1,3 @@
-import argparse
-
 import ray
 from ray import air, tune
 from ray.rllib.models import ModelCatalog
@@ -9,17 +7,16 @@ from ray.rllib.algorithms.alpha_zero import AlphaZeroConfig
 from ray.air.integrations.wandb import WandbLoggerCallback
 from train_resources.curriculum_callbacks import CurriculumCallbacks
 from train_resources.curriculum_function import curriculum_fn
+from train_resources.avalancheEnv import GameBoardEnv
 import functools
 
-tf1, tf, tfv = try_import_tf()
-torch, nn = try_import_torch()
-
+import argparse
 import json
 import jsonschema
 from model import CustomModel
 
-from train_resources.avalancheEnv import GameBoardEnv
-
+tf1, tf, tfv = try_import_tf()
+torch, nn = try_import_torch()
 
 #we use argparse so you can configure the training settings from the command line call of the script like so:
 #python train.py --variant baseline --train_on generationTest2
@@ -121,10 +118,12 @@ env_setup["variant"] = args.variant
 env_setup["curriculum_threshold"] = float(args.curriculum_threshold)
 env_setup["start_level"] = 0
 
+"""
 #register custom model from model.py
 ModelCatalog.register_custom_model(
     "my_model", CustomModel
 )
+"""
 
 #initialize ray
 ray.init(num_cpus=int(args.num_cpus), num_gpus=1)
