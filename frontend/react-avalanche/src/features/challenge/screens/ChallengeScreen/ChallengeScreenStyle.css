@@ -14,6 +14,13 @@
   opacity: 0;
 }
 
+.challenge__board--goal
+  > .board__switches
+  > .board__switches__row
+  > .switch:has(.ball) {
+  background-color: red;
+}
+
 .won {
   position: absolute;
   top: 50%;

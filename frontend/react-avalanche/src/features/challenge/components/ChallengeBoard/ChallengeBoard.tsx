@@ -17,7 +17,12 @@ const ChallengeBoard: React.FC<ChallengeBoardProps> = ({
 }) => {
   return (
     <div className="challenge">
-      <Board currentMarbles={currentMarbles} currentBoard={currentBoard} />
+      <Board
+        className="challenge__current"
+        currentMarbles={currentMarbles}
+        currentBoard={currentBoard}
+      />
+
       <Board
         className="challenge__board--goal"
         currentMarbles={[]}
