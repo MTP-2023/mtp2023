@@ -9,7 +9,7 @@ import sys
 sys.path.append("../../")
 from gameVariants.baseline.reward import baselineReward
 from gameResources.simulation.simulate import run
-from agent.rl import avalancheEnv
+from agent.rl.train_resources import avalancheEnv
 from collections import OrderedDict
 
 # policy = Policy.from_checkpoint(
