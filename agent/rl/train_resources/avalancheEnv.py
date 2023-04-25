@@ -10,6 +10,7 @@ import sys
 #sys.path.append('../')
 sys.path.append('../../')
 from gameResources.simulation.simulate import run
+from copy import deepcopy
 
 # maybe change this import to be based on received game variant name later
 
@@ -20,6 +21,7 @@ class GameBoardEnv(TaskSettableEnv):
     You can configure the length of the corridor via the env config."""
 
     def __init__(self, config: EnvContext):
+        self.config = config
         self.task_level = 0
         self.variant = config["variant"]
         self.n_steps = 0
@@ -56,7 +58,7 @@ class GameBoardEnv(TaskSettableEnv):
         #self.reset(default=True)
 
     # implement how the game board initialization should work
-    def reset(self, seed=None, options=None):
+    def reset(self, *, seed=None, options=None):
         #print("reset")
         #random.seed(seed)
         #self.cur_pos = 0
@@ -111,3 +113,26 @@ class GameBoardEnv(TaskSettableEnv):
         self.training_states = self.training_levels[task]
         self.training_index = 0
 
+    def __deepcopy__(self, memo):
+        # Create a new instance of the class with the same configuration
+        new_env = GameBoardEnv(config=self.config)
+
+        # Copy all attributes of the environment
+        new_env.task_level = deepcopy(self.task_level, memo)
+        new_env.variant = deepcopy(self.variant, memo)
+        new_env.n_steps = deepcopy(self.n_steps, memo)
+        new_env.training_index = deepcopy(self.training_index, memo)
+        new_env.width = deepcopy(self.width, memo)
+        new_env.height = deepcopy(self.height, memo)
+        new_env.training_levels = deepcopy(self.training_levels, memo)
+        new_env.training_states = deepcopy(self.training_states, memo)
+        new_env.observation_space = deepcopy(self.observation_space, memo)
+        new_env.action_space = deepcopy(self.action_space, memo)
+        new_env.current_board = deepcopy(self.current_board, memo)
+        new_env.goal_board = deepcopy(self.goal_board, memo)
+        new_env.max_steps = deepcopy(self.max_steps, memo)
+
+        # Deep copy the reward module
+        #new_env.reward_module = deepcopy(self.reward_module, memo)
+
+        return new_env

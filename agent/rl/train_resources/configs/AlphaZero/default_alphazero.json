@@ -1,5 +1,6 @@
 {
     "num_rollout_workers": 1,
-    "sgd_minibatch_size": 256,
-    "lr": 0.0002
+    "model": {
+        "custom_model": "default_alphazero_model"
+    }
 }

@@ -8,6 +8,7 @@ from ray.air.integrations.wandb import WandbLoggerCallback
 from train_resources.curriculum_callbacks import CurriculumCallbacks
 from train_resources.curriculum_function import curriculum_fn
 from train_resources.avalancheEnv import GameBoardEnv
+from train_resources.envWrapperAlphaZero import WrappedGameBoardEnv
 import functools
 
 import argparse
@@ -118,21 +119,26 @@ env_setup["variant"] = args.variant
 env_setup["curriculum_threshold"] = float(args.curriculum_threshold)
 env_setup["start_level"] = 0
 
-"""
-#register custom model from model.py
-ModelCatalog.register_custom_model(
-    "my_model", CustomModel
-)
-"""
 
 #initialize ray
-ray.init(num_cpus=int(args.num_cpus), num_gpus=1)
+ray.init(num_cpus=int(args.num_cpus))
 
 #initialize our optimization algorithm
 if args.algo == "PPO":
     config = PPOConfig()
+    env_class = GameBoardEnv
 elif args.algo == "AlphaZero":
     config = AlphaZeroConfig()
+    env_class = WrappedGameBoardEnv
+    #register custom model from model.py
+    from train_resources.az_model import AlphaZeroModel
+    ModelCatalog.register_custom_model(
+        "default_alphazero_model", AlphaZeroModel
+    )
+    #from ray.rllib.algorithms.alpha_zero.models.custom_torch_models import DenseModel
+    #ModelCatalog.register_custom_model(
+    #    "default_alphazero_model", DenseModel
+    #)
 
 config_path = "./train_resources/configs/" + args.algo + "/" + args.config
 pre_config = json.load(open(config_path + ".json"))
@@ -147,11 +153,11 @@ stop = {
 if args.curriculum == "manual":
     custom_callback_class = functools.partial(CurriculumCallbacks, env_setup)
     config = config.callbacks(custom_callback_class)
-    config = config.environment(GameBoardEnv, env_config=env_setup)
+    config = config.environment(env_class, env_config=env_setup)
 elif args.curriculum == "ray":
-    config = config.environment(GameBoardEnv, env_config=env_setup, env_task_fn=curriculum_fn)
+    config = config.environment(env_class, env_config=env_setup, env_task_fn=curriculum_fn)
 else:
-    config = config.environment(GameBoardEnv, env_config=env_setup)
+    config = config.environment(env_class, env_config=env_setup)
 
 #start a training run, make sure you indicate the correct optimization algorithm
 #local dir and name define where training results and checkpoints are saved to
@@ -160,22 +166,23 @@ else:
 cb = []
 if args.wandb:
     cb.append(
-            WandbLoggerCallback(
-                api_key_file="wandb_api_key.txt",
-                entity="mtp2023_avalanche",
-                project="CurriculumLearning",
-                group=args.algo,
-                name=args.log_as,
-                save_checkpoints=True
-            )
+        WandbLoggerCallback(
+            api_key_file="wandb_api_key.txt",
+            entity="mtp2023_avalanche",
+            project="CurriculumLearning",
+            group=args.algo,
+            name=args.log_as,
+            save_checkpoints=True
+        )
     )
 
 tune.Tuner(
-        args.algo,
-        run_config=air.RunConfig(stop=stop,
-                                name=args.results_folder,
-                                checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
-                                callbacks=cb
-                                ),
-        param_space=config.to_dict()
+    args.algo,
+    run_config=air.RunConfig(
+        stop=stop,
+        name=args.results_folder,
+        checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
+        callbacks=cb
+        ),
+    param_space=config.to_dict()
 ).fit()

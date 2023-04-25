@@ -1,16 +1,16 @@
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
-from ray.rllib.env import BaseEnv
-from ray.rllib.env.base_env import BaseEnv
-from ray.rllib.policy.policy import Policy
+from ray.rllib.algorithms.alpha_zero.alpha_zero import AlphaZeroDefaultCallbacks
 from ray.rllib.algorithms import Algorithm
 
-class CurriculumCallbacks(DefaultCallbacks):
+class CurriculumCallbacks(AlphaZeroDefaultCallbacks):
 
     def __init__(self, env_setup):
-        super().__init__()
         self.current_level = env_setup["start_level"]
         self.num_levels = len(env_setup["training_levels"])
         self.curriculum_threshold = env_setup["curriculum_threshold"]
+
+    def on_episode_start(self, *, worker, base_env, policies, episode, env_index, **kwargs):
+        super().on_episode_start(worker, base_env, policies, episode, **kwargs)
 
     def on_train_result(
         self,
@@ -20,6 +20,7 @@ class CurriculumCallbacks(DefaultCallbacks):
         **kwargs,
     ) -> None:
         #print(pretty_print(result))
+
         if result["episode_reward_mean"] >= self.curriculum_threshold:
             if self.current_level + 1 < self.num_levels:
                 task = self.current_level + 1
