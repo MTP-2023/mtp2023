@@ -4,13 +4,15 @@ from ray.rllib.algorithms import Algorithm
 
 class CurriculumCallbacks(AlphaZeroDefaultCallbacks):
 
-    def __init__(self, env_setup):
+    def __init__(self, env_setup, alphazero):
         self.current_level = env_setup["start_level"]
         self.num_levels = len(env_setup["training_levels"])
         self.curriculum_threshold = env_setup["curriculum_threshold"]
+        self.alphazero = alphazero
 
     def on_episode_start(self, *, worker, base_env, policies, episode, env_index, **kwargs):
-        super().on_episode_start(worker, base_env, policies, episode, **kwargs)
+        if self.alphazero:
+            super().on_episode_start(worker, base_env, policies, episode, **kwargs)
 
     def on_train_result(
         self,

@@ -123,6 +123,7 @@ env_setup["start_level"] = 0
 #initialize ray
 ray.init(num_cpus=int(args.num_cpus))
 
+alphazero_cb = False
 #initialize our optimization algorithm
 if args.algo == "PPO":
     config = PPOConfig()
@@ -130,6 +131,7 @@ if args.algo == "PPO":
 elif args.algo == "AlphaZero":
     config = AlphaZeroConfig()
     env_class = WrappedGameBoardEnv
+    alphazero_cb = True
     #register custom model from model.py
     from train_resources.az_model import AlphaZeroModel
     ModelCatalog.register_custom_model(
@@ -151,7 +153,7 @@ stop = {
     }
 
 if args.curriculum == "manual":
-    custom_callback_class = functools.partial(CurriculumCallbacks, env_setup)
+    custom_callback_class = functools.partial(CurriculumCallbacks, env_setup, alphazero_cb)
     config = config.callbacks(custom_callback_class)
     config = config.environment(env_class, env_config=env_setup)
 elif args.curriculum == "ray":
