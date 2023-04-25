@@ -1,6 +1,7 @@
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
 from ray.rllib.algorithms.alpha_zero.alpha_zero import AlphaZeroDefaultCallbacks
 from ray.rllib.algorithms import Algorithm
+from sympy import pretty_print
 
 class CurriculumCallbacks(AlphaZeroDefaultCallbacks):
 
@@ -14,14 +15,16 @@ class CurriculumCallbacks(AlphaZeroDefaultCallbacks):
         if self.alphazero:
             super().on_episode_start(worker, base_env, policies, episode, **kwargs)
 
-    def on_train_result(
-        self,
-        *,
-        algorithm: "Algorithm",
-        result: dict,
-        **kwargs,
-    ) -> None:
-        #print(pretty_print(result))
+    def on_episode_step(self, *, worker, base_env, policies, episode, env_index, **kwargs) -> None:
+        print("HERE")
+        return super().on_episode_step(worker=worker, base_env=base_env, policies=policies, episode=episode, env_index=env_index, **kwargs)
+
+    def on_episode_end(self, *, worker, base_env, policies, episode, env_index, **kwargs) -> None:
+        print("DONE")
+        return super().on_episode_end(worker=worker, base_env=base_env, policies=policies, episode=episode, env_index=env_index, **kwargs)
+
+    def on_train_result(self, *, algorithm: "Algorithm", result: dict, **kwargs) -> None:
+        print("RESULT", pretty_print(result))
 
         if result["episode_reward_mean"] >= self.curriculum_threshold:
             if self.current_level + 1 < self.num_levels:

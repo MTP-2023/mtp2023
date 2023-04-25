@@ -133,7 +133,7 @@ elif args.algo == "AlphaZero":
     env_class = WrappedGameBoardEnv
     alphazero_cb = True
     #register custom model from model.py
-    from train_resources.az_model import AlphaZeroModel
+    from train_resources.azModel import AlphaZeroModel
     ModelCatalog.register_custom_model(
         "default_alphazero_model", AlphaZeroModel
     )

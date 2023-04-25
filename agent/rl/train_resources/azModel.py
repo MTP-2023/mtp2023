@@ -34,26 +34,31 @@ class AlphaZeroModel(ActorCriticModel):
     def forward(self, input_dict, state, seq_lens):
         x = input_dict["obs"].float()
         
+        log = False
         # Print out the input tensor
-        print("CHECK Input tensor:", x)
+        if log:
+            print("CHECK Input tensor:", x)
         
         # Pass the input tensor through the shared layers
         x = self.shared_layers(x)
         
         # Print out the output of the shared layers
-        print("CHECK Shared layers output:", x)
+        if log:
+            print("CHECK Shared layers output:", x)
         
         # Pass the output of the shared layers through the actor layers
         logits = self.actor_layers(x)
         
         # Print out the logits
-        print("CHECK Logits:", logits)
+        if log:
+            print("CHECK Logits:", logits)
         
         # Pass the output of the shared layers through the critic layers
         value_out = self.critic_layers(x)
         
         # Print out the value output
-        print("CHECK Value out:", value_out)
+        if log:
+            print("CHECK Value out:", value_out)
         
         self._value_out = value_out.squeeze(1)
         return logits, state
