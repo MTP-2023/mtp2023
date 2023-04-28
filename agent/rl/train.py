@@ -5,7 +5,7 @@ from ray.rllib.utils.framework import try_import_tf, try_import_torch
 from ray.rllib.algorithms.ppo import PPOConfig
 from ray.rllib.algorithms.alpha_zero import AlphaZeroConfig
 from ray.air.integrations.wandb import WandbLoggerCallback
-from train_resources.curriculum_callbacks import CurriculumCallbacks
+from train_resources.custom_callbacks import CustomCallbacks
 from train_resources.curriculum_function import curriculum_fn
 from train_resources.avalancheEnv import GameBoardEnv
 from train_resources.envWrapperAlphaZero import WrappedGameBoardEnv
@@ -153,13 +153,18 @@ stop = {
     }
 
 if args.curriculum == "manual":
-    custom_callback_class = functools.partial(CurriculumCallbacks, env_setup, alphazero_cb)
-    config = config.callbacks(custom_callback_class)
+    curriculum_cb = True
     config = config.environment(env_class, env_config=env_setup)
 elif args.curriculum == "ray":
+    curriculum_cb = False
     config = config.environment(env_class, env_config=env_setup, env_task_fn=curriculum_fn)
 else:
+    curriculum_cb = False
     config = config.environment(env_class, env_config=env_setup)
+
+custom_callback_class = functools.partial(CustomCallbacks, env_setup, alphazero_cb, curriculum_cb)
+config = config.callbacks(custom_callback_class)
+    
 
 #start a training run, make sure you indicate the correct optimization algorithm
 #local dir and name define where training results and checkpoints are saved to
