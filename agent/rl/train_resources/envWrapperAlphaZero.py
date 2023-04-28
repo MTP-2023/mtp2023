@@ -51,13 +51,13 @@ class WrappedGameBoardEnv(gym.Env):
         self.running_reward = state[1]
         self.env = deepcopy(state[0])
         obs = {
-            "current": tensor(self.env.current_board),
-            "goal": tensor(self.env.goal_board)
+            "current": self.env.current_board,
+            "goal": self.env.goal_board
         }
         return {"obs": self.flatten_original_obs(obs), "action_mask": np.ones((self.env.n_choices,), dtype=int)}
 
     def get_state(self):
-        #print("AAAAAAAAAAAA", self.env)
+        #print("GET STATE", self.env)
         return deepcopy(self.env), self.running_reward
     
     def flatten_original_obs(self, obs):

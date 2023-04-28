@@ -1,7 +1,6 @@
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
 from ray.rllib.algorithms.alpha_zero.alpha_zero import AlphaZeroDefaultCallbacks
 from ray.rllib.algorithms import Algorithm
-from sympy import pretty_print
 
 class CustomCallbacks(AlphaZeroDefaultCallbacks):
 
@@ -25,7 +24,7 @@ class CustomCallbacks(AlphaZeroDefaultCallbacks):
         return super().on_episode_end(worker=worker, base_env=base_env, policies=policies, episode=episode, env_index=env_index, **kwargs)
 
     def on_train_result(self, *, algorithm: "Algorithm", result: dict, **kwargs) -> None:
-        print("RESULT", pretty_print(result))
+        print("RESULT", result)
 
         if self.curriculum:
             if result["episode_reward_mean"] >= self.curriculum_threshold:
