@@ -62,3 +62,9 @@ class WrappedGameBoardEnv(gym.Env):
     
     def flatten_original_obs(self, obs):
         return FlattenObservation(self.env).observation(obs)
+
+    def set_task(self, task):
+        self.env.set_task(task)
+
+    def get_task(self):
+        return self.env.get_task()
