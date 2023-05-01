@@ -14,7 +14,7 @@ import functools
 import argparse
 import json
 import jsonschema
-from model import CustomModel
+#from model import CustomModel
 
 tf1, tf, tfv = try_import_tf()
 torch, nn = try_import_torch()

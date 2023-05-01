@@ -16,11 +16,11 @@ class CustomCallbacks(AlphaZeroDefaultCallbacks):
             super().on_episode_start(worker, base_env, policies, episode, **kwargs)
 
     def on_episode_step(self, *, worker, base_env, policies, episode, env_index, **kwargs) -> None:
-        print("HERE")
+        #print("HERE")
         return super().on_episode_step(worker=worker, base_env=base_env, policies=policies, episode=episode, env_index=env_index, **kwargs)
 
     def on_episode_end(self, *, worker, base_env, policies, episode, env_index, **kwargs) -> None:
-        print("DONE")
+        #print("DONE")
         return super().on_episode_end(worker=worker, base_env=base_env, policies=policies, episode=episode, env_index=env_index, **kwargs)
 
     def on_train_result(self, *, algorithm: "Algorithm", result: dict, **kwargs) -> None:
