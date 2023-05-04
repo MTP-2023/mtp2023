@@ -29,20 +29,18 @@ const useHandleBoard = (board: number[][]) => {
 
     if (loadingDrop) return;
 
-    console.log("before za frop", boards, boardIndex);
     if (boards.length > 0 && boardIndex != boards.length - 1) return;
-    console.log("handleMarbleDrop");
 
     setLoadingDrop(true);
     try {
       const newBoard = await calculateBoard(currentBoard, column);
-      console.log(newBoard);
+
       const boards = newBoard.boards;
       setBoards(boards);
       setCurrentBoard(boards[0]);
       const marbles = newBoard.marbles;
       marbles.push([]);
-      console.log(marbles);
+
       setMarbles(marbles);
       setCurrentMarbles(marbles[0]);
 
@@ -54,23 +52,13 @@ const useHandleBoard = (board: number[][]) => {
   };
 
   const handleBoardChange = async (action: string) => {
-    console.log("handleBoardChange");
-    console.log(boards);
     if (!boards || !marbles) return;
-    console.log("handleBoardChange2");
+
     if (action == "back" && boardIndex > 0) {
-      console.log("prev");
-      console.log(boardIndex);
-      console.log(boards);
       setBoardIndex((prev) => prev - 1);
     } else if (action == "forward" && boardIndex < boards.length - 1) {
-      console.log("next");
-      console.log(boardIndex);
-      console.log(boards);
       setBoardIndex((prev) => prev + 1);
     } else if (action == "last") {
-      console.log("last");
-      console.log(boardIndex);
       setBoardIndex(boards.length - 1);
     }
   };

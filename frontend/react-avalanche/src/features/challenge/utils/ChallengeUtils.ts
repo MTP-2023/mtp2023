@@ -1,4 +1,4 @@
-const checkSwitchHasMarble = (left: number, right: number) => {
+export const checkSwitchHasMarble = (left: number, right: number) => {
   return right === 2 || left === 2;
 };
 

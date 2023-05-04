@@ -2,9 +2,7 @@ import React from "react";
 import { fetchBoard } from "../../../api/publicApi";
 
 const useBoardContext = () => {
-  const [currentBoard, setCurrentBoard] = React.useState<
-    number[][] | undefined
-  >(undefined);
+  const [currentBoard, setCurrentBoard] = React.useState<number[][]>([]);
   const [loadingStart, setLoadingStart] = React.useState<boolean>(false);
   const [errorStart, setError] = React.useState<boolean>(false);
   const [width, setWidth] = React.useState<number>(3);
@@ -59,7 +57,7 @@ type UseBoardContextType = ReturnType<typeof useBoardContext>;
 const initialState: UseBoardContextType = {
   loadingStart: false,
   errorStart: false,
-  currentBoard: undefined,
+  currentBoard: [],
   sizeControls: {
     increaseHeight: () => {},
     decreaseHeight: () => {},
@@ -93,7 +91,7 @@ export type sizeControlsType = {
 type useBoardType = {
   loadingStart: boolean;
   errorStart: boolean;
-  currentBoard: number[][] | undefined;
+  currentBoard: number[][];
   sizeControls: sizeControlsType;
 };
 

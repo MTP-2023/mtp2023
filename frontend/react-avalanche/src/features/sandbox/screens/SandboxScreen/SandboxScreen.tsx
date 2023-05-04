@@ -10,10 +10,10 @@ import useHandleBoard from "../../../board/hooks/useHandleBoard";
 const SandboxScreen = () => {
   const { currentBoard: start, sizeControls } = useBoard();
 
-  if (!start) return null;
-
   const { currentBoard, currentMarbles, handleMarbleDrop, handleBoardChange } =
     useHandleBoard(start);
+
+  if (!start) return null;
 
   return (
     <div className="center">
