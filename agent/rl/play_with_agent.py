@@ -7,16 +7,30 @@ from ray.rllib.algorithms.ppo import PPOConfig
 import sys
 
 sys.path.append("../../")
-from gameVariants.baseline.reward import baselineReward
+from gameVariants.baseline.reward import reward
 from gameResources.simulation.simulate import run
-from agent.rl.train_resources import avalancheEnv
+from agent.rl.train_resources.avalancheEnv import GameBoardEnv
+from ray.rllib.models import ModelCatalog
 from collections import OrderedDict
 
 # policy = Policy.from_checkpoint(
 #     "C:/Users/thoma/PycharmProjects/mtp2023/gameEnv/rllibEnv/results/PPO_no_model_gen_test2_new_rewards_big_grid_search/PPO_GameBoardEnv_fc999_00006_6_clip_param=0.3000,lr=0.0002_2023-03-21_19-07-29/checkpoint_000300/policies/default_policy")
 
-agent = Algorithm.from_checkpoint("C:/Users/thoma/PycharmProjects/mtp2023/gameEnv/rllibEnv/results/PPO_no_model_gen_test2_new_rewards_big_grid_search/PPO_GameBoardEnv_fc999_00006_6_clip_param=0.3000,lr=0.0002_2023-03-21_19-07-29/checkpoint_000300")
+def return_move(artifact_dir, obs):
+    # load policy
+    agent = Policy.from_checkpoint(artifact_dir)
 
+    # create "empty" env to obtain preprocessor
+    preprocessor = ModelCatalog.get_preprocessor(GameBoardEnv(config={}, example_board=challenge.current))
+
+    # flatten obs and query results
+    flat_obs = preprocessor.transform(obs)
+    move = agent.compute_single_action(flat_obs)
+
+    # returns action
+    return move[0]
+
+agent = Algorithm.from_checkpoint("C:/Users/thoma/PycharmProjects/mtp2023/gameEnv/rllibEnv/results/PPO_no_model_gen_test2_new_rewards_big_grid_search/PPO_GameBoardEnv_fc999_00006_6_clip_param=0.3000,lr=0.0002_2023-03-21_19-07-29/checkpoint_000300")
 
 challenges = json.load(open("../../gameVariants/baseline/training/generationTest2.json"))
 height = challenges["height"] * 2
@@ -44,7 +58,7 @@ for j in range(noOfChallenges):
         print("TURN", i, "SELECTED MOVE:", move)
         run(move, current_board)
         print("UPDATED BOARD\n", current_board)
-        reward, done = baselineReward(i, max_steps, height, width, goal_board, current_board)
+        reward, done = reward(i, max_steps, height, width, goal_board, current_board)
         if done:
             print("FINISHED CHALLENGE IN", i, "TURNS\n")
             solvedChallenges += 1

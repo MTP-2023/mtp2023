@@ -4,9 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import sys
 sys.path.append('../')
+sys.path.append('../..')
 from simulation.simulate import run
 from boardGenerator.generate import generate_random_board
 from challengeGenerator.generateGoal import generateGoalState
+from ray.rllib.algorithms.algorithm import Algorithm
+from collections import OrderedDict
+import numpy as np
+from agent.rl.apply_policy import return_move
 
 # basic description of API endpoints for /docs
 tags_metadata = [
@@ -26,6 +31,10 @@ tags_metadata = [
         "name": "interpret",
         "description": "Provide a game board status and a marble throw. Receive the updated game state with all intermediate steps.",
     },
+    {
+        "name": "solve",
+        "description": "Request the next throw from a pretrained agent.",
+    }
 ]
 
 
@@ -50,6 +59,10 @@ default_height = 2
 class SimulationDTO(BaseModel):
     marble_throw: int
     board: list
+
+class ChallengeDTO(BaseModel):
+    current: list
+    goal: list
 
 # request new random board
 @app.get("/randomboard", tags=["randomboard"])
@@ -79,3 +92,18 @@ async def returnChallenge(width: int = default_width, height: int = default_heig
 async def runSimulation(gameBoard: SimulationDTO):
     updatedStates = run(gameBoard.marble_throw, gameBoard.board, return_intermediate_data = True)
     return updatedStates
+
+# request the next action from a pretrained RL agent
+@app.get("/solve/", tags=["solve"])
+async def requestAction(challenge: ChallengeDTO, artifact_dir: str='../../gameResources/trainedAgents/test/policies/default_policy'):
+    # create observation
+    obs = OrderedDict()
+    obs["current"] = np.array(challenge.current)
+    obs["goal"] = np.array(challenge.goal)
+
+    from ray.rllib.policy.policy import Policy
+    agent = Policy.from_checkpoint(artifact_dir)
+    action = return_move(artifact_dir, obs)
+
+    print(action)
+    return action
