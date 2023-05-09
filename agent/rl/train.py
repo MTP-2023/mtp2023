@@ -1,38 +1,23 @@
-import argparse
-import numpy as np
-import os
-import random
-
-from ray.rllib.env import EnvContext
 import ray
 from ray import air, tune
-from ray.rllib.env.env_context import EnvContext
 from ray.rllib.models import ModelCatalog
-from ray.rllib.models.tf.tf_modelv2 import TFModelV2
-from ray.rllib.models.tf.fcnet import FullyConnectedNetwork
-from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
-from ray.rllib.models.torch.fcnet import FullyConnectedNetwork as TorchFC
 from ray.rllib.utils.framework import try_import_tf, try_import_torch
-from ray.rllib.utils.test_utils import check_learning_achieved
-from ray.tune.logger import pretty_print
-from ray.tune.registry import get_trainable_cls
-from ray.rllib.models.tf.misc import normc_initializer
-from ray.rllib.algorithms import ppo
 from ray.rllib.algorithms.ppo import PPOConfig
-from ray.rllib.algorithms.dqn import DQNConfig
-from ray.rllib.algorithms.algorithm import Algorithm
+from ray.rllib.algorithms.alpha_zero import AlphaZeroConfig
 from ray.air.integrations.wandb import WandbLoggerCallback
+from train_resources.custom_callbacks import CustomCallbacks
+from train_resources.curriculum_function import curriculum_fn
+from train_resources.avalancheEnv import GameBoardEnv
+from train_resources.envWrapperAlphaZero import WrappedGameBoardEnv
+import functools
+
+import argparse
+import json
+import jsonschema
+#from model import CustomModel
 
 tf1, tf, tfv = try_import_tf()
 torch, nn = try_import_torch()
-
-import json
-import jsonschema
-from model import CustomModel
-
-from avalancheEnv import GameBoardEnv
-from curriculum_function import curriculum_fn
-
 
 #we use argparse so you can configure the training settings from the command line call of the script like so:
 #python train.py --variant baseline --train_on generationTest2
@@ -48,7 +33,7 @@ parser.add_argument(
 #argument to set the training scenarios for the agent
 parser.add_argument(
     "--train_on",
-    default="test",
+    default="curriculumVer1",
     help="The name of the json file which contains training scenarios."
 )
 
@@ -74,13 +59,45 @@ parser.add_argument(
     help="Define the name of the run which will be displayed in WandB."
 )
 
+parser.add_argument(
+    "--num_cpus",
+    default=2,
+    help="Number of CPUs available (important for cluster runs)."
+)
+
+parser.add_argument(
+    "--algo",
+    default="PPO",
+    help="Sefine which algorrithm should be applied."
+)
+
+parser.add_argument(
+    "--config",
+    default="default_ppo",
+    help="Sefine which algorrithm should be applied."
+)
+
+parser.add_argument(
+    "--curriculum",
+    default="manual",
+    help="Define if the curriculum learning concept should be applied."
+)
+
+# this option can be turned off by providing "--no-wandb"
+parser.add_argument(
+    "--wandb",
+    default=True,
+    action=argparse.BooleanOptionalAction,
+    help="Define if run should be logged to wandb."
+)
+
 args = parser.parse_args()
 
 # quick and dirty addition for baseline_strict (TO BE CHANGED)
 # list of variants that use the same json format as the baseline variant and, thus, do not have dedicated training folders 
-baseline_adapted_variants = ['baseline_strict']
+baseline_adapted_variants = ['baseline_strict', 'baseline_solverate']
 
-if args.variant in "baseline_strict":
+if args.variant in "baseline_strict" or args.variant in "baseline_solverate":
     path = "../../gameVariants/baseline"
 else:
     path = "../../gameVariants/" + args.variant
@@ -100,26 +117,34 @@ except Exception as e:
 #we use this to pass the game variant selection to the environment
 env_setup["variant"] = args.variant
 env_setup["curriculum_threshold"] = float(args.curriculum_threshold)
+env_setup["start_level"] = 0
 
-#register custom model from model.py
-ModelCatalog.register_custom_model(
-    "my_model", CustomModel
-)
 
 #initialize ray
-ray.init()
+ray.init(num_cpus=int(args.num_cpus))
 
-#initialize our optimization algorithm (PPO in this case)
-config = PPOConfig()
-#configure the algorithm's settings
-config.rollouts(num_rollout_workers=1)
-#uncomment to use the custom model
-#config = config.training(model={"custom_model": "my_model"})
-#this shows how to define a grid search over various parameters
-#config.training(lr=tune.grid_search([0.0001, 0.0002, 0.00001]), clip_param=tune.grid_search([0.1, 0.2, 0.3, 0.4]))
-config = config.training(lr=0.0002, clip_param=0.3)
-#configuring the game environment
-config = config.environment(GameBoardEnv, env_config=env_setup, env_task_fn=curriculum_fn)
+alphazero_cb = False
+#initialize our optimization algorithm
+if args.algo == "PPO":
+    config = PPOConfig()
+    env_class = GameBoardEnv
+elif args.algo == "AlphaZero":
+    config = AlphaZeroConfig()
+    env_class = WrappedGameBoardEnv
+    alphazero_cb = True
+    #register custom model from model.py
+    from train_resources.azModel import AlphaZeroModel
+    ModelCatalog.register_custom_model(
+        "default_alphazero_model", AlphaZeroModel
+    )
+    #from ray.rllib.algorithms.alpha_zero.models.custom_torch_models import DenseModel
+    #ModelCatalog.register_custom_model(
+    #    "default_alphazero_model", DenseModel
+    #)
+
+config_path = "./train_resources/configs/" + args.algo + "/" + args.config
+pre_config = json.load(open(config_path + ".json"))
+config.update_from_dict(pre_config)
 
 #stopping conditions, these are assumed to be increasing by ray tune (meaning we can't use metrics we want to decrease, e.g. episode length, as stopping criteria)
 stop = {
@@ -127,26 +152,44 @@ stop = {
         "episode_reward_mean": float(args.stop_reward),
     }
 
+if args.curriculum == "manual":
+    curriculum_cb = True
+    config = config.environment(env_class, env_config=env_setup)
+elif args.curriculum == "ray":
+    curriculum_cb = False
+    config = config.environment(env_class, env_config=env_setup, env_task_fn=curriculum_fn)
+else:
+    curriculum_cb = False
+    config = config.environment(env_class, env_config=env_setup)
+
+custom_callback_class = functools.partial(CustomCallbacks, env_setup, alphazero_cb, curriculum_cb)
+config = config.callbacks(custom_callback_class)
+    
+
 #start a training run, make sure you indicate the correct optimization algorithm
 #local dir and name define where training results and checkpoints are saved to
 #checkpoint config defines if and when checkpoints are saved
 
+cb = []
+if args.wandb:
+    cb.append(
+        WandbLoggerCallback(
+            api_key_file="wandb_api_key.txt",
+            entity="mtp2023_avalanche",
+            project="CurriculumLearning",
+            group=args.algo,
+            name=args.log_as,
+            save_checkpoints=True
+        )
+    )
+
 tune.Tuner(
-        "PPO",
-        run_config=air.RunConfig(stop=stop, 
-                                    local_dir="./results", 
-                                    name=args.results_folder,
-                                    checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
-                                    callbacks=[
-                                    # adjust the entries here to conform to your wandb environment
-                                    # cf. https://docs.wandb.ai/ and https://docs.ray.io/en/master/tune/examples/tune-wandb.html
-                                    WandbLoggerCallback(
-                                        api_key_file="wandb_api_key.txt",
-                                        entity="mtp2023_avalanche",
-                                        project="wandb_test_runs",
-                                        group="first_test",
-                                        name=args.log_as
-                                    )]
-                                ),
-                                param_space=config.to_dict(),
-    ).fit()
+    args.algo,
+    run_config=air.RunConfig(
+        stop=stop,
+        name=args.results_folder,
+        checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
+        callbacks=cb
+        ),
+    param_space=config.to_dict()
+).fit()
