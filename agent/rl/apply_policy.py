@@ -1,11 +1,7 @@
-from agent.rl.train_resources.avalancheEnv import GameBoardEnv
+from train_resources.avalancheEnv import GameBoardEnv
 from ray.rllib.models import ModelCatalog
-from ray.rllib.policy.policy import Policy
 
-def return_move(artifact_dir, obs):
-    # load policy
-    #agent = Policy.from_checkpoint(artifact_dir)
-
+def return_move(agent, obs):
     # create "empty" env to obtain preprocessor
     preprocessor = ModelCatalog.get_preprocessor(GameBoardEnv(config={}, example_board=obs["current"]))
 

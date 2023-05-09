@@ -4,14 +4,18 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import sys
 sys.path.append('../')
-sys.path.append('../..')
+sys.path.append('../../agent/rl')
 from simulation.simulate import run
 from boardGenerator.generate import generate_random_board
 from challengeGenerator.generateGoal import generateGoalState
-from ray.rllib.algorithms.algorithm import Algorithm
 from collections import OrderedDict
 import numpy as np
-from agent.rl.apply_policy import return_move
+from apply_policy import return_move
+from ray.rllib.policy.policy import Policy
+
+# load policy
+artifact_dir ='../../gameResources/trainedAgents/test/policies/default_policy'
+agent = Policy.from_checkpoint(artifact_dir)
 
 # basic description of API endpoints for /docs
 tags_metadata = [
@@ -95,15 +99,15 @@ async def runSimulation(gameBoard: SimulationDTO):
 
 # request the next action from a pretrained RL agent
 @app.get("/solve/", tags=["solve"])
-async def requestAction(challenge: ChallengeDTO, artifact_dir: str='../../gameResources/trainedAgents/test/policies/default_policy'):
+async def requestAction(challenge: ChallengeDTO):
     # create observation
     obs = OrderedDict()
     obs["current"] = np.array(challenge.current)
     obs["goal"] = np.array(challenge.goal)
 
-    from ray.rllib.policy.policy import Policy
-    agent = Policy.from_checkpoint(artifact_dir)
-    action = return_move(artifact_dir, obs)
+    action = return_move(agent, obs)
 
     print(action)
-    return action
+    return {
+        "action": int(action)
+    }
