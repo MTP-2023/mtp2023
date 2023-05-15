@@ -1,6 +1,0 @@
-{
-    "num_rollout_workers": 1,
-    "model": {
-        "custom_model": "default_alphazero_model"
-    }
-}
