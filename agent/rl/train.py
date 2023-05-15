@@ -91,6 +91,12 @@ parser.add_argument(
     help="Define if run should be logged to wandb."
 )
 
+parser.add_argument(
+    "--num_gpus",
+    default=0,
+    help="Number of GPUs to use (important for cluster)."
+)
+
 args = parser.parse_args()
 
 # quick and dirty addition for baseline_strict (TO BE CHANGED)
@@ -121,7 +127,7 @@ env_setup["start_level"] = 0
 
 
 #initialize ray
-ray.init(num_cpus=int(args.num_cpus))
+ray.init(num_cpus=int(args.num_cpus), num_gpus=1)
 
 alphazero_cb = False
 #initialize our optimization algorithm
@@ -162,6 +168,9 @@ else:
     curriculum_cb = False
     config = config.environment(env_class, env_config=env_setup)
 
+if float(args.num_gpus)>0:
+    config = config.resources(num_gpus=float(args.num_gpus))
+
 custom_callback_class = functools.partial(CustomCallbacks, env_setup, alphazero_cb, curriculum_cb)
 config = config.callbacks(custom_callback_class)
     
@@ -189,6 +198,7 @@ tune.Tuner(
         stop=stop,
         name=args.results_folder,
         checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
+        local_dir=args.results_folder,
         callbacks=cb
         ),
     param_space=config.to_dict()
