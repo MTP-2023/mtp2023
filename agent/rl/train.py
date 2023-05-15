@@ -127,7 +127,7 @@ env_setup["start_level"] = 0
 
 
 #initialize ray
-ray.init(num_cpus=int(args.num_cpus), num_gpus=1)
+ray.init(num_cpus=int(args.num_cpus), num_gpus=int(args.num_gpus))
 
 alphazero_cb = False
 #initialize our optimization algorithm
@@ -168,8 +168,8 @@ else:
     curriculum_cb = False
     config = config.environment(env_class, env_config=env_setup)
 
-if float(args.num_gpus)>0:
-    config = config.resources(num_gpus=float(args.num_gpus))
+if int(args.num_gpus)>0:
+    config = config.resources(num_gpus=int(args.num_gpus))
 
 custom_callback_class = functools.partial(CustomCallbacks, env_setup, alphazero_cb, curriculum_cb)
 config = config.callbacks(custom_callback_class)
