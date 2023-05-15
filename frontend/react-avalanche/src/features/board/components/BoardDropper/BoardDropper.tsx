@@ -14,7 +14,7 @@ const BoardDropper: React.FC<BoardDropperProps> = ({
   }
 
   const buttons = [];
-  for (let i = 1; i < currentBoard[0].length - 1; i++) {
+  for (let i = 1; i < currentBoard[0]?.length - 1; i++) {
     buttons.push(
       <button onClick={() => handleMarbleDrop(i - 1)} key={i}>
         {i}

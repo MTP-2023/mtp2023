@@ -20,8 +20,6 @@ const Board: React.FC<BoardProps> = ({
   currentBoard,
   currentMarbles,
 }) => {
-  console.log("current", currentBoard.length, currentMarbles);
-
   const marbleRows: (
     | string
     | number
@@ -35,10 +33,6 @@ const Board: React.FC<BoardProps> = ({
 
   const buildedBoard = [];
 
-  //console.log(currentBoard, currentMarbles)
-
-  console.log(currentBoard.length);
-
   for (let row = 0; row < currentBoard.length; row++) {
     const marbleRow = [];
     // build marbles html
@@ -50,7 +44,6 @@ const Board: React.FC<BoardProps> = ({
         currentMarbles[0].length > 0
       ) {
         for (let marble of currentMarbles) {
-          //console.log("CHECK", currentMarbles, marble)
           if (marble[0] == row && marble[1] == col) {
             //print("FOUND", marble)
             exists = true;
@@ -59,11 +52,10 @@ const Board: React.FC<BoardProps> = ({
         }
       }
       const obj = <MarblePos key={col} state={exists} />;
-      // console.log(exists, obj);
+
       marbleRow.push(obj);
     }
     marbleRows.push(marbleRow);
-    console.log("current", currentBoard, currentMarbles);
 
     const buildedRow = [];
     let key = 0;
@@ -93,15 +85,11 @@ const Board: React.FC<BoardProps> = ({
     buildedBoard.push(buildedRow);
   }
 
-  console.log("curente", currentBoard);
-
-  //console.log(marbleRows, buildedBoard)
-
   return (
     <div className={`board ${className}`}>
       <div className="board__switches">
         {buildedBoard.map((row, index) => (
-          <React.Fragment>
+          <React.Fragment key={index}>
             <div className="marble_row" key={"marble" + index}>
               {marbleRows[index]}
             </div>

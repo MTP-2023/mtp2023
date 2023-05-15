@@ -39,7 +39,7 @@ const BoardSizeController: React.FC<BoardSimulationNavigatorProps> = ({
           <button onClick={() => decreaseWidth()}>
             <FaMinus />
           </button>
-          <p>Columns: {currentBoard[0].length}</p>
+          <p>Columns: {currentBoard[0]?.length}</p>
           <button onClick={() => increaseWidth()}>
             <FaPlus />
           </button>

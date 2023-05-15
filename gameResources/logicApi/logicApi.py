@@ -10,7 +10,7 @@ from boardGenerator.generate import generate_random_board
 from challengeGenerator.generateGoal import generateGoalState
 from collections import OrderedDict
 import numpy as np
-from apply_policy import return_move
+from apply_policy import return_move, solve_challenge
 from ray.rllib.policy.policy import Policy
 
 # load policy
@@ -36,8 +36,12 @@ tags_metadata = [
         "description": "Provide a game board status and a marble throw. Receive the updated game state with all intermediate steps.",
     },
     {
+        "name": "step",
+        "description": "Request the next action from a pretrained agent.",
+    },
+    {
         "name": "solve",
-        "description": "Request the next throw from a pretrained agent.",
+        "description": "Request the sequence of moves that solves the challenge (within a mximum range).",
     }
 ]
 
@@ -98,7 +102,7 @@ async def runSimulation(gameBoard: SimulationDTO):
     return updatedStates
 
 # request the next action from a pretrained RL agent
-@app.get("/solve/", tags=["solve"])
+@app.get("/step/", tags=["step"])
 async def requestAction(challenge: ChallengeDTO):
     # create observation
     obs = OrderedDict()
@@ -107,7 +111,19 @@ async def requestAction(challenge: ChallengeDTO):
 
     action = return_move(agent, obs)
 
-    print(action)
     return {
         "action": int(action)
     }
+
+# request the solution for a challenge from a pretrained RL agent
+@app.get("/solve/", tags=["solve"])
+async def requestAction(challenge: ChallengeDTO, max_steps: int = 20):
+    # create observation
+    obs = OrderedDict()
+    obs["current"] = np.array(challenge.current)
+    obs["goal"] = np.array(challenge.goal)
+
+    # obtain solution of agent
+    solution = solve_challenge(agent, obs, max_steps)
+
+    return solution

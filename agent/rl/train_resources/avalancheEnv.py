@@ -20,8 +20,8 @@ class GameBoardEnv(TaskSettableEnv):
     """Example of a custom env in which you have to walk down a corridor.
     You can configure the length of the corridor via the env config."""
 
-    def __init__(self, config: EnvContext, example_board: list = None):
-        if example_board.any():
+    def __init__(self, config: EnvContext, example_board: list = []):
+        if any(example_board):
             self.height = len(example_board)
             self.width = len(example_board[0])
             self.observation_space = Dict({

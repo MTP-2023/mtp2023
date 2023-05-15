@@ -8,9 +8,7 @@ import { checkWon } from "../../utils/ChallengeUtils";
 import "./ChallengeScreenStyle.css";
 
 const ChallengeScreen = () => {
-  const { challenge } = useChallenge();
-
-  if (!challenge) return null;
+  const { challenge, challengeLoading, challengeError } = useChallenge();
 
   const { start } = challenge;
 
@@ -20,12 +18,21 @@ const ChallengeScreen = () => {
   const [won, setWon] = React.useState(false);
 
   React.useEffect(() => {
-    if (checkWon(currentBoard, challenge.goal)) {
+    if (
+      checkWon(currentBoard, challenge.goal) &&
+      !challengeLoading &&
+      !challengeError &&
+      challenge.goal[0]
+    ) {
       setWon(true);
     } else {
       setWon(false);
     }
   }, [currentBoard]);
+
+  if (!challenge) return null;
+
+  if (challengeLoading) return <div>Loading...</div>;
 
   return (
     <div className="center">

@@ -3,7 +3,10 @@ import { fetchChallenge } from "../../api/publicApi";
 import { Challenge } from "./domain";
 
 const useChallengeContext = () => {
-  const [challenge, setChallenge] = React.useState<Challenge | null>(null);
+  const [challenge, setChallenge] = React.useState<Challenge>({
+    start: [],
+    goal: [],
+  });
   const [challengeLoading, setChallengeLoading] =
     React.useState<boolean>(false);
   const [challengeError, setChallengeError] = React.useState<boolean>(false);
@@ -12,10 +15,10 @@ const useChallengeContext = () => {
     try {
       setChallengeLoading(true);
       const data = await fetchChallenge();
-      console.log("data", data);
-      for(let i = 0; i < data.start.length; i++){
-        for(let j = 0; j < data.start[i].length; j++){
-          if(data.start[i][j] === 2){
+
+      for (let i = 0; i < data.start.length; i++) {
+        for (let j = 0; j < data.start[i].length; j++) {
+          if (data.start[i][j] === 2) {
             data.start[i][j] = 1;
           }
         }
@@ -23,6 +26,8 @@ const useChallengeContext = () => {
       setChallenge(data);
     } catch (e) {
       setChallengeError(true);
+    } finally {
+      setChallengeLoading(false);
     }
   };
 
@@ -60,7 +65,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({
 };
 
 type useChallengeType = {
-  challenge: Challenge | null;
+  challenge: Challenge;
   challengeLoading: boolean;
   challengeError: boolean;
 };
