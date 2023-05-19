@@ -188,6 +188,7 @@ tune.Tuner(
     run_config=air.RunConfig(
         stop=stop,
         name=args.results_folder,
+        local_dir=args.results_folder,
         checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
         callbacks=cb
         ),
