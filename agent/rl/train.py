@@ -123,24 +123,31 @@ env_setup["start_level"] = 0
 #initialize ray
 ray.init(num_cpus=int(args.num_cpus))
 
+
+worker_dict = {
+    # adapt workers, rollout_workers and cpu_worker settings depending on num_cpus given
+    "num_workers": args.num_cpus,
+    "num_rollout_workers": args.num_cpus-1,
+    "config.num_cpus_per_worker": 1
+}
+
 alphazero_cb = False
 #initialize our optimization algorithm
 if args.algo == "PPO":
-    config = PPOConfig()
+    config = PPOConfig(worker_dict)
     env_class = GameBoardEnv
 elif args.algo == "AlphaZero":
-    config = AlphaZeroConfig()
+    config = AlphaZeroConfig(worker_dict)
     env_class = WrappedGameBoardEnv
     alphazero_cb = True
-    #register custom model from model.py
-    from train_resources.azModel import AlphaZeroModel
+    #register custom models from model.py
+    from train_resources.azModel import DefaultModel, SimplerModel
     ModelCatalog.register_custom_model(
-        "default_alphazero_model", AlphaZeroModel
+        "default_alphazero_model", DefaultModel
     )
-    #from ray.rllib.algorithms.alpha_zero.models.custom_torch_models import DenseModel
-    #ModelCatalog.register_custom_model(
-    #    "default_alphazero_model", DenseModel
-    #)
+    ModelCatalog.register_custom_model(
+        "simpler_alphazero_model", SimplerModel
+    )
 
 config_path = "./train_resources/configs/" + args.algo + "/" + args.config
 pre_config = json.load(open(config_path + ".json"))
@@ -164,7 +171,6 @@ else:
 
 custom_callback_class = functools.partial(CustomCallbacks, env_setup, alphazero_cb, curriculum_cb)
 config = config.callbacks(custom_callback_class)
-    
 
 #start a training run, make sure you indicate the correct optimization algorithm
 #local dir and name define where training results and checkpoints are saved to
