@@ -6,6 +6,7 @@ import Navbar from "./features/navigation/Components/Navbar/Navbar";
 import SandboxScreen from "./features/sandbox/screens/SandboxScreen/SandboxScreen";
 import ChallengeScreen from "./features/challenge/screens/ChallengeScreen/ChallengeScreen";
 import { ChallengeProvider } from "./features/challenge/ChallengeContext";
+import AiShowcaseScreen from "./features/aiShowcase/aiShowcaseScreen";
 
 function Layout() {
   return (
@@ -43,6 +44,14 @@ function App() {
             element={
               <ChallengeProvider>
                 <ChallengeScreen />
+              </ChallengeProvider>
+            }
+          />
+          <Route
+            path="ai"
+            element={
+              <ChallengeProvider>
+                <AiShowcaseScreen />
               </ChallengeProvider>
             }
           />

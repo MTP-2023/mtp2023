@@ -33,15 +33,15 @@ const Board: React.FC<BoardProps> = ({
 
   const buildedBoard = [];
 
-  for (let row = 0; row < currentBoard.length; row++) {
+  for (let row = 0; row < currentBoard?.length; row++) {
     const marbleRow = [];
     // build marbles html
-    for (let col = 0; col < currentBoard[row].length; col += 1) {
+    for (let col = 0; col < currentBoard[row]?.length; col += 1) {
       let exists = false;
       if (
         currentMarbles &&
-        currentMarbles.length > 0 &&
-        currentMarbles[0].length > 0
+        currentMarbles?.length > 0 &&
+        currentMarbles[0]?.length > 0
       ) {
         for (let marble of currentMarbles) {
           if (marble[0] == row && marble[1] == col) {
@@ -60,7 +60,7 @@ const Board: React.FC<BoardProps> = ({
     const buildedRow = [];
     let key = 0;
     if (row % 2 === 0) {
-      for (let col = 1; col < currentBoard[row].length - 1; col += 2) {
+      for (let col = 1; col < currentBoard[row]?.length - 1; col += 2) {
         key++;
         buildedRow.push(
           <Switcher
@@ -71,7 +71,7 @@ const Board: React.FC<BoardProps> = ({
         );
       }
     } else {
-      for (let col = 0; col < currentBoard[row].length; col += 2) {
+      for (let col = 0; col < currentBoard[row]?.length; col += 2) {
         key++;
         buildedRow.push(
           <Switcher

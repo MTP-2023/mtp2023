@@ -12,6 +12,9 @@ const Navbar = () => {
         <li>
           <Link to="/challenge">Challenge</Link>
         </li>
+        <li>
+          <Link to="/ai">AI</Link>
+        </li>
       </ul>
     </nav>
   );
