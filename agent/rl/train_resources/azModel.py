@@ -62,3 +62,34 @@ class AlphaZeroModel(ActorCriticModel):
         
         self._value_out = value_out.squeeze(1)
         return logits, state
+
+
+
+# This is an adapted version of the above, default model class
+# It reduces the amount of units per shared layer to 128
+
+class SimplerModel(ActorCriticModel):
+    def __init__(self, obs_space, action_space, num_outputs, model_config, name):
+        ActorCriticModel.__init__(
+            self, obs_space, action_space, num_outputs, model_config, name
+        )
+
+        self.shared_layers = nn.Sequential(
+            nn.Linear(obs_space.original_space["obs"].shape[0], 128),
+            nn.Linear(128, 128)
+        )
+        self.actor_layers = nn.Sequential(
+            nn.Linear(128, action_space.n)
+        )
+        self.critic_layers = nn.Sequential(
+            nn.Linear(128, 1)
+        )
+        self._value_out = None
+
+    def forward(self, input_dict, state, seq_lens):
+        x = input_dict["obs"].float()
+        x = self.shared_layers(x)
+        logits = self.actor_layers(x)
+        value_out = self.critic_layers(x)
+        self._value_out = value_out.squeeze(1)
+        return logits, state

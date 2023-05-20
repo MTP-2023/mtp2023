@@ -139,14 +139,9 @@ elif args.algo == "AlphaZero":
     env_class = WrappedGameBoardEnv
     alphazero_cb = True
     #register custom model from model.py
-    from train_resources.azModel import AlphaZeroModel
-    ModelCatalog.register_custom_model(
-        "default_alphazero_model", AlphaZeroModel
-    )
-    #from ray.rllib.algorithms.alpha_zero.models.custom_torch_models import DenseModel
-    #ModelCatalog.register_custom_model(
-    #    "default_alphazero_model", DenseModel
-    #)
+    from train_resources.azModel import AlphaZeroModel, SimplerModel
+    ModelCatalog.register_custom_model("default_alphazero_model", AlphaZeroModel)
+    ModelCatalog.register_custom_model("simpler_alphazero_model", SimplerModel)
 
 config_path = "./train_resources/configs/" + args.algo + "/" + args.config
 pre_config = json.load(open(config_path + ".json"))
