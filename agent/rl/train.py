@@ -103,7 +103,7 @@ args = parser.parse_args()
 # list of variants that use the same json format as the baseline variant and, thus, do not have dedicated training folders 
 baseline_adapted_variants = ['baseline_strict', 'baseline_solverate']
 
-if args.variant in "baseline_strict" or args.variant in "baseline_solverate":
+if args.variant in baseline_adapted_variants:
     path = "../../gameVariants/baseline"
 else:
     path = "../../gameVariants/" + args.variant
