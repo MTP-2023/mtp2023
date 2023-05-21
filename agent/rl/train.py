@@ -60,6 +60,11 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--log_group",
+    help="Define the name of the group the run will be associated with in WandB."
+)
+
+parser.add_argument(
     "--num_cpus",
     default=2,
     help="Number of CPUs available (important for cluster runs)."
@@ -98,6 +103,12 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+
+# set value of log group, if not given
+if args.log_group is None:
+    log_group = args.algo
+else:
+    log_group = args.log_group
 
 # quick and dirty addition for baseline_strict (TO BE CHANGED)
 # list of variants that use the same json format as the baseline variant and, thus, do not have dedicated training folders 
@@ -182,7 +193,7 @@ if args.wandb:
             api_key_file="wandb_api_key.txt",
             entity="mtp2023_avalanche",
             project="CurriculumLearning",
-            group=args.algo,
+            group=log_group,
             name=args.log_as,
             save_checkpoints=True
         )
