@@ -6,7 +6,7 @@ from ray.rllib.algorithms.alpha_zero.models.custom_torch_models import ActorCrit
 # Currently, this is a copy of ray.rllib.algorithms.alpha_zero.models.custom_torch_models.DenseModel that is used for debugging
 # Later, this code might be adapted to implement custom models
 
-class AlphaZeroModel(ActorCriticModel):
+class DefaultModel(ActorCriticModel):
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
         ActorCriticModel.__init__(
             self, obs_space, action_space, num_outputs, model_config, name
@@ -93,3 +93,59 @@ class SimplerModel(ActorCriticModel):
         value_out = self.critic_layers(x)
         self._value_out = value_out.squeeze(1)
         return logits, state
+    
+
+# This is an adapted version of the default model class
+# It adds complexity by adding more layers and units to the model's architecture
+class ComplexModel(ActorCriticModel):
+    def __init__(self, obs_space, action_space, num_outputs, model_config, name):
+        super(ComplexModel, self).__init__(obs_space, action_space, num_outputs, model_config, name)
+
+        num_rows, num_cols = obs_space.shape
+
+        self.shared_layers = nn.Sequential(
+            nn.Linear(num_rows * num_cols, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU()
+        )
+        self.actor_layers = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, num_outputs)
+        )
+        self.critic_layers = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 1)
+        )
+
+        self._value_out = None
+        self._initialize()
+
+    def _initialize(self):
+        for layer in self.shared_layers:
+            if isinstance(layer, nn.Linear):
+                nn.init.xavier_uniform_(layer.weight, gain=nn.init.calculate_gain("relu"))
+                nn.init.constant_(layer.bias, 0.0)
+        for layer in self.actor_layers:
+            if isinstance(layer, nn.Linear):
+                nn.init.xavier_uniform_(layer.weight)
+                nn.init.constant_(layer.bias, 0.0)
+        for layer in self.critic_layers:
+            if isinstance(layer, nn.Linear):
+                nn.init.xavier_uniform_(layer.weight)
+                nn.init.constant_(layer.bias, 0.0)
+
+    def forward(self, input_dict, state, seq_lens):
+        x = input_dict["obs"].float()
+        batch_size = x.size(0)
+        x = x.view(batch_size, -1)
+        
+        shared_out = self.shared_layers(x)
+        logits = self.actor_layers(shared_out)
+        values = self.critic_layers(shared_out).squeeze(1)
+        
+        return logits, state, values

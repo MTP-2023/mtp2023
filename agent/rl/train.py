@@ -138,10 +138,11 @@ elif args.algo == "AlphaZero":
     config = AlphaZeroConfig()
     env_class = WrappedGameBoardEnv
     alphazero_cb = True
-    #register custom model from model.py
-    from train_resources.azModel import AlphaZeroModel, SimplerModel
-    ModelCatalog.register_custom_model("default_alphazero_model", AlphaZeroModel)
+    #register custom models from model.py
+    from train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
+    ModelCatalog.register_custom_model("default_alphazero_model", DefaultModel)
     ModelCatalog.register_custom_model("simpler_alphazero_model", SimplerModel)
+    ModelCatalog.register_custom_model("complex_alphazero_model", ComplexModel)
 
 config_path = "./train_resources/configs/" + args.algo + "/" + args.config
 pre_config = json.load(open(config_path + ".json"))
