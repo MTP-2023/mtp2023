@@ -44,6 +44,12 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--stop_iter",
+    default=10000,
+    help="The # of iterations we stop training at."
+)
+
+parser.add_argument(
     "--curriculum_threshold",
     default=-0.3,
     help="The reward we go to the next level at."
@@ -161,7 +167,7 @@ config.update_from_dict(pre_config)
 
 #stopping conditions, these are assumed to be increasing by ray tune (meaning we can't use metrics we want to decrease, e.g. episode length, as stopping criteria)
 stop = {
-        #"training_iteration": 500,
+        "training_iteration": int(args.stop_iter),
         "episode_reward_mean": float(args.stop_reward),
     }
 
