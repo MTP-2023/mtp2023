@@ -129,7 +129,7 @@ class GameBoardEnv(TaskSettableEnv):
         #new_env.observation_space = deepcopy(self.observation_space, memo)
         #new_env.action_space = deepcopy(self.action_space, memo)
         new_env.current_board = deepcopy(self.current_board, memo)
-        #new_env.goal_board = deepcopy(self.goal_board, memo)
+        new_env.goal_board = deepcopy(self.goal_board, memo)
         #new_env.max_steps = deepcopy(self.max_steps, memo)
 
         # Deep copy the reward module
@@ -171,6 +171,6 @@ class SingleChallengeTestEnv(GameBoardEnv):
         # Copy all attributes of the environment
         new_env.n_steps = deepcopy(self.n_steps, memo)
         new_env.current_board = deepcopy(self.current_board, memo)
-        #new_env.goal_board = deepcopy(self.goal_board, memo)
+        new_env.goal_board = deepcopy(self.goal_board, memo)
 
         return new_env
