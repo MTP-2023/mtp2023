@@ -52,7 +52,7 @@ for k in range(noOfLevels):
         obs = OrderedDict()
         obs["current"] = current_board
         obs["goal"] = goal_board
-        results = solve_challenge(agent, obs, max_steps, is_aphazero)
+        results = solve_challenge(agent, obs, max_steps, is_alphazero)
         if results["solved"]:
             print("FINISHED CHALLENGE IN", results["actions_required"], "TURNS\n")
             solvedChallenges += 1

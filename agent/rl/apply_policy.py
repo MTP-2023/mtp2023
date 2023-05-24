@@ -4,6 +4,10 @@ from ray.rllib.models import ModelCatalog
 from gameResources.simulation.simulate import run
 from gameVariants.baseline.reward import reward
 
+from ray.rllib.evaluation.episode import Episode
+from ray.rllib.policy.policy_map import PolicyMap
+from ray.rllib.policy.sample_batch import DEFAULT_POLICY_ID
+
 # object representing the envronment that can be used for simulting steps without having an actual env
 class ShallowEnv:
     def __init__(self, current_board, goal_board, n_steps, max_steps, width, height):
@@ -33,11 +37,6 @@ def return_move(agent, shallowEnv, obs, az):
         # flatten obs and query results
         flat_obs = preprocessor.transform(obs)
 
-        from ray.rllib.evaluation.episode import Episode
-        from ray.rllib.policy.policy_map import PolicyMap
-        from ray.rllib.policy.sample_batch import DEFAULT_POLICY_ID
-
-
         dummy_episode = Episode(
             PolicyMap(),
             lambda _, __: DEFAULT_POLICY_ID,
@@ -47,7 +46,6 @@ def return_move(agent, shallowEnv, obs, az):
         )
 
         dummy_episode.user_data['initial_state'] = agent.env.get_state()
-
 
         move = agent.compute_single_action(flat_obs, episode=dummy_episode)
 

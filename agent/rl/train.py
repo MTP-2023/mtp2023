@@ -9,6 +9,7 @@ from train_resources.custom_callbacks import CustomCallbacks
 from train_resources.curriculum_function import curriculum_fn
 from train_resources.avalancheEnv import GameBoardEnv
 from train_resources.envWrapperAlphaZero import WrappedGameBoardEnv
+from train_resources.hyperparameter_callbacks import CustomWandbLoggerCallback
 import functools
 
 import argparse
@@ -100,6 +101,13 @@ parser.add_argument(
     default=True,
     action=argparse.BooleanOptionalAction,
     help="Define if run should be logged to wandb."
+)
+
+parser.add_argument(
+    "--single_train",
+    default=True,
+    action=argparse.BooleanOptionalAction,
+    help="Define if this is a simple training run with fixed hyperparameter settings or a hyperparameter tuning run."
 )
 
 parser.add_argument(
@@ -201,18 +209,122 @@ if args.wandb:
             project="CurriculumLearning",
             group=log_group,
             name=args.log_as,
+            log_config=True,
             save_checkpoints=True
         )
     )
 
-tune.Tuner(
-    args.algo,
-    run_config=air.RunConfig(
-        stop=stop,
-        name=args.results_folder,
-        checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
-        local_dir=args.results_folder,
-        callbacks=cb
-        ),
-    param_space=config.to_dict()
-).fit()
+if args.single_train:
+    tune.Tuner(
+        args.algo,
+        run_config=air.RunConfig(
+            stop=stop,
+            name=args.results_folder,
+            checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
+            local_dir=args.results_folder,
+            callbacks=cb
+            ),
+        param_space=config.to_dict()
+    ).fit()
+else:
+    
+    hp_config = {
+        "model": {
+            "custom_model": tune.grid_search(["default_alphazero_model", "complex_alphazero_model"])
+        },
+        "lr": tune.grid_search([1e-2, 1e-4, 5e-5]),
+        "mcts_config": {
+            "puct_coefficient": tune.grid_search([0.5, 1.0, 2.0]),
+            "num_simulations": tune.grid_search([50, 100, 200]),
+            "temperature": tune.grid_search([0.5, 1.5, 3.0]),
+            "dirichlet_epsilon": 0.25,
+            "dirichlet_noise": 0.03,
+            "argmax_tree_policy": False,
+            "add_dirichlet_noise": True
+        }
+    }
+    """
+    hp_config = {
+        "model": {
+            "custom_model": "default_alphazero_model",
+        },
+        "lr_schedule": 0.01,
+        "mcts_config": {
+            "puct_coefficient": tune.grid_search([0.5, 1.0, 2.0]),
+            "num_simulations": 50,
+            "temperature": tune.grid_search([0.5, 1.5, 3.0]),
+            "dirichlet_epsilon": 0.25,
+            "dirichlet_noise": 0.03,
+            "argmax_tree_policy": False,
+            "add_dirichlet_noise": True
+        }
+    }"""
+
+    config.update_from_dict(hp_config)
+
+    import re
+
+    def custom_trial_name_creator(trial):
+        # Generate a custom trial name with trial ID and hyperparameter config
+        trial_name = f"Trial-{trial.trial_id}"
+
+        # Access the hyperparameter config
+        hyperparameters = trial.evaluated_params
+
+        # Remove "mcts_config" prefix from parameter names
+        hyperparameters = {
+            re.sub(r"mcts_config", "", param): value
+            for param, value in hyperparameters.items()
+        }
+
+        # Remove "custom_ model" info from parameter names
+        hyperparameters = {
+            re.sub(r"custom_model", "", param): value
+            for param, value in hyperparameters.items()
+        }
+
+        # Convert the hyperparameters to a string representation
+        hyperparameters_str = "_".join([f"{param}-{value}" for param, value in hyperparameters.items()])
+
+        # Remove forbidden characters from the trial name
+        forbidden_chars = r"[<>:\"/\\|?*]"
+        trial_name = re.sub(forbidden_chars, "", trial_name)
+        hyperparameters_str = re.sub(forbidden_chars, "", hyperparameters_str)
+
+        # Append the hyperparameter config to the trial name
+        trial_name += f"__{hyperparameters_str}"
+
+        return trial_name
+
+
+    cb = []
+    if args.wandb:
+        cb.append(
+          CustomWandbLoggerCallback(
+                api_key_file="wandb_api_key.txt",
+                entity="mtp2023_avalanche",
+                project="CurriculumLearning",
+                group=log_group,
+                name=args.log_as,
+                log_config=True,
+                save_checkpoints=True
+            )
+        )
+
+
+    tune.Tuner(
+        args.algo,
+        run_config=air.RunConfig(
+            stop=stop,
+            checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
+            local_dir=args.results_folder,
+            callbacks=cb
+            ),
+        tune_config=tune.TuneConfig(
+            mode="max",
+            metric="episode_reward_mean",
+            num_samples=1,
+            trial_name_creator=custom_trial_name_creator
+            ),
+        param_space=config.to_dict()
+    ).fit()
