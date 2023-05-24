@@ -11,14 +11,14 @@ from collections import OrderedDict
 from apply_policy import solve_challenge
 
 run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumLearning/checkpoint_stop125_thresh65_new_set_ray_curr:v130', type='model')
+artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_14_65:v171', type='model')
 artifact_dir = artifact.download()
 
 agent = Policy.from_checkpoint(artifact_dir+'/policies/default_policy')
 
 
 
-challenges = json.load(open("../../gameVariants/baseline/training/curriculumVer2.json"))
+challenges = json.load(open("../../gameVariants/baseline/training/curriculumVer2Test.json"))
 height = challenges["height"] * 2
 width = challenges["width"] * 2 + 2
 noOfLevels = len(challenges["training_levels"])
