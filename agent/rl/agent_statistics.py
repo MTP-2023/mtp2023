@@ -5,6 +5,7 @@ import sys
 from ray.air.integrations.wandb import setup_wandb
 import argparse
 import pandas as pd
+import pickle
 
 sys.path.append("../../")
 from gameVariants.baseline.reward import reward
@@ -24,6 +25,13 @@ parser.add_argument(
     default="curriculumVer2Test",
     help=""
 )
+parser.add_argument(
+    "--local_run",
+    default=True,
+    action=argparse.BooleanOptionalAction,
+    help="store data in pickle if run on server"
+)
+
 parser.add_argument(
     "--out"
 )
@@ -93,8 +101,14 @@ for agent_link in agent_links:
 
     print("agent tested")
 
+
 stats_df = pd.DataFrame(data=stats_dict)
-stats_df.to_excel(args.out + ".xlsx")
+
+if not args.local_run:
+    file = open(args.out+".pkl", "wb")
+    pickle.dump(stats_df, file)
+    file.close()
+else:
+    stats_df.to_excel(args.out + ".xlsx")
 
 run_wandb.finish()
-
