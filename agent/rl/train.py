@@ -330,6 +330,6 @@ else:
         param_space=config.to_dict()
     ).fit()
 
-    with open("./hp_tuning/hp_tune_results/"+args.log_group+".pkl", "wb") as res_file:
+    with open("./result_eval/hp_tune_results/"+args.log_group+".pkl", "wb") as res_file:
         dill.dump(results, res_file)
         res_file.close()

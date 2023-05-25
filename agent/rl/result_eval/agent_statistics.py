@@ -7,7 +7,8 @@ import argparse
 import pandas as pd
 import pickle
 
-sys.path.append("../../")
+sys.path.append("../../..")
+sys.path.append("../")
 from gameVariants.baseline.reward import reward
 from gameResources.simulation.simulate import run
 from collections import OrderedDict
@@ -44,10 +45,10 @@ ModelCatalog.register_custom_model("complex_alphazero_model", ComplexModel)
 
 args = parser.parse_args()
 
-run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-agent_links = json.load(open("train_resources/agent_tests/" + args.agent_links + ".json"))["agents"]
+run_wandb = setup_wandb(api_key_file="../wandb_api_key.txt")
+agent_links = json.load(open("agent_test_lists/" + args.agent_links + ".json"))["agents"]
 
-challenges = json.load(open("../../gameVariants/baseline/training/" + args.challenges + ".json"))
+challenges = json.load(open("../../../gameVariants/baseline/training/" + args.challenges + ".json"))
 noOfLevels = len(challenges["training_levels"])
 
 print("test on", args.challenges)
