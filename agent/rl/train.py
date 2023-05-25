@@ -11,6 +11,7 @@ from train_resources.avalancheEnv import GameBoardEnv
 from train_resources.envWrapperAlphaZero import WrappedGameBoardEnv
 from train_resources.hyperparameter_callbacks import CustomWandbLoggerCallback
 import functools
+import dill
 
 import argparse
 import json
@@ -248,17 +249,17 @@ else:
         "model": {
             "custom_model": "default_alphazero_model",
         },
-        "lr_schedule": 0.01,
+        "lr": 5e-5,
         "mcts_config": {
-            "puct_coefficient": tune.grid_search([0.5, 1.0, 2.0]),
+            "puct_coefficient": tune.grid_search([0.5, 1.0]),
             "num_simulations": 50,
-            "temperature": tune.grid_search([0.5, 1.5, 3.0]),
+            "temperature": tune.grid_search([0.5, 1.5]),
             "dirichlet_epsilon": 0.25,
             "dirichlet_noise": 0.03,
             "argmax_tree_policy": False,
             "add_dirichlet_noise": True
         }
-    }"""
+    }#"""
 
     config.update_from_dict(hp_config)
 
@@ -312,11 +313,11 @@ else:
         )
 
 
-    tune.Tuner(
+    results = tune.Tuner(
         args.algo,
         run_config=air.RunConfig(
             stop=stop,
-            checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=100),
+            checkpoint_config=air.CheckpointConfig(num_to_keep=4, checkpoint_frequency=3, checkpoint_at_end=True),
             local_dir=args.results_folder,
             callbacks=cb
             ),
@@ -328,3 +329,7 @@ else:
             ),
         param_space=config.to_dict()
     ).fit()
+
+    with open("./hp_tuning/hp_tune_results/"+args.log_group+".pkl", "wb") as res_file:
+        dill.dump(results, res_file)
+        res_file.close()

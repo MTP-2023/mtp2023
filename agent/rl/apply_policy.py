@@ -71,7 +71,7 @@ def solve_challenge(agent, obs, max_steps, az = False):
         _, done = reward(solveEnv)
         if done: 
             solved = True
-            print("ACTIONS", action_sequence)
+            #print("ACTIONS", action_sequence)
             break
 
     # return results dict
