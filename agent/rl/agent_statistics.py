@@ -37,7 +37,7 @@ ModelCatalog.register_custom_model("complex_alphazero_model", ComplexModel)
 args = parser.parse_args()
 
 run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-agent_links = json.load(open("train_resources/" + args.agent_links + ".json"))["agents"]
+agent_links = json.load(open("train_resources/agent_tests/" + args.agent_links + ".json"))["agents"]
 
 challenges = json.load(open("../../gameVariants/baseline/training/" + args.challenges + ".json"))
 noOfLevels = len(challenges["training_levels"])
