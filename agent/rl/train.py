@@ -100,14 +100,14 @@ parser.add_argument(
 parser.add_argument(
     "--wandb",
     default=True,
-    action=argparse.BooleanOptionalAction,
+    #action=argparse.BooleanOptionalAction,
     help="Define if run should be logged to wandb."
 )
 
 parser.add_argument(
     "--single_train",
     default=True,
-    action=argparse.BooleanOptionalAction,
+    #action=argparse.BooleanOptionalAction,
     help="Define if this is a simple training run with fixed hyperparameter settings or a hyperparameter tuning run."
 )
 
@@ -115,6 +115,13 @@ parser.add_argument(
     "--num_gpus",
     default=0,
     help="Number of GPUs to use (important for cluster)."
+)
+
+parser.add_argument(
+    "--online",
+    default=True,
+    #action=argparse.BooleanOptionalAction,
+    help="Online learning toggle."
 )
 
 args = parser.parse_args()
@@ -137,14 +144,18 @@ else:
 training_path = path + "/training/" + args.train_on
 
 #we use a json schema to check if all the training scenarios are formatted correctly
-schema = json.load(open(path+"/env_schema.json"))
+if not args.online:
+    schema = json.load(open(path+"/env_schema.json"))
 
-# load all train examples into a list and validate them
-env_setup = json.load(open(training_path + ".json"))
-try:
-    jsonschema.validate(env_setup, schema)
-except Exception as e:
-    print(e)
+    # load all train examples into a list and validate them
+    env_setup = json.load(open(training_path + ".json"))
+    try:
+        jsonschema.validate(env_setup, schema)
+    except Exception as e:
+        print(e)
+else:
+    env_setup = json.load(open(training_path + ".json"))
+    env_setup["online"] = args.online
 
 #we use this to pass the game variant selection to the environment
 env_setup["variant"] = args.variant

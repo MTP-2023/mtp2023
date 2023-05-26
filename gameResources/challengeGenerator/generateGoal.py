@@ -1,7 +1,8 @@
 import random
 import sys
-sys.path.append("../")
-from simulation.simulate import run
+#sys.path.append("../")
+sys.path.append("../../")
+from gameResources.simulation.simulate import run
 import copy
 
 # board = start board produced by generator
@@ -12,13 +13,14 @@ import copy
 # fallthrough = when true, no marbles are allowed to fall through the board
 
 def generateGoalState(startBoard, minMarbles, maxMarbles, turnlimit, availableMarbles, width, fallthrough):
+    #print("WIDTH", width)
     board = copy.deepcopy(startBoard)
-    print("GenerateGoalState")
+    #print("GenerateGoalState", width)
     while True:
         goalBoard = generateBoard(board, minMarbles, maxMarbles, turnlimit, availableMarbles, width, fallthrough)
         if goalBoard is not None:
             break
-    print("Generated board!")
+    #print("Generated board!")
     return goalBoard
 
 def generateBoard(board, minMarbles, maxMarbles, turnlimit, availableMarbles, width, fallthrough):
@@ -26,6 +28,8 @@ def generateBoard(board, minMarbles, maxMarbles, turnlimit, availableMarbles, wi
     #print("trying to generate with maxTurns", maxTurns)
     for _ in range(turnlimit):
         move = random.randint(0, width)
+        #print("WIDTH", width)
+        #print("MOVE", move)
         result = run(move, board, True)
         if fallthrough and result["marbles_dropped"] > 0:
             return lastValid
@@ -47,6 +51,6 @@ def isValid(board, minMarbles, maxMarbles):
                 count += 1
     if count > maxMarbles or count < minMarbles:
         return False
-    print("ValidState with " + str(count) + " marbles")
-    print(board)
+    #print("ValidState with " + str(count) + " marbles")
+    #print(board)
     return True

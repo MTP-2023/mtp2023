@@ -1,0 +1,41 @@
+{
+  "width": 3,
+  "height": 2,
+  "training_levels": [
+    {
+      "minMarbles": 2,
+      "maxMarbles": 2,
+      "turnLimit": 16
+    },
+    {
+      "minMarbles": 2,
+      "maxMarbles": 2,
+      "turnLimit": 14
+    },
+    {
+      "minMarbles": 2,
+      "maxMarbles": 2,
+      "turnLimit": 12
+    },
+    {
+      "minMarbles": 2,
+      "maxMarbles": 2,
+      "turnLimit": 10
+    },
+    {
+      "minMarbles": 2,
+      "maxMarbles": 2,
+      "turnLimit": 8
+    },
+    {
+      "minMarbles": 2,
+      "maxMarbles": 2,
+      "turnLimit": 6
+    },
+    {
+      "minMarbles": 2,
+      "maxMarbles": 2,
+      "turnLimit": 4
+    }
+  ]
+}
