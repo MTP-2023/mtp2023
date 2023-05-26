@@ -34,6 +34,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--AlphaZero",
+    default=False,
+    action=argparse.BooleanOptionalAction,
+    help="indicate if run uses alphazero models or not"
+)
+
+parser.add_argument(
     "--out"
 )
 
@@ -82,7 +89,7 @@ for agent_link in agent_links:
             obs = OrderedDict()
             obs["current"] = current_board
             obs["goal"] = goal_board
-            results = solve_challenge(agent, obs, max_steps, az=True)
+            results = solve_challenge(agent, obs, max_steps, az=args.AlphaZero)
             if results["solved"]:
                 #print("FINISHED CHALLENGE IN", results["actions_required"], "TURNS\n")
                 solvedChallengesLvl += 1
