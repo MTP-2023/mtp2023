@@ -208,7 +208,7 @@ if args.wandb:
             api_key_file="wandb_api_key.txt",
             entity="mtp2023_avalanche",
             project="CurriculumVer2Fix",
-            group=args.algo,
+            group=log_group,
             name=args.log_as,
             log_config=True,
             save_checkpoints=True
