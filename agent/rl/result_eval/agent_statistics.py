@@ -13,6 +13,7 @@ from gameVariants.baseline.reward import reward
 from gameResources.simulation.simulate import run
 from collections import OrderedDict
 from apply_policy import solve_challenge
+import traceback
 
 parser = argparse.ArgumentParser()
 
@@ -51,6 +52,8 @@ agent_links = json.load(open("agent_test_lists/" + args.agent_links + ".json"))[
 challenges = json.load(open("../../../gameVariants/baseline/training/" + args.challenges + ".json"))
 noOfLevels = len(challenges["training_levels"])
 
+print(noOfLevels)
+
 print("test on", args.challenges)
 
 stats_dict = {}
@@ -69,6 +72,7 @@ for agent_link in agent_links:
         solvedChallenges = 0
         noOfTurns = 0
         for level in range(noOfLevels):
+            print("level", level)
             noOfChallengesLvl = len(challenges["training_levels"][level])
             solvedChallengesLvl = 0
             noOfTurnsLvl = 0
@@ -82,7 +86,10 @@ for agent_link in agent_links:
                 obs = OrderedDict()
                 obs["current"] = current_board
                 obs["goal"] = goal_board
-                results = solve_challenge(agent, obs, max_steps)
+                is_alphazero = False
+                if "alphazero" in args.agent_links.lower():
+                    is_alphazero = True
+                results = solve_challenge(agent, obs, max_steps, az=is_alphazero)
                 if results["solved"]:
                     #print("FINISHED CHALLENGE IN", results["actions_required"], "TURNS\n")
                     solvedChallengesLvl += 1
@@ -100,6 +107,7 @@ for agent_link in agent_links:
         stats_dict[agent_link + "_solverate"] = agent_solverates
         stats_dict[agent_link + "_average_turns"] = agent_turns
     except Exception as e:
+        traceback.print_exc()
         print(e)
 
     print("agent tested")
