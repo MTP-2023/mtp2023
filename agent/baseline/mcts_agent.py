@@ -166,39 +166,46 @@ def generate_child_state(state, width):
 
 
 if __name__ == "__main__":
-    with open('../../gameVariants/baseline/training/generationTest.json') as json_file:
+
+    with open('../../gameVariants/baseline/training/curriculumVer2Test.json') as json_file:
         data = json.load(json_file)
-    arraydata = data['training_states']
-    startboards = []
-    endboards = []
-    max_steps = []
     height = data['height'] * 2
     width = data['width'] * 2
-
-    for i in range(len(arraydata)):
-        startboards.append(arraydata[i]['start_board'])
-        endboards.append(arraydata[i]['goal_board'])
-        max_steps.append(arraydata[i]['max_turns'])
-
-    startboard = 0
-    endboard = 0
-    max_step = 0
-
     totalwins = 0
-    for j in range(len(startboards)):
-        startboard = startboards[j]
-        endboard = endboards[j]
-        max_step = max_steps[j]
-        for i in range(max_step):
-            # move = mcts(copy.deepcopy(startboard), 1000, math.sqrt(2), endboard, width, height, max_step - i)
-            move = mcts(copy.deepcopy(startboard), 1000, 1, endboard, width, height, max_step - i)
-            # print("making move", move)
-            run(move, startboard, False)
-            if evaluate(startboard, endboard):
-                print("Solved in ", i, "steps")
-                totalwins += 1
-                break
-        print("finished challenge", j)
+    levelnumber = 0
+    for level in data['training_levels']:
+        startboards = []
+        endboards = []
+        max_steps = []
+
+
+        for i in range(len(level)):
+            startboards.append(level[i]['start_board'])
+            endboards.append(level[i]['goal_board'])
+            max_steps.append(level[i]['max_turns'])
+
+        startboard = 0
+        endboard = 0
+        max_step = 0
+
+        levelwins = 0
+        for j in range(len(startboards)):
+            startboard = startboards[j]
+            endboard = endboards[j]
+            max_step = max_steps[j]
+            for i in range(max_step):
+                # move = mcts(copy.deepcopy(startboard), 1000, math.sqrt(2), endboard, width, height, max_step - i)
+                move = mcts(copy.deepcopy(startboard), 300, 1, endboard, width, height, max_step - i)
+                # print("making move", move)
+                run(move, startboard, False)
+                if evaluate(startboard, endboard):
+                    #print("Solved in ", i, "steps")
+                    totalwins += 1
+                    levelwins += 1
+                    break
+            #print("finished challenge", j)
+        print("level", levelnumber, ": ", levelwins, "out of", len(level))
+        levelnumber += 1
     print('totalwins ', totalwins, 'out of', j + 1)
     percent = totalwins / (j + 1)
     print('percent', percent)
