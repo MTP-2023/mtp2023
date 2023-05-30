@@ -176,7 +176,7 @@ if args.wandb:
         WandbLoggerCallback(
             api_key_file="wandb_api_key.txt",
             entity="mtp2023_avalanche",
-            project="CurriculumLearning",
+            project="CurriculumVer2Fix",
             group=args.algo,
             name=args.log_as,
             save_checkpoints=True

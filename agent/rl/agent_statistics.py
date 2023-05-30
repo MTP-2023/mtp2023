@@ -44,42 +44,45 @@ for agent_link in agent_links:
 
     artifact = run_wandb.use_artifact(agent_link, type='model')
     artifact_dir = artifact.download()
-    agent = Policy.from_checkpoint(artifact_dir + '/policies/default_policy')
+    try:
+        agent = Policy.from_checkpoint(artifact_dir + '/policies/default_policy')
 
-    noOfChallenges = 0
-    solvedChallenges = 0
-    noOfTurns = 0
-    for level in range(noOfLevels):
-        noOfChallengesLvl = len(challenges["training_levels"][level])
-        solvedChallengesLvl = 0
-        noOfTurnsLvl = 0
-        noOfChallenges += noOfChallengesLvl
-        for challengeNo in range(noOfChallengesLvl):
-            challenge = challenges["training_levels"][level][challengeNo]
-            current_board = np.array(challenge["start_board"])
-            goal_board = np.array(challenge["goal_board"])
-            max_steps = challenge["max_turns"]
-            done = False
-            obs = OrderedDict()
-            obs["current"] = current_board
-            obs["goal"] = goal_board
-            results = solve_challenge(agent, obs, max_steps)
-            if results["solved"]:
-                #print("FINISHED CHALLENGE IN", results["actions_required"], "TURNS\n")
-                solvedChallengesLvl += 1
-                noOfTurnsLvl += results["actions_required"]
-        solvedChallenges += solvedChallengesLvl
-        noOfTurns += noOfTurnsLvl
-        solverateLvl = solvedChallengesLvl/noOfChallengesLvl
-        avgTurnsLvl = noOfTurnsLvl/solvedChallengesLvl
-        agent_solverates.append(solverateLvl)
-        agent_turns.append(avgTurnsLvl)
-    solverate = solvedChallenges/noOfChallenges
-    avgTurns = noOfTurns/solvedChallenges
-    agent_solverates.append(solverate)
-    agent_turns.append(avgTurns)
-    stats_dict[agent_link + "_solverate"] = agent_solverates
-    stats_dict[agent_link + "_average_turns"] = agent_turns
+        noOfChallenges = 0
+        solvedChallenges = 0
+        noOfTurns = 0
+        for level in range(noOfLevels):
+            noOfChallengesLvl = len(challenges["training_levels"][level])
+            solvedChallengesLvl = 0
+            noOfTurnsLvl = 0
+            noOfChallenges += noOfChallengesLvl
+            for challengeNo in range(noOfChallengesLvl):
+                challenge = challenges["training_levels"][level][challengeNo]
+                current_board = np.array(challenge["start_board"])
+                goal_board = np.array(challenge["goal_board"])
+                max_steps = challenge["max_turns"]
+                done = False
+                obs = OrderedDict()
+                obs["current"] = current_board
+                obs["goal"] = goal_board
+                results = solve_challenge(agent, obs, max_steps)
+                if results["solved"]:
+                    #print("FINISHED CHALLENGE IN", results["actions_required"], "TURNS\n")
+                    solvedChallengesLvl += 1
+                    noOfTurnsLvl += results["actions_required"]
+            solvedChallenges += solvedChallengesLvl
+            noOfTurns += noOfTurnsLvl
+            solverateLvl = solvedChallengesLvl/noOfChallengesLvl
+            avgTurnsLvl = noOfTurnsLvl/solvedChallengesLvl
+            agent_solverates.append(solverateLvl)
+            agent_turns.append(avgTurnsLvl)
+        solverate = solvedChallenges/noOfChallenges
+        avgTurns = noOfTurns/solvedChallenges
+        agent_solverates.append(solverate)
+        agent_turns.append(avgTurns)
+        stats_dict[agent_link + "_solverate"] = agent_solverates
+        stats_dict[agent_link + "_average_turns"] = agent_turns
+    except Exception as e:
+        print(e)
 
 stats_df = pd.DataFrame(data=stats_dict)
 stats_df.to_excel(args.out + ".xlsx")
