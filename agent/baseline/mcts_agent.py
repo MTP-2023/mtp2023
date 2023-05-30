@@ -167,7 +167,7 @@ def generate_child_state(state, width):
 
 if __name__ == "__main__":
 
-    with open('../../gameVariants/baseline/training/curriculumVer2Test.json') as json_file:
+    with open('../../gameVariants/baseline/training/curriculum2MarblesTest.json') as json_file:
         data = json.load(json_file)
     height = data['height'] * 2
     width = data['width'] * 2
@@ -204,8 +204,8 @@ if __name__ == "__main__":
                     levelwins += 1
                     break
             #print("finished challenge", j)
-        print("level", levelnumber, ": ", levelwins, "out of", len(level))
+        print("level", levelnumber, ": ", levelwins, "out of", len(level), "=", levelwins/len(level)*100, "%")
         levelnumber += 1
-    print('totalwins ', totalwins, 'out of', j + 1)
-    percent = totalwins / (j + 1)
+    print('totalwins ', totalwins, 'out of', (j + 1)*len(data['training_levels']))
+    percent = totalwins / ((j + 1)*len(data['training_levels']))*100
     print('percent', percent)
