@@ -7,6 +7,7 @@ import SandboxScreen from "./features/sandbox/screens/SandboxScreen/SandboxScree
 import ChallengeScreen from "./features/challenge/screens/ChallengeScreen/ChallengeScreen";
 import { ChallengeProvider } from "./features/challenge/ChallengeContext";
 import AiShowcaseScreen from "./features/aiShowcase/aiShowcaseScreen";
+import PresentionScreen from "./features/presentation/PresentionScreen";
 
 function Layout() {
   return (
@@ -23,14 +24,7 @@ function App() {
     <div className="App">
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route
-            index
-            element={
-              <BoardProvider>
-                <SandboxScreen />
-              </BoardProvider>
-            }
-          />
+          <Route index element={<PresentionScreen />} />
           <Route
             path="sandbox"
             element={
