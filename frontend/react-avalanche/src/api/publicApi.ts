@@ -30,8 +30,8 @@ export const fetchChallenge = async () => {
   return await response.json();
 };
 
-export const solveChallenge = async (challenge: Challenge) => {
-  const response = await fetch("http://127.0.0.1:8000/solve", {
+export const solveChallenge = async (challenge: Challenge, agent: string) => {
+  const response = await fetch(`http://127.0.0.1:8000/solve/${agent}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -42,5 +42,10 @@ export const solveChallenge = async (challenge: Challenge) => {
     }),
   });
 
+  return await response.json();
+};
+
+export const getAgents = async () => {
+  const response = await fetch("http://127.0.0.1:8000/agent_options");
   return await response.json();
 };

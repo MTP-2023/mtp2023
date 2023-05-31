@@ -2,8 +2,9 @@ import React from "react";
 import { useChallenge } from "../challenge/ChallengeContext";
 import ChallengeBoard from "../challenge/components/ChallengeBoard/ChallengeBoard";
 import useHandleBoard from "../board/hooks/useHandleBoard";
-import { calculateBoard, solveChallenge } from "../../api/publicApi";
+import { calculateBoard, getAgents, solveChallenge } from "../../api/publicApi";
 import BoardSimulationNavigator from "../board/components/BoardSimulationNavigator/BoardSimulationNavigator";
+import SelectComponent from "./components/SelectComponent";
 
 const aiShowcaseScreen = () => {
   const { challenge, challengeLoading, challengeError } = useChallenge();
@@ -20,6 +21,12 @@ const aiShowcaseScreen = () => {
 
   const [boards, setBoards] = React.useState<number[][][]>([]);
   const [currentBoard, setCurrentBoard] = React.useState<number[][]>(start);
+  const [currentAgents, setCurrentAgents] = React.useState<
+    { value: string; label: string }[] | undefined
+  >(undefined);
+  const [selectedAgent, setSelectedAgent] = React.useState<string | undefined>(
+    undefined
+  );
 
   const [marbles, setMarbles] = React.useState<number[][][]>([]);
   const [currentMarbles, setCurrentMarbles] = React.useState<number[][]>([]);
@@ -37,16 +44,33 @@ const aiShowcaseScreen = () => {
   }, [boardIndex]);
 
   React.useEffect(() => {
+    const fetchAgents = async () => {
+      const { agents } = await getAgents();
+      const agentsFormatted = agents.map((agent: string) => ({
+        value: agent,
+        label: agent,
+      }));
+      setCurrentAgents(agentsFormatted);
+      setSelectedAgent(agentsFormatted[0].value);
+    };
+    fetchAgents();
+  }, []);
+
+  React.useEffect(() => {
     const getSolution = async () => {
-      if (challenge.goal[0] === undefined || challenge.start[0] === undefined)
+      if (
+        challenge.goal[0] === undefined ||
+        challenge.start[0] === undefined ||
+        selectedAgent === undefined
+      )
         return;
 
-      const steps = await solveChallenge(challenge);
+      const steps = await solveChallenge(challenge, selectedAgent);
 
       setSolution(steps);
     };
     getSolution();
-  }, []);
+  }, [selectedAgent]);
 
   React.useEffect(() => {
     if (solution.action_sequence === undefined) return;
@@ -108,14 +132,37 @@ const aiShowcaseScreen = () => {
     }
   };
 
+  const handleSelectChange = (e: any) => {
+    setSelectedAgent(e.target.value);
+  };
+
+  if (!currentAgents || !solution) return <div>Loading...</div>;
+
   return (
-    <div className="center">
-      <BoardSimulationNavigator handleBoardChange={handleBoardChange} />
-      <ChallengeBoard
-        challenge={challenge}
-        currentBoard={currentBoard}
-        currentMarbles={currentMarbles}
-      />
+    <div className="flex">
+      <div className="center">
+        <BoardSimulationNavigator handleBoardChange={handleBoardChange} />
+        <ChallengeBoard
+          challenge={challenge}
+          currentBoard={currentBoard}
+          currentMarbles={currentMarbles}
+        />
+      </div>
+      <div>
+        <h1>AI Showcase</h1>
+        <h2>Agent</h2>
+        <SelectComponent
+          options={currentAgents}
+          selectedOption={selectedAgent}
+          onChange={handleSelectChange}
+        />
+        {solution.solved ? (
+          <p>{`This challenge was solved in ${solution.actions_required} moves`}</p>
+        ) : (
+          <p>{`This challenge was not solved in ${solution.actions_required} moves`}</p>
+        )}
+        <p>{"Actions taken: " + solution.action_sequence}</p>
+      </div>
     </div>
   );
 };

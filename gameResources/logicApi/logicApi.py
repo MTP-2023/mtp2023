@@ -130,7 +130,7 @@ async def returnAgentList():
     }
 
 # request the solution for a challenge from a specified agent
-@app.get("/solve/{agent_handle}", tags=["solve"])
+@app.post("/solve/{agent_handle}", tags=["solve"])
 async def requestSolution(challenge: ChallengeDTO, agent_handle: str, max_steps: int = 20):
     # check if requested agent exists
     if agent_handle not in agent_handles:
