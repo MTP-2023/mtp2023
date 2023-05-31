@@ -20,7 +20,7 @@ agent_handles = [
     #'SimpleAgent',
     #'MCTS',
     'PPO', # checkpoint_gpu_14_675:v2
-    'AlphaZero' # default train, default settings, 200 simulations
+    'AlphaZero' # curriculum2Marbles, 100 simulations, complex model
 ]
 
 # register models required for alphazero
