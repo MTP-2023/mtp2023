@@ -19,6 +19,7 @@ const useHandleBoard = (board: number[][]) => {
   React.useEffect(() => {
     if (!boards || boards.length === 0 || !marbles || marbles.length === 0)
       return;
+    console.log("boardIndex", boardIndex);
     setCurrentBoard(boards[boardIndex]);
 
     setCurrentMarbles(marbles[boardIndex]);
@@ -31,18 +32,21 @@ const useHandleBoard = (board: number[][]) => {
 
     if (boards.length > 0 && boardIndex != boards.length - 1) return;
 
+    console.log("handleMarbleDrop", currentBoard, column);
+
     setLoadingDrop(true);
     try {
       const newBoard = await calculateBoard(currentBoard, column);
 
-      const boards = newBoard.boards;
-      setBoards(boards);
-      setCurrentBoard(boards[0]);
-      const marbles = newBoard.marbles;
-      marbles.push([]);
+      console.log("newBoard", newBoard);
+      const newBoards = newBoard.boards;
+      setBoards(newBoards);
+      setCurrentBoard(newBoards[0]);
+      const newMarbles = newBoard.marbles;
+      newMarbles.push([]);
 
-      setMarbles(marbles);
-      setCurrentMarbles(marbles[0]);
+      setMarbles(newMarbles);
+      setCurrentMarbles(newMarbles[0]);
 
       setBoardIndex(0);
     } catch (e) {
@@ -51,8 +55,15 @@ const useHandleBoard = (board: number[][]) => {
     setLoadingDrop(false);
   };
 
-  const handleBoardChange = async (action: string) => {
+  React.useEffect(() => {
+    console.log("boards2", boards);
+    console.log("boardIndex2", boardIndex);
+  }, [boards, boardIndex]);
+
+  const handleBoardChange = (action: string) => {
     if (!boards || !marbles) return;
+
+    console.log("handleBoardChange", boards, action);
 
     if (action == "back" && boardIndex > 0) {
       setBoardIndex((prev) => prev - 1);

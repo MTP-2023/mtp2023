@@ -10,3 +10,5 @@ tensorflow-probability
 ray~=2.3.0
 fastapi[all]
 wandb
+dill
+openpyxl

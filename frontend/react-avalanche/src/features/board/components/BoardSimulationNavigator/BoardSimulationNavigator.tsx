@@ -2,6 +2,7 @@ import React from "react";
 import {
   FaChevronCircleLeft,
   FaChevronCircleRight,
+  FaFastBackward,
   FaFastForward,
 } from "react-icons/fa";
 import { useBoard } from "../../context/BoardContext";
@@ -15,6 +16,10 @@ const BoardSimulationNavigator: React.FC<BoardSimulationNavigatorProps> = ({
 }) => {
   return (
     <div className="navigation">
+      <button onClick={() => handleBoardChange("first")}>
+        <FaFastBackward />
+      </button>
+
       <button onClick={() => handleBoardChange("back")}>
         <FaChevronCircleLeft />
       </button>
