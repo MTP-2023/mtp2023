@@ -30,13 +30,13 @@ class GameBoardEnv(TaskSettableEnv):
         self.training_index = challenge_idx
         self.width = config["width"]*2+2
         self.height = config["height"]*2
-        self.online = config["online"]
+        #self.online = config["online"]
 
         # if this instance is the main training object, store all challenges
         if train:
             self.training_levels = config["training_levels"]
-            if not self.online:
-                self.training_states = self.training_levels[self.task_level]
+            #if not self.online:
+            self.training_states = self.training_levels[self.task_level]
 
         self.set_challenge(config["training_levels"])
         
@@ -64,24 +64,24 @@ class GameBoardEnv(TaskSettableEnv):
 
     # similar to set task, but provide challenge idx as well
     def set_challenge(self, data):
-        if not self.online:
-            challenge = data[self.task_level][self.training_index]
-            self.current_board = np.array(challenge["start_board"])
-            self.goal_board = np.array(challenge["goal_board"])
-            self.max_steps = challenge["max_turns"]
-        else:
-            #print("GENERATING ONLINE LEARNING BOARD")
-            width = int((self.width - 2) / 2)
-            height = int(self.height / 2)
-            #print("WIDTH AND HEIGHT", width, height)
-            start_board = generate_random_board(width, height)
-            goal_board = generateGoalState(start_board, self.training_levels[self.task_level]["minMarbles"],
-                                           self.training_levels[self.task_level]["maxMarbles"],
-                                           self.training_levels[self.task_level]["turnLimit"],
-                                           42, width*2, False)
-            self.current_board = start_board
-            self.goal_board = goal_board
-            self.max_steps = self.training_levels[self.task_level]["turnLimit"]
+        #if not self.online:
+        challenge = data[self.task_level][self.training_index]
+        self.current_board = np.array(challenge["start_board"])
+        self.goal_board = np.array(challenge["goal_board"])
+        self.max_steps = challenge["max_turns"]
+        # else:
+        #     #print("GENERATING ONLINE LEARNING BOARD")
+        #     width = int((self.width - 2) / 2)
+        #     height = int(self.height / 2)
+        #     #print("WIDTH AND HEIGHT", width, height)
+        #     start_board = generate_random_board(width, height)
+        #     goal_board = generateGoalState(start_board, self.training_levels[self.task_level]["minMarbles"],
+        #                                    self.training_levels[self.task_level]["maxMarbles"],
+        #                                    self.training_levels[self.task_level]["turnLimit"],
+        #                                    42, width*2, False)
+        #     self.current_board = start_board
+        #     self.goal_board = goal_board
+        #     self.max_steps = self.training_levels[self.task_level]["turnLimit"]
 
     # implement how the game board initialization should work
     def reset(self, *, seed=None, options=None):
@@ -93,30 +93,30 @@ class GameBoardEnv(TaskSettableEnv):
         self.n_steps = 0
 
         # iterate over challenges
-        if not self.online:
-            if self.training_index < len(self.training_states) - 1:
-                self.training_index += 1
-            else:
-                #print("RESET: All challenges played.")
-                self.training_index = 0
+        #if not self.online:
+        if self.training_index < len(self.training_states) - 1:
+            self.training_index += 1
+        else:
+            #print("RESET: All challenges played.")
+            self.training_index = 0
 
             # reset env to next challenge
-            self.current_board = np.array(self.training_states[self.training_index]["start_board"])
-            self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
-            self.max_steps = self.training_states[self.training_index]["max_turns"]
-        else:
-            #print("GENERATING ONLINE LEARNING BOARD")
-            width = int((self.width - 2) / 2)
-            height = int(self.height / 2)
-            #print("WIDTH AND HEIGHT", width, height)
-            start_board = generate_random_board(width, height)
-            goal_board = generateGoalState(start_board, self.training_levels[self.task_level]["minMarbles"],
-                                           self.training_levels[self.task_level]["maxMarbles"],
-                                           self.training_levels[self.task_level]["turnLimit"],
-                                           42, width * 2, False)
-            self.current_board = start_board
-            self.goal_board = goal_board
-            self.max_steps = self.training_levels[self.task_level]["turnLimit"]
+        self.current_board = np.array(self.training_states[self.training_index]["start_board"])
+        self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
+        self.max_steps = self.training_states[self.training_index]["max_turns"]
+        # else:
+        #     #print("GENERATING ONLINE LEARNING BOARD")
+        #     width = int((self.width - 2) / 2)
+        #     height = int(self.height / 2)
+        #     #print("WIDTH AND HEIGHT", width, height)
+        #     start_board = generate_random_board(width, height)
+        #     goal_board = generateGoalState(start_board, self.training_levels[self.task_level]["minMarbles"],
+        #                                    self.training_levels[self.task_level]["maxMarbles"],
+        #                                    self.training_levels[self.task_level]["turnLimit"],
+        #                                    42, width * 2, False)
+        #     self.current_board = start_board
+        #     self.goal_board = goal_board
+        #     self.max_steps = self.training_levels[self.task_level]["turnLimit"]
 
         obs = {
             "current": self.current_board,
@@ -150,9 +150,9 @@ class GameBoardEnv(TaskSettableEnv):
 
     def set_task(self, task):
         self.task_level = task
-        if not self.online:
-            self.training_states = self.training_levels[task]
-            self.training_index = 0
+        #if not self.online:
+        self.training_states = self.training_levels[task]
+        self.training_index = 0
 
     def __deepcopy__(self, memo):
         # Create a new instance of the class with the same configuration
