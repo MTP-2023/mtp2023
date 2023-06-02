@@ -7,7 +7,7 @@ from ray.rllib.algorithms.alpha_zero import AlphaZeroConfig
 from ray.air.integrations.wandb import WandbLoggerCallback
 from train_resources.custom_callbacks import CustomCallbacks
 from train_resources.curriculum_function import curriculum_fn
-from train_resources.avalancheEnv import GameBoardEnv
+from train_resources.avalancheEnv import GameBoardEnv, OnlineLearningEnv
 from train_resources.envWrapperAlphaZero import WrappedGameBoardEnv
 from train_resources.hyperparameter_callbacks import CustomWandbLoggerCallback
 import functools
@@ -100,14 +100,14 @@ parser.add_argument(
 parser.add_argument(
     "--wandb",
     default=True,
-    #action=argparse.BooleanOptionalAction,
+    action=argparse.BooleanOptionalAction,
     help="Define if run should be logged to wandb."
 )
 
 parser.add_argument(
     "--single_train",
     default=True,
-    #action=argparse.BooleanOptionalAction,
+    action=argparse.BooleanOptionalAction,
     help="Define if this is a simple training run with fixed hyperparameter settings or a hyperparameter tuning run."
 )
 
@@ -120,7 +120,7 @@ parser.add_argument(
 parser.add_argument(
     "--online",
     default=True,
-    #action=argparse.BooleanOptionalAction,
+    action=argparse.BooleanOptionalAction,
     help="Online learning toggle."
 )
 
@@ -155,7 +155,6 @@ if not args.online:
         print(e)
 else:
     env_setup = json.load(open(training_path + ".json"))
-    env_setup["online"] = args.online
 
 #we use this to pass the game variant selection to the environment
 env_setup["variant"] = args.variant
@@ -170,7 +169,10 @@ alphazero_cb = False
 #initialize our optimization algorithm
 if args.algo == "PPO":
     config = PPOConfig()
-    env_class = GameBoardEnv
+    if args.online:
+        env_class = OnlineLearningEnv
+    else:
+        env_class = GameBoardEnv
 elif args.algo == "AlphaZero":
     config = AlphaZeroConfig()
     env_class = WrappedGameBoardEnv
