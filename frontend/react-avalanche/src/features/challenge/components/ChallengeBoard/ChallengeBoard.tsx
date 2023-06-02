@@ -23,9 +23,9 @@ const ChallengeBoard: React.FC<ChallengeBoardProps> = ({
   React.useEffect(() => {
     const newMatchBoard = [...challenge.start.map((row) => [...row])];
 
-    for (let row = 0; row < currentBoard.length; row++) {
+    for (let row = 0; row < currentBoard?.length; row++) {
       if (row % 2 === 0) {
-        for (let col = 1; col < currentBoard[row].length - 1; col += 2) {
+        for (let col = 1; col < currentBoard[row]?.length - 1; col += 2) {
           if (
             checkSwitchHasMarble(
               challenge.goal[row][col],
@@ -41,7 +41,7 @@ const ChallengeBoard: React.FC<ChallengeBoardProps> = ({
           }
         }
       } else {
-        for (let col = 0; col < currentBoard[row].length; col += 2) {
+        for (let col = 0; col < currentBoard[row]?.length; col += 2) {
           if (
             checkSwitchHasMarble(
               challenge.goal[row][col],

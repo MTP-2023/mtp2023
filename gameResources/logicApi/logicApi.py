@@ -20,7 +20,7 @@ agent_handles = [
     #'SimpleAgent',
     #'MCTS',
     'PPO', # checkpoint_gpu_14_675:v2
-    'AlphaZero' # default train, default settings, 200 simulations
+    'AlphaZero' # curriculum2Marbles, 100 simulations, complex model
 ]
 
 # register models required for alphazero
@@ -107,7 +107,7 @@ async def staticBoard():
         [1,0,1,0,1,0,0,1]]
 
 @app.get("/challenge", tags=["challenge"])
-async def returnChallenge(width: int = default_width, height: int = default_height, minMarbles: int = 3, maxMarbles: int = 3, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
+async def returnChallenge(width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
     start_board = generate_random_board(width, height)
     goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)
 
@@ -130,7 +130,7 @@ async def returnAgentList():
     }
 
 # request the solution for a challenge from a specified agent
-@app.get("/solve/{agent_handle}", tags=["solve"])
+@app.post("/solve/{agent_handle}", tags=["solve"])
 async def requestSolution(challenge: ChallengeDTO, agent_handle: str, max_steps: int = 20):
     # check if requested agent exists
     if agent_handle not in agent_handles:
