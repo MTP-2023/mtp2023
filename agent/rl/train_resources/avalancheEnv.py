@@ -20,50 +20,50 @@ class GameBoardEnv(TaskSettableEnv):
     """Example of a custom env in which you have to walk down a corridor.
     You can configure the length of the corridor via the env config."""
 
-    def __init__(self, config: EnvContext, example_board: list = [0]):
-        if len(example_board) > 0:
-            self.height = len(example_board)
-            self.width = len(example_board[0])
-            self.observation_space = Dict({
-                "current": Box(low=0, high=2, shape=(self.height, self.width), dtype=int),
-                "goal": Box(low=0, high=2, shape=(self.height, self.width), dtype=int)
-            })
-        else:
-            self.config = config
-            self.task_level = 0
-            self.variant = config["variant"]
-            self.n_steps = 0
-            self.training_index = 0
-            self.width = config["width"]*2+2
-            self.height = config["height"]*2
+    def __init__(self, config: EnvContext, level = 0, challenge_idx = 0, train = True):
+        self.config = config
+        self.task_level = level
+        self.variant = config["variant"]
+        self.n_steps = 0
+        self.training_index = challenge_idx
+        self.width = config["width"]*2+2
+        self.height = config["height"]*2
+
+        # if this instance is the main training object, store all challenges
+        if train:
             self.training_levels = config["training_levels"]
-            self.training_states = self.training_levels[0]
+            self.training_states = self.training_levels[self.task_level]
 
-            
-            #print(self.training_states)
+        self.set_challenge(config["training_levels"])
+        
+        #print(self.training_states)
 
-            # self.observation_space = Dict({
-            #     "game_board": Box(low=0, high=2, shape=(self.width, self.height), dtype=np.int8)
-            # })
-            self.observation_space = Dict({
-                "current": Box(low=0, high=2, shape=(self.height, self.width), dtype=int),
-                "goal": Box(low=0, high=2, shape=(self.height, self.width), dtype=int)
-            })
+        # self.observation_space = Dict({
+        #     "game_board": Box(low=0, high=2, shape=(self.width, self.height), dtype=np.int8)
+        # })
+        self.observation_space = Dict({
+            "current": Box(low=0, high=2, shape=(self.height, self.width), dtype=int),
+            "goal": Box(low=0, high=2, shape=(self.height, self.width), dtype=int)
+        })
 
-            self.n_choices = 2*config["width"]
-            #print("CHOICES", self.n_choices)
-            self.action_space = Discrete(self.n_choices)
+        self.n_choices = 2*config["width"]
+        #print("CHOICES", self.n_choices)
+        self.action_space = Discrete(self.n_choices)
 
-            self.current_board = np.array(self.training_states[self.training_index]["start_board"])
-            self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
-            self.max_steps = self.training_states[self.training_index]["max_turns"]
-            reward_module = "gameVariants." + config["variant"] + ".reward"
-            self.reward_module = importlib.import_module(reward_module)
-            #print(self.current_board, type(self.current_board))
-            #print(self.goal_board, type(self.current_board))
-            
-            # Set the seed. This is only used for the final (reach goal) reward.
-            #self.reset(default=True)
+        reward_module = "gameVariants." + config["variant"] + ".reward"
+        self.reward_module = importlib.import_module(reward_module)
+        #print(self.current_board, type(self.current_board))
+        #print(self.goal_board, type(self.current_board))
+        
+        # Set the seed. This is only used for the final (reach goal) reward.
+        #self.reset(default=True)
+
+    # similar to set task, but provide challenge idx as well
+    def set_challenge(self, data):
+        challenge = data[self.task_level][self.training_index]
+        self.current_board = np.array(challenge["start_board"])
+        self.goal_board = np.array(challenge["goal_board"])
+        self.max_steps = challenge["max_turns"]
 
     # implement how the game board initialization should work
     def reset(self, *, seed=None, options=None):
@@ -123,24 +123,62 @@ class GameBoardEnv(TaskSettableEnv):
 
     def __deepcopy__(self, memo):
         # Create a new instance of the class with the same configuration
-        new_env = GameBoardEnv(config=self.config)
+        new_env = GameBoardEnv(config=self.config, level = self.task_level, challenge_idx = self.training_index, train=False)
 
         # Copy all attributes of the environment
-        new_env.task_level = deepcopy(self.task_level, memo)
-        new_env.variant = deepcopy(self.variant, memo)
+        #new_env.task_level = deepcopy(self.task_level, memo)
+        #new_env.variant = deepcopy(self.variant, memo)
         new_env.n_steps = deepcopy(self.n_steps, memo)
-        new_env.training_index = deepcopy(self.training_index, memo)
-        new_env.width = deepcopy(self.width, memo)
-        new_env.height = deepcopy(self.height, memo)
-        new_env.training_levels = deepcopy(self.training_levels, memo)
-        new_env.training_states = deepcopy(self.training_states, memo)
-        new_env.observation_space = deepcopy(self.observation_space, memo)
-        new_env.action_space = deepcopy(self.action_space, memo)
+        #new_env.training_index = deepcopy(self.training_index, memo)
+        #new_env.width = deepcopy(self.width, memo)
+        #new_env.height = deepcopy(self.height, memo)
+        #new_env.training_levels = deepcopy(self.training_levels, memo)
+        #new_env.training_states = deepcopy(self.training_states, memo)
+        #new_env.observation_space = deepcopy(self.observation_space, memo)
+        #new_env.action_space = deepcopy(self.action_space, memo)
         new_env.current_board = deepcopy(self.current_board, memo)
-        new_env.goal_board = deepcopy(self.goal_board, memo)
-        new_env.max_steps = deepcopy(self.max_steps, memo)
+        #new_env.goal_board = deepcopy(self.goal_board, memo)
+        #new_env.max_steps = deepcopy(self.max_steps, memo)
 
         # Deep copy the reward module
         #new_env.reward_module = deepcopy(self.reward_module, memo)
+
+        return new_env
+    
+
+class SingleChallengeTestEnv(GameBoardEnv):
+    def __init__(self, shallowEnv):
+        self.shallowEnv = shallowEnv
+        self.current_board = shallowEnv.current_board
+        self.goal_board = shallowEnv.goal_board
+        self.max_steps = shallowEnv.max_steps
+        self.height = shallowEnv.height
+        self.width = shallowEnv.width
+        self.n_steps = 0
+        self.n_choices = self.width-2
+        self.observation_space = Dict({
+            "current": Box(low=0, high=2, shape=(self.height, self.width), dtype=int),
+            "goal": Box(low=0, high=2, shape=(self.height, self.width), dtype=int)
+        })
+        self.action_space = Discrete(self.n_choices)
+        reward_module = "gameVariants." + shallowEnv.variant + ".reward"
+        self.reward_module = importlib.import_module(reward_module)
+
+    def reset(self, *, seed=None, options=None):
+        self.n_steps = 0
+        obs = {
+            "current": self.current_board,
+            "goal": self.goal_board
+        }
+        return obs, {}
+    
+    def __deepcopy__(self, memo):
+        # Create a new instance of the class with the same configuration
+        new_env = SingleChallengeTestEnv(self.shallowEnv)
+
+        # Copy all attributes of the environment
+        new_env.n_steps = deepcopy(self.n_steps, memo)
+        new_env.current_board = deepcopy(self.current_board, memo)
+        new_env.goal_board = deepcopy(self.goal_board, memo)
 
         return new_env

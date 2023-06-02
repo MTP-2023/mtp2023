@@ -10,15 +10,23 @@ from gameResources.simulation.simulate import run
 from collections import OrderedDict
 from apply_policy import solve_challenge
 
-run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_14_65:v171', type='model')
-artifact_dir = artifact.download()
+from train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
+from ray.rllib.models import ModelCatalog
+ModelCatalog.register_custom_model("simpler_alphazero_model", SimplerModel)
+
+download = False
+is_alphazero = True
+
+if download:
+    run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
+    artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumLearning/checkpoint_SmallTrainLocalSolverate:v0', type='model')
+    artifact_dir = artifact.download()
+else:
+    artifact_dir = './artifacts/checkpoint_SmallTrainLocalRay-v0'
 
 agent = Policy.from_checkpoint(artifact_dir+'/policies/default_policy')
 
-
-
-challenges = json.load(open("../../gameVariants/baseline/training/curriculumVer2Test.json"))
+challenges = json.load(open("../../gameVariants/baseline/training/curriculumVer2.json"))
 height = challenges["height"] * 2
 width = challenges["width"] * 2 + 2
 noOfLevels = len(challenges["training_levels"])
@@ -44,7 +52,7 @@ for k in range(noOfLevels):
         obs = OrderedDict()
         obs["current"] = current_board
         obs["goal"] = goal_board
-        results = solve_challenge(agent, obs, max_steps)
+        results = solve_challenge(agent, obs, max_steps, is_alphazero)
         if results["solved"]:
             print("FINISHED CHALLENGE IN", results["actions_required"], "TURNS\n")
             solvedChallenges += 1
@@ -57,4 +65,5 @@ print("SOLVE RATE:", solvedPercent)
 avgTurns = float(totalTurns)/float(solvedChallenges)
 print("AVERAGE TURNS:", avgTurns)
 
-run_wandb.finish()
+if download:
+    run_wandb.finish()

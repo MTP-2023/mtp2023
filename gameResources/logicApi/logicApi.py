@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,10 +12,31 @@ from collections import OrderedDict
 import numpy as np
 from apply_policy import return_move, solve_challenge
 from ray.rllib.policy.policy import Policy
+import os
+from ray.rllib.models import ModelCatalog
 
-# load policy
-artifact_dir ='../../gameResources/trainedAgents/test/policies/default_policy'
-agent = Policy.from_checkpoint(artifact_dir)
+# initialize agents
+agent_handles = [
+    #'SimpleAgent',
+    #'MCTS',
+    'PPO', # checkpoint_gpu_14_675:v2
+    'AlphaZero' # default train, default settings, 200 simulations
+]
+
+# register models required for alphazero
+from train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
+ModelCatalog.register_custom_model("default_alphazero_model", DefaultModel)
+ModelCatalog.register_custom_model("simpler_alphazero_model", SimplerModel)
+ModelCatalog.register_custom_model("complex_alphazero_model", ComplexModel)
+
+agent_dict = {}
+
+# load policies if possible
+for agent_handle in agent_handles:
+    artifact_dir ='../../gameResources/trainedAgents/'+agent_handle+'/policies/default_policy'
+    if os.path.isdir(artifact_dir):
+        agent = Policy.from_checkpoint(artifact_dir)
+        agent_dict[agent_handle] = agent
 
 # basic description of API endpoints for /docs
 tags_metadata = [
@@ -36,8 +57,8 @@ tags_metadata = [
         "description": "Provide a game board status and a marble throw. Receive the updated game state with all intermediate steps.",
     },
     {
-        "name": "step",
-        "description": "Request the next action from a pretrained agent.",
+        "name": "agent_options",
+        "description": "Request the available agent options.",
     },
     {
         "name": "solve",
@@ -101,29 +122,33 @@ async def runSimulation(gameBoard: SimulationDTO):
     updatedStates = run(gameBoard.marble_throw, gameBoard.board, return_intermediate_data = True)
     return updatedStates
 
-# request the next action from a pretrained RL agent
-@app.get("/step/", tags=["step"])
-async def requestAction(challenge: ChallengeDTO):
-    # create observation
-    obs = OrderedDict()
-    obs["current"] = np.array(challenge.current)
-    obs["goal"] = np.array(challenge.goal)
-
-    action = return_move(agent, obs)
-
+# request the available agent options
+@app.get("/agent_options/", tags=["agent_options"])
+async def returnAgentList():
     return {
-        "action": int(action)
+        "agents": agent_handles
     }
 
-# request the solution for a challenge from a pretrained RL agent
-@app.get("/solve/", tags=["solve"])
-async def requestAction(challenge: ChallengeDTO, max_steps: int = 20):
-    # create observation
-    obs = OrderedDict()
-    obs["current"] = np.array(challenge.current)
-    obs["goal"] = np.array(challenge.goal)
+# request the solution for a challenge from a specified agent
+@app.get("/solve/{agent_handle}", tags=["solve"])
+async def requestSolution(challenge: ChallengeDTO, agent_handle: str, max_steps: int = 20):
+    # check if requested agent exists
+    if agent_handle not in agent_handles:
+        raise HTTPException(status_code=404, detail="Agent not found")
 
-    # obtain solution of agent
-    solution = solve_challenge(agent, obs, max_steps)
+    if agent_handle in agent_dict.keys():
+        # create observation
+        obs = OrderedDict()
+        obs["current"] = np.array(challenge.current)
+        obs["goal"] = np.array(challenge.goal)
+
+        is_alphazero = False
+        if "alphazero" in agent_handle.lower():
+            is_alphazero = True
+
+        # obtain solution of agent
+        solution = solve_challenge(agent_dict[agent_handle], obs, max_steps, is_alphazero)
+
+        #print(solution)
 
     return solution

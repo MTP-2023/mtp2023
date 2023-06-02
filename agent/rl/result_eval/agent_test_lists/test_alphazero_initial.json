@@ -1,0 +1,14 @@
+{
+    "agents": [
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain100lowLR:v0",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain100highLR:v1",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain300Sim:v0",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain100SimComplex:v0",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain100SimExploit:v0",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain100Sim:v0",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrainDefault:v0",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain1008Thresh:v0",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain100SimExplore:v0",
+        "mtp2023_avalanche/CurriculumLearning/checkpoint_OriginalTrain200Sim:v0"
+      ]
+  }

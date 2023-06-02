@@ -6,7 +6,7 @@ from ray.rllib.algorithms.alpha_zero.models.custom_torch_models import ActorCrit
 # Currently, this is a copy of ray.rllib.algorithms.alpha_zero.models.custom_torch_models.DenseModel that is used for debugging
 # Later, this code might be adapted to implement custom models
 
-class AlphaZeroModel(ActorCriticModel):
+class DefaultModel(ActorCriticModel):
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
         ActorCriticModel.__init__(
             self, obs_space, action_space, num_outputs, model_config, name
@@ -60,5 +60,70 @@ class AlphaZeroModel(ActorCriticModel):
         if log:
             print("CHECK Value out:", value_out)
         
+        self._value_out = value_out.squeeze(1)
+        return logits, state
+
+
+
+# This is an adapted version of the above, default model class
+# It reduces the amount of units per shared layer to 128
+
+class SimplerModel(ActorCriticModel):
+    def __init__(self, obs_space, action_space, num_outputs, model_config, name):
+        ActorCriticModel.__init__(
+            self, obs_space, action_space, num_outputs, model_config, name
+        )
+
+        self.shared_layers = nn.Sequential(
+            nn.Linear(obs_space.original_space["obs"].shape[0], 128),
+            nn.Linear(128, 128)
+        )
+        self.actor_layers = nn.Sequential(
+            nn.Linear(128, action_space.n)
+        )
+        self.critic_layers = nn.Sequential(
+            nn.Linear(128, 1)
+        )
+        self._value_out = None
+
+    def forward(self, input_dict, state, seq_lens):
+        x = input_dict["obs"].float()
+        x = self.shared_layers(x)
+        logits = self.actor_layers(x)
+        value_out = self.critic_layers(x)
+        self._value_out = value_out.squeeze(1)
+        return logits, state
+    
+
+# This is an adapted version of the default model class
+# It adds complexity by adding more layers and units to the model's architecture
+class ComplexModel(ActorCriticModel):
+    def __init__(self, obs_space, action_space, num_outputs, model_config, name):
+        super(ComplexModel, self).__init__(obs_space, action_space, num_outputs, model_config, name)
+
+        self.shared_layers = nn.Sequential(
+            nn.Linear(obs_space.original_space["obs"].shape[0], 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU()
+        )
+        self.actor_layers = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, action_space.n)
+        )
+        self.critic_layers = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 1)
+        )
+
+def forward(self, input_dict, state, seq_lens):
+        x = input_dict["obs"].float()
+        x = self.shared_layers(x)
+        logits = self.actor_layers(x)
+        value_out = self.critic_layers(x)
         self._value_out = value_out.squeeze(1)
         return logits, state

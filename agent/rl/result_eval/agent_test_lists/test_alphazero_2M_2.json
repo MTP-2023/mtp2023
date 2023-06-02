@@ -1,0 +1,9 @@
+{
+    "agents": [
+        "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_NewTrain100SimExploit:v0",
+        "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_NewTrain100Sim:v0",
+        "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_NewTrain100SimSolverate:v0",
+        "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_NewTrain300Sim:v0",
+        "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_NewTrain100SimComplexModel:v0"
+      ]
+  }

@@ -5,12 +5,15 @@ import sys
 from ray.air.integrations.wandb import setup_wandb
 import argparse
 import pandas as pd
+import pickle
 
-sys.path.append("../../")
+sys.path.append("../../..")
+sys.path.append("../")
 from gameVariants.baseline.reward import reward
 from gameResources.simulation.simulate import run
 from collections import OrderedDict
 from apply_policy import solve_challenge
+import traceback
 
 parser = argparse.ArgumentParser()
 
@@ -25,20 +28,38 @@ parser.add_argument(
     help=""
 )
 parser.add_argument(
+    "--local_run",
+    default=True,
+    action=argparse.BooleanOptionalAction,
+    help="store data in pickle if run on server"
+)
+
+parser.add_argument(
     "--out"
 )
 
+from ray.rllib.models import ModelCatalog
+from train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
+ModelCatalog.register_custom_model("default_alphazero_model", DefaultModel)
+ModelCatalog.register_custom_model("simpler_alphazero_model", SimplerModel)
+ModelCatalog.register_custom_model("complex_alphazero_model", ComplexModel)
+
 args = parser.parse_args()
 
-run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-agent_links = json.load(open("train_resources/" + args.agent_links + ".json"))["agents"]
+run_wandb = setup_wandb(api_key_file="../wandb_api_key.txt")
+agent_links = json.load(open("agent_test_lists/" + args.agent_links + ".json"))["agents"]
 
-challenges = json.load(open("../../gameVariants/baseline/training/" + args.challenges + ".json"))
+challenges = json.load(open("../../../gameVariants/baseline/training/" + args.challenges + ".json"))
 noOfLevels = len(challenges["training_levels"])
+
+print(noOfLevels)
+
+print("test on", args.challenges)
 
 stats_dict = {}
 
 for agent_link in agent_links:
+    print("started", agent_link)
     agent_solverates = []
     agent_turns = []
 
@@ -51,6 +72,7 @@ for agent_link in agent_links:
         solvedChallenges = 0
         noOfTurns = 0
         for level in range(noOfLevels):
+            print("level", level)
             noOfChallengesLvl = len(challenges["training_levels"][level])
             solvedChallengesLvl = 0
             noOfTurnsLvl = 0
@@ -64,7 +86,10 @@ for agent_link in agent_links:
                 obs = OrderedDict()
                 obs["current"] = current_board
                 obs["goal"] = goal_board
-                results = solve_challenge(agent, obs, max_steps)
+                is_alphazero = False
+                if "alphazero" in args.agent_links.lower():
+                    is_alphazero = True
+                results = solve_challenge(agent, obs, max_steps, az=is_alphazero)
                 if results["solved"]:
                     #print("FINISHED CHALLENGE IN", results["actions_required"], "TURNS\n")
                     solvedChallengesLvl += 1
@@ -82,10 +107,19 @@ for agent_link in agent_links:
         stats_dict[agent_link + "_solverate"] = agent_solverates
         stats_dict[agent_link + "_average_turns"] = agent_turns
     except Exception as e:
+        traceback.print_exc()
         print(e)
 
+    print("agent tested")
+
+
 stats_df = pd.DataFrame(data=stats_dict)
-stats_df.to_excel(args.out + ".xlsx")
+
+if not args.local_run:
+    file = open(args.out+".pkl", "wb")
+    pickle.dump(stats_df, file)
+    file.close()
+else:
+    stats_df.to_excel(args.out + ".xlsx")
 
 run_wandb.finish()
-
