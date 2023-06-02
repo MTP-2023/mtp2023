@@ -13,7 +13,7 @@ class WrappedGameBoardEnv(gym.Env):
     def __init__(self, config: EnvContext, shallowEnv = None):
         if config["online"]:
             self.env = OnlineLearningEnv(config)
-        if not shallowEnv:
+        elif not shallowEnv:
             self.env = GameBoardEnv(config)
         else:
             self.env = SingleChallengeTestEnv(shallowEnv)  
