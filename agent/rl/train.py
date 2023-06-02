@@ -119,7 +119,7 @@ parser.add_argument(
 
 parser.add_argument(
     "--online",
-    default=True,
+    default=False,
     action=argparse.BooleanOptionalAction,
     help="Online learning toggle."
 )
@@ -175,6 +175,7 @@ if args.algo == "PPO":
         env_class = GameBoardEnv
 elif args.algo == "AlphaZero":
     config = AlphaZeroConfig()
+    env_setup["online"] = args.online
     env_class = WrappedGameBoardEnv
     alphazero_cb = True
     #register custom models from model.py

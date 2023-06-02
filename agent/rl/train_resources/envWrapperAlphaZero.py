@@ -5,12 +5,14 @@ import numpy as np
 from gymnasium.spaces import Dict, Box, flatten_space
 from gymnasium.wrappers.flatten_observation import FlattenObservation
 from ray.rllib.env.env_context import EnvContext
-from .avalancheEnv import GameBoardEnv, SingleChallengeTestEnv
+from .avalancheEnv import GameBoardEnv, SingleChallengeTestEnv, OnlineLearningEnv
 
 class WrappedGameBoardEnv(gym.Env):
     """Wrapper for the GameBoardEnv where reward is accumulated to the end."""
 
     def __init__(self, config: EnvContext, shallowEnv = None):
+        if config["online"]:
+            self.env = OnlineLearningEnv(config)
         if not shallowEnv:
             self.env = GameBoardEnv(config)
         else:
