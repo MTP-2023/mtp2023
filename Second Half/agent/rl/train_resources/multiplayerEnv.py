@@ -13,11 +13,12 @@ class MultiplayerEnv(GameBoardEnv):
             "current": Box(low=-2, high=2, shape=(self.height, self.width), dtype=int),
             "goal": Box(low=-2, high=2, shape=(self.height, self.width), dtype=int)
         })
+        self.current_player = 1
 
     def step(self, action):
         assert action in range(self.n_choices), action
 
-        self.current_board = run(action, self.current_board)
+        self.current_board = run(self.current_player, action, self.current_board)
         self.n_steps += 1
 
         reward, done = self.reward_module.reward(self)
@@ -31,5 +32,17 @@ class MultiplayerEnv(GameBoardEnv):
             # to be changed for actual agent training
             return obs, reward, done, False, {}
         else:
-            enemyAction = mcts(self.current_board, self.max_steps, 1, goalstate, width, height, max_steps):
+            self.current_player = -1
+            enemyAction = mcts(self.current_board, self.max_steps, 1, self.goal_board, self.width, self.height, self.max_steps)
+            self.current_board = run(self.current_player, action, self.current_board)
+
+            reward, done = self.reward_module.reward(self)
+            self.current_player = 1
+            obs = {
+                "current": self.current_board,
+                "goal": self.goal_board
+            }
+
+            # to be changed for actual agent training
+            return obs, reward, done, False, {}
 
