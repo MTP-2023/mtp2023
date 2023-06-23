@@ -127,40 +127,21 @@ class GameBoardEnv(TaskSettableEnv):
     def __deepcopy__(self, memo):
         # Create a new instance of the class with the same configuration
         new_env = GameBoardEnv(config=self.config, level = self.task_level, challenge_idx = self.training_index, train=False)
-
-        # Copy all attributes of the environment
-        #new_env.task_level = deepcopy(self.task_level, memo)
-        #new_env.variant = deepcopy(self.variant, memo)
         new_env.n_steps = deepcopy(self.n_steps, memo)
-        #new_env.training_index = deepcopy(self.training_index, memo)
-        #new_env.width = deepcopy(self.width, memo)
-        #new_env.height = deepcopy(self.height, memo)
-        #new_env.training_levels = deepcopy(self.training_levels, memo)
-        #new_env.training_states = deepcopy(self.training_states, memo)
-        #new_env.observation_space = deepcopy(self.observation_space, memo)
-        #new_env.action_space = deepcopy(self.action_space, memo)
         new_env.current_board = deepcopy(self.current_board, memo)
-        #new_env.goal_board = deepcopy(self.goal_board, memo)
-        #new_env.max_steps = deepcopy(self.max_steps, memo)
-
-        # Deep copy the reward module
-        #new_env.reward_module = deepcopy(self.reward_module, memo)
 
         return new_env
     
 class OnlineLearningEnv(GameBoardEnv):
 
-    def __init__(self, config: EnvContext, level=0, train=True):
+    def __init__(self, config: EnvContext, level = 0, is_copy=False):
         self.config = config
         self.task_level = level
         self.variant = config["variant"]
         self.n_steps = 0
         self.width = config["width"] * 2 + 2
         self.height = config["height"] * 2
-
-        # if this instance is the main training object, store all challenges
-        if train:
-            self.training_levels = config["training_levels"]
+        self.training_levels = config["training_levels"]
 
         # print(self.training_states)
 
@@ -183,14 +164,15 @@ class OnlineLearningEnv(GameBoardEnv):
 
         # Set the seed. This is only used for the final (reach goal) reward.
         # self.reset(default=True)
-
-        self.generate_board()
+        if not is_copy:
+            self.generate_board()
 
     def generate_board(self):
-        print("GENERATING ONLINE LEARNING BOARD")
+        #print("GENERATING ONLINE LEARNING BOARD")
         width = int((self.width - 2) / 2)
         height = int(self.height / 2)
         # print("WIDTH AND HEIGHT", width, height)
+        print(self.training_levels[self.task_level]["turnLimit"])
         start_board = generate_random_board(width, height)
         goal_board = generateGoalState(start_board, self.training_levels[self.task_level]["minMarbles"],
                                        self.training_levels[self.task_level]["maxMarbles"],
@@ -219,6 +201,16 @@ class OnlineLearningEnv(GameBoardEnv):
 
     def set_task(self, task):
         self.task_level = task
+
+    def __deepcopy__(self, memo):
+        # Create a new instance of the class with the same configuration
+        new_env = OnlineLearningEnv(config=self.config, level=self.task_level, is_copy=True)
+        new_env.n_steps = deepcopy(self.n_steps, memo)
+        new_env.current_board = deepcopy(self.current_board, memo)
+        new_env.goal_board = self.goal_board
+        new_env.max_steps = self.max_steps
+
+        return new_env
 
 class SingleChallengeTestEnv(GameBoardEnv):
     def __init__(self, shallowEnv):
