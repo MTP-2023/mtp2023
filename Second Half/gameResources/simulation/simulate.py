@@ -1,9 +1,9 @@
 import copy
 
-def run(start_col: int, input_board: list, return_intermediate_data = False):  
+def run(start_col: int, input_board: list, player, return_intermediate_data = False):
     start_col += 1 
     # format: list of items where [current_row, col_idx] represents a marble rolling down
-    active_marbles = [[0, start_col]]
+    active_marbles = [[0, start_col, player]]
 
     board_states = []
     marble_positions = []
@@ -28,6 +28,7 @@ def run(start_col: int, input_board: list, return_intermediate_data = False):
             if row[col_idx] == 1:
                 # save marble in position
                 row[col_idx] += 1
+                row[col_idx] *= player
                 active_marbles.remove(marble)
 
             # check if marble causes a switch toggle
@@ -56,7 +57,11 @@ def run(start_col: int, input_board: list, return_intermediate_data = False):
                     # check if another marble is activated by the switch toggle
                     if row[switch_col] == 2:
                         ## if this is the case, add the active marble to the active marbles list
-                        activated_marble = [row_idx, switch_col]
+                        activated_marble = [row_idx, switch_col, 1]
+                        active_marbles.append(activated_marble)
+                    elif row[switch_col] == -2:
+                        ## if this is the case, add the active marble to the active marbles list
+                        activated_marble = [row_idx, switch_col, -1]
                         active_marbles.append(activated_marble)
 
                     # set value of the switch's second part to 0
