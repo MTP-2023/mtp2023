@@ -7,10 +7,8 @@ import argparse
 import pandas as pd
 import pickle
 
-sys.path.append("../../..")
+sys.path.append("../../../..")
 sys.path.append("../")
-from gameVariants.baseline.reward import reward
-from gameResources.simulation.simulate import run
 from collections import OrderedDict
 from apply_policy import solve_challenge
 import traceback

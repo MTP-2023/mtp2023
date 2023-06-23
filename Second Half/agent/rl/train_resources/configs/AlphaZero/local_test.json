@@ -1,0 +1,20 @@
+{
+    "num_workers": 1,
+    "num_rollout_workers": 1,
+    "model": {
+        "custom_model": "simpler_alphazero_model"
+    },
+    "rollout_fragment_length": 100,
+    "train_batch_size": 2000,
+    "num_sgd_iter": 10,
+    "lr_schedule": [1e-3, 1e-6],
+    "mcts_config": {
+        "puct_coefficient": 1.0,
+        "num_simulations": 30,
+        "temperature": 1.5,
+        "dirichlet_epsilon": 0.25,
+        "dirichlet_noise": 0.03,
+        "argmax_tree_policy": false,
+        "add_dirichlet_noise": true
+    }
+}

@@ -1,7 +1,7 @@
 import random
 import sys
 #sys.path.append("../")
-sys.path.append("../../")
+sys.path.append("../../../")
 from gameResources.simulation.simulate import run
 import copy
 

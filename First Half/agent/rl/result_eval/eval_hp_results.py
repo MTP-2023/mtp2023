@@ -4,7 +4,7 @@ from ray.tune.analysis import ExperimentAnalysis
 from ray.tune import ResultGrid
 
 sys.path.append("../")
-sys.path.append("../../..")
+sys.path.append("../../../..")
 
 filename = "localHPtune.pkl"
 thresh = 6.5

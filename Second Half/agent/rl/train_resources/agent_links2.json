@@ -1,0 +1,15 @@
+{
+  "agents": [
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_14_65:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_14_675:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_14_7:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_14_65_manual:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_14_675_manual:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_14_7_manual:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_099_085:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_099_08:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_099_075:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_099_08_manual:v20",
+    "mtp2023_avalanche/CurriculumLearning/checkpoint_gpu_099_075_manual:v20"
+  ]
+}

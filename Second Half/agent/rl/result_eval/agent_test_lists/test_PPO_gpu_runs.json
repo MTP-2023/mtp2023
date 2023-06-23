@@ -1,0 +1,15 @@
+{
+  "agents": [
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_099_085_manual:v154",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_099_08_manual:v162",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_099_075_manual:v115",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_099_08:v159",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_099_075:v157",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_14_7_manual:v161",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_14_675_manual:v160",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_14_65_manual:v173",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_14_7:v154",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_14_675:v158",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_gpu_14_65:v170"
+  ]
+}

@@ -2,7 +2,7 @@ import json
 import time
 
 import sys
-sys.path.append('../../')
+sys.path.append('../../../')
 from gameResources.simulation.simulate import run
 import copy
 import random

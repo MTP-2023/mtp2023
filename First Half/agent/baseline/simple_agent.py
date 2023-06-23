@@ -2,7 +2,7 @@ import json
 import copy
 
 import sys
-sys.path.append('../../')
+sys.path.append('../../../')
 from gameVariants.baseline.reward import simple_agent_metrics
 from gameResources.simulation.simulate import run
 

@@ -4,13 +4,11 @@ from ray.rllib.policy.policy import Policy
 import sys
 from ray.air.integrations.wandb import setup_wandb
 
-sys.path.append("../../")
-from gameVariants.baseline.reward import reward
-from gameResources.simulation.simulate import run
+sys.path.append("../../../")
 from collections import OrderedDict
 from apply_policy import solve_challenge
 
-from train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
+from train_resources.azModel import SimplerModel
 from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_model("simpler_alphazero_model", SimplerModel)
 

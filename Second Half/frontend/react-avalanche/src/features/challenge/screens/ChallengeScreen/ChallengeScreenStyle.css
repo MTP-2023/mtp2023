@@ -1,0 +1,53 @@
+.challenge {
+  position: relative;
+}
+
+.challenge__board--goal {
+  opacity: 0.5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: ;
+}
+
+.challenge__board--green {
+  opacity: 0.5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.challenge__board--goal .switch img,
+.challenge__board--goal .switch .ball,
+.challenge__board--green .switch img,
+.challenge__board--green .switch .ball {
+  opacity: 0;
+}
+
+.challenge__board--goal
+  > .board__switches
+  > .board__switches__row
+  > .switch:has(.ball) {
+  background-color: red;
+}
+
+.challenge__board--green
+  > .board__switches
+  > .board__switches__row
+  > .switch:has(.ball) {
+  background-color: green;
+}
+
+.won {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  font-size: 4rem;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+}
