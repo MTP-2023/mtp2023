@@ -1,5 +1,5 @@
 from avalancheEnv import GameBoardEnv
-rom ray.rllib.env.env_context import EnvContext
+from ray.rllib.env.env_context import EnvContext
 from gymnasium.spaces import Discrete, Box, Dict
 sys.path.append("../../")
 from gameResources.simulation.simulate import run

@@ -1,4 +1,4 @@
-rom ray.rllib.env.env_context import EnvContext
+from ray.rllib.env.env_context import EnvContext
 from ray.rllib.env.apis.task_settable_env import TaskSettableEnv
 from gymnasium.spaces import Discrete, Box, Dict
 import numpy as np

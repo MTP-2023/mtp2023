@@ -8,6 +8,7 @@ from ray.air.integrations.wandb import WandbLoggerCallback
 from train_resources.custom_callbacks import CustomCallbacks
 from train_resources.curriculum_function import curriculum_fn
 from train_resources.avalancheEnv import GameBoardEnv, OnlineLearningEnv
+from train_resources.multiplayerEnv import MultiplayerEnv
 from train_resources.envWrapperAlphaZero import WrappedGameBoardEnv
 from train_resources.hyperparameter_callbacks import CustomWandbLoggerCallback
 import functools
@@ -124,6 +125,12 @@ parser.add_argument(
     help="Online learning toggle."
 )
 
+parser.add_argument(
+    "--multiplayer",
+    default=True,
+    action=argparse.BooleanOptionalAction
+)
+
 args = parser.parse_args()
 
 # set value of log group, if not given
@@ -171,6 +178,8 @@ if args.algo == "PPO":
     config = PPOConfig()
     if args.online:
         env_class = OnlineLearningEnv
+    elif args.multiplayer:
+        env_class = MultiplayerEnv
     else:
         env_class = GameBoardEnv
 elif args.algo == "AlphaZero":
