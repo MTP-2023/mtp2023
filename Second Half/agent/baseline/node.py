@@ -20,6 +20,9 @@ class Node:
         self.depth = 0
 
     def select_child(self, exploration_constant):
+        #print("CHILDREN")
+        #for child in self.children:
+        #    print(child.visits)
         log_total = math.log(sum(child.visits for child in self.children))
         best_child = None
         best_score = float('-inf')
@@ -42,3 +45,4 @@ class Node:
     def update(self, result):
         self.visits += 1
         self.wins += result
+

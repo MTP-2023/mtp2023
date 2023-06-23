@@ -21,7 +21,7 @@ def run(start_col: int, input_board: list, player, return_intermediate_data = Fa
         # iterate over each active (= falling) marble
         for marble in marble_update_queue:
             # get variales for currently updating marble
-            row_idx, col_idx = marble
+            row_idx, col_idx, player = marble
             row = input_board[row_idx]
 
             # check if switch position saves the marble
@@ -82,7 +82,10 @@ def run(start_col: int, input_board: list, player, return_intermediate_data = Fa
                         new_col = col_idx - 1
 
                 # add the other marble to active marbles
-                activated_marble = [row_idx, col_idx]
+                if input_board[row_idx][col_idx] == 2:
+                    activated_marble = [row_idx, col_idx, 1]
+                if input_board[row_idx][col_idx] == -2:
+                    activated_marble = [row_idx, col_idx, -1]
                 active_marbles.append(activated_marble)
 
                 # update switch status
@@ -90,7 +93,8 @@ def run(start_col: int, input_board: list, player, return_intermediate_data = Fa
                 row[new_col] = 1
 
                 # update marble position
-                active_marbles[active_marbles.index(marble)] = [row_idx + 1, new_col]
+                active_marbles[active_marbles.index(marble)][0] = row_idx + 1
+                active_marbles[active_marbles.index(marble)][1] = new_col
 
             # remove active marbles if they reach the bottom
             marbles_dropped += len([marble for marble in active_marbles if marble[0] == len(input_board)])
