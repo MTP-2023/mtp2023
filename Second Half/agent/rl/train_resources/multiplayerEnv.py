@@ -33,7 +33,7 @@ class MultiplayerEnv(GameBoardEnv):
             return obs, reward, done, False, {}
         else:
             self.current_player = -1
-            enemyAction = mcts(self.current_board, self.max_steps, 1, self.goal_board, self.width, self.height, self.max_steps)
+            enemyAction = mcts(self.current_board, 1000, 1, self.goal_board, self.width, self.height, self.max_steps, self.n_steps, self.current_player)
             self.current_board = run(self.current_player, action, self.current_board)
 
             reward, done = self.reward_module.reward(self)
