@@ -28,7 +28,7 @@ def propagate(node, result):
 
 
 def mcts(root_state, max_iterations, exploration_constant, goalstate, width, height, max_steps, n_steps, player):
-    root_node = Node(root_state)
+    root_node = Node(root_state, player)
     startTime = time.time_ns()
     # while time.time_ns - startTime < maxTime / 1000000000:
     for i in range(max_iterations):
