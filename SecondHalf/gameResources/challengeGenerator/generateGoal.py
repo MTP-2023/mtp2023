@@ -2,7 +2,7 @@ import random
 import sys
 #sys.path.append("../")
 sys.path.append("../../../")
-from gameResources.simulation.simulate import run
+from SecondHalf.gameResources.simulation.simulate import run
 import copy
 
 # board = start board produced by generator
@@ -26,6 +26,7 @@ def generateGoalState(startBoard, minMarbles, maxMarbles, turnlimit, availableMa
 def generateBoard(board, minMarbles, maxMarbles, turnlimit, availableMarbles, width, fallthrough):
     lastValid = None
     #print("trying to generate with maxTurns", maxTurns)
+    player = 1
     for _ in range(turnlimit):
         move = random.randint(0, width)
         #print("WIDTH", width)
@@ -33,7 +34,8 @@ def generateBoard(board, minMarbles, maxMarbles, turnlimit, availableMarbles, wi
         result = run(move, board, True)
         if fallthrough and result["marbles_dropped"] > 0:
             return lastValid
-        board = run(move, board, True)["boards"][-1]
+        board = run(move, board, player, True)["boards"][-1]
+        #player *= -1
         if isValid(board, minMarbles, maxMarbles):
             lastValid = copy.deepcopy(board)
     return lastValid
