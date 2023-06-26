@@ -96,7 +96,7 @@ class GameBoardEnv(TaskSettableEnv):
     def step(self, action):
         assert action in range(self.n_choices), action
 
-        self.current_board = run(action, self.current_board)
+        self.current_board = run(action, self.current_board, player=1)
         self.n_steps += 1
 
         # game variant dependencies:

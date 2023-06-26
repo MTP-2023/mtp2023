@@ -65,7 +65,7 @@ def solve_challenge(agent, obs, max_steps, az = False):
         action = return_move(agent, paramEnv, obs, az)
         action_sequence.append(int(action))
         # simulate game
-        current_board = run(action, current_board)
+        current_board = run(action, current_board, player=1)
         solveEnv = ShallowEnv(current_board, obs["goal"], n_steps+1, max_steps, len(current_board[0]), len(current_board))
         # determine if goal is fulfilled
         _, done = reward(solveEnv)

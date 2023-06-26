@@ -11,7 +11,7 @@ class WrappedGameBoardEnv(gym.Env):
     """Wrapper for the GameBoardEnv where reward is accumulated to the end."""
 
     def __init__(self, config: EnvContext, shallowEnv = None):
-        if config["online"]:
+        if config.get("online", False):
             self.env = OnlineLearningEnv(config)
         elif not shallowEnv:
             self.env = GameBoardEnv(config)
