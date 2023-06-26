@@ -119,7 +119,7 @@ async def returnChallenge(width: int = default_width, height: int = default_heig
 # request to simulate a throw, return game board and marble states
 @app.post("/interpret/", tags=["interpret"])
 async def runSimulation(gameBoard: SimulationDTO):
-    updatedStates = run(gameBoard.marble_throw, gameBoard.board, return_intermediate_data = True)
+    updatedStates = run(gameBoard.marble_throw, gameBoard.board, player=1,return_intermediate_data = True)
     return updatedStates
 
 # request the available agent options
