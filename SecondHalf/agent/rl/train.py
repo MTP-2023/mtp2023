@@ -128,7 +128,14 @@ parser.add_argument(
 parser.add_argument(
     "--multiplayer",
     default=True,
-    action=argparse.BooleanOptionalAction
+    action=argparse.BooleanOptionalAction,
+    help="multiplayer toggle"
+)
+
+parser.add_argument(
+    "--vs",
+    default="random",
+    help="Agent to train against"
 )
 
 args = parser.parse_args()
@@ -180,6 +187,7 @@ if args.algo == "PPO":
         env_class = OnlineLearningEnv
     elif args.multiplayer:
         env_class = MultiplayerEnv
+        env_setup["vs"] = args.vs
     else:
         env_class = GameBoardEnv
 elif args.algo == "AlphaZero":

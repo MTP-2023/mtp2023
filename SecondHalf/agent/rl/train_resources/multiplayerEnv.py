@@ -1,3 +1,4 @@
+import random
 import sys
 sys.path.append("../../")
 sys.path.append("../")
@@ -16,6 +17,7 @@ class MultiplayerEnv(GameBoardEnv):
             "goal": Box(low=-2, high=2, shape=(self.height, self.width), dtype=int)
         })
         self.current_player = 1
+        self.vs = config.get("vs", "random")
 
     def step(self, action):
         assert action in range(self.n_choices), action
@@ -36,7 +38,10 @@ class MultiplayerEnv(GameBoardEnv):
             return obs, reward, done, False, {}
         else:
             self.current_player = -1
-            enemyAction = mcts(self.current_board, 100, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
+            if self.vs == "mcts":
+                enemyAction = mcts(self.current_board, 100, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
+            else:
+                enemyAction = random.randint(0, self.n_choices)
             #print("MCTS ACTION", enemyAction)
             self.current_board = run(enemyAction, self.current_board, self.current_player)
 

@@ -1,7 +1,7 @@
 import copy
 import sys
-sys.path.append('../')
-from SecondHalf.gameResources.boardGenerator.generate import generate_random_board
+sys.path.append('../../')
+from gameResources.boardGenerator.generate import generate_random_board
 from generateGoal import generateGoalState
 import json
 
@@ -83,6 +83,6 @@ if __name__ == "__main__":
         dict["training_levels"].append(training_states)
     json_object = json.dumps(dict, indent=4)
 
-    with open("../../gameVariants/baseline/training/multiplayertest1" + ".json", "w") as outfile:
+    with open("../../gameVariants/baseline/training/multiplayer_train" + ".json", "w") as outfile:
         outfile.write(json_object)
 
