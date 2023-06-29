@@ -4,11 +4,16 @@ import "./Navbar.css";
 
 const Navbar = () => {
   return (
-    <nav className="navbar">
+    <nav className="navbar" id="navbar">
       <ul className="navbar__items">
         <Link to="/">
           <div className="logo">AVALANCHE</div>
         </Link>
+        <li className="navbar__item">
+          <Link to="/game" className="navbar__link">
+            Game
+          </Link>
+        </li>
         <li className="navbar__item">
           <Link to="/sandbox" className="navbar__link">
             Sandbox
