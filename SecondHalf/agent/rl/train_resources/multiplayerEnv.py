@@ -39,19 +39,19 @@ class MultiplayerEnv(GameBoardEnv):
                 "goal": self.goal_board
             }
 
-            #print("DONE ON AGENT TURN")
-            #print(self.current_board)
-            #print(self.goal_board)
-            #print(reward)
+            """print("DONE ON AGENT TURN")
+            print(self.current_board)
+            print(self.goal_board)
+            print(reward)"""
             return obs, reward, done, False, {}
         else:
             self.current_player = -1
             if self.vs == "mcts":
-                enemyAction = mcts(self.current_board, 10, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
+                enemyAction = mcts(self.current_board, 5, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
             else:
                 enemyAction = random.randint(0, self.n_choices)
-            #print("MCTS ACTION", enemyAction)
-            #self.current_board = run(enemyAction, self.current_board, self.current_player)
+            #print("ENEMY ACTION", enemyAction)
+            self.current_board = run(enemyAction, self.current_board, self.current_player)
             #print("ENEMY ACTION", enemyAction)
             #print(self.current_board)
 
@@ -62,9 +62,9 @@ class MultiplayerEnv(GameBoardEnv):
                 "goal": self.goal_board
             }
 
-            #if done:
-                #print("DONE ON ENEMY TURN")
-                #print(self.goal_board)
-                #print(reward)
+            """if done:
+                print("DONE ON ENEMY TURN")
+                print(self.goal_board)
+                print(reward)"""
             return obs, reward, done, False, {}
 
