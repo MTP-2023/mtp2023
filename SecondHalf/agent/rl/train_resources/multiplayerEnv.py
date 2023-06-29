@@ -22,7 +22,13 @@ class MultiplayerEnv(GameBoardEnv):
     def step(self, action):
         assert action in range(self.n_choices), action
 
+        #print("STEP", self.n_steps)
+        #print(self.current_board)
+        #if self.n_steps == 0:
+        #    print("GOAL\n", self.goal_board)
+        #print("ACTION", action)
         self.current_board = run(action, self.current_board, self.current_player)
+        #print(self.current_board)
         self.n_steps += 1
 
         reward, done = self.reward_module.reward(self)
@@ -33,17 +39,21 @@ class MultiplayerEnv(GameBoardEnv):
                 "goal": self.goal_board
             }
 
-            # to be changed for actual agent training
-            #print("EPISODE END")
+            #print("DONE ON AGENT TURN")
+            #print(self.current_board)
+            #print(self.goal_board)
+            #print(reward)
             return obs, reward, done, False, {}
         else:
             self.current_player = -1
             if self.vs == "mcts":
-                enemyAction = mcts(self.current_board, 100, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
+                enemyAction = mcts(self.current_board, 10, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
             else:
                 enemyAction = random.randint(0, self.n_choices)
             #print("MCTS ACTION", enemyAction)
-            self.current_board = run(enemyAction, self.current_board, self.current_player)
+            #self.current_board = run(enemyAction, self.current_board, self.current_player)
+            #print("ENEMY ACTION", enemyAction)
+            #print(self.current_board)
 
             reward, done = self.reward_module.reward(self)
             self.current_player = 1
@@ -52,8 +62,9 @@ class MultiplayerEnv(GameBoardEnv):
                 "goal": self.goal_board
             }
 
-            # to be changed for actual agent training
-            if done:
-                print("EPISODE END on MCTS turn")
+            #if done:
+                #print("DONE ON ENEMY TURN")
+                #print(self.goal_board)
+                #print(reward)
             return obs, reward, done, False, {}
 

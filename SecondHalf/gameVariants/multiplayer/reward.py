@@ -21,6 +21,23 @@ def reward(env):
             if not done:
                 break
             i += 1
+        #check if other player won through own action
+        if not done:
+            done = True
+            player = player*-1
+            while i < env.height:
+                j = 0
+                if i % 2 == 0:
+                    j = 1
+                while j < env.width - 1:
+                    if env.goal_board[i][j] == 2 * player or env.goal_board[i][j + 1] == 2 * player or env.goal_board[i][j] == 3 or env.goal_board[i][j + 1] == 3:
+                        if env.current_board[i][j] != 2 * player and env.current_board[i][j + 1] != 2 * player:
+                            done = False
+                            break
+                    j += 2
+                if not done:
+                    break
+                i += 1
 
         reward = (1 + env.max_steps - env.n_steps)*player if done else 0
 
