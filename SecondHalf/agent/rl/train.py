@@ -131,6 +131,12 @@ parser.add_argument(
     help="Agent to train against (only relevant for multiplayer)"
 )
 
+parser.add_argument(
+    "--mcts_depth",
+    default=100,
+    help="MCTS opponent search depth for multiplayer training"
+)
+
 args = parser.parse_args()
 
 # set value of log group, if not given
@@ -181,6 +187,7 @@ if args.algo == "PPO":
     elif args.variant == "multiplayer":
         env_class = MultiplayerEnv
         env_setup["vs"] = args.vs
+        env_setup["mcts_depth"] = args.mcts_depth
     else:
         env_class = GameBoardEnv
 elif args.algo == "AlphaZero":

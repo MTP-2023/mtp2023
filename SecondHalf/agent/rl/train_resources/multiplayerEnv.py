@@ -18,6 +18,7 @@ class MultiplayerEnv(GameBoardEnv):
         })
         self.current_player = 1
         self.vs = config.get("vs", "random")
+        self.mcts_depth = config.get("mcts_depth", 100)
 
     def step(self, action):
         assert action in range(self.n_choices), action
@@ -55,7 +56,7 @@ class MultiplayerEnv(GameBoardEnv):
             reward, done = self.reward_module.reward(self)
             if not done:
                 if self.vs == "mcts":
-                    enemyAction = mcts(self.current_board, 5, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
+                    enemyAction = mcts(self.current_board, self.mcts_depth, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
                 else:
                     enemyAction = random.randint(0, self.n_choices)
                 #print("ENEMY ACTION", enemyAction)

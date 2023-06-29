@@ -1,8 +1,8 @@
 import random
 import sys
 #sys.path.append("../")
-sys.path.append("../../../")
-from SecondHalf.gameResources.simulation.simulate import run
+sys.path.append("../../")
+from gameResources.simulation.simulate import run
 import copy
 
 # board = start board produced by generator
