@@ -13,7 +13,10 @@ export default class Preloader extends Phaser.Scene {
 		this.load.path = "src/features/game/assets/";
 		this.load.image("phaser_pixel_medium_flat");
 		//this.load.image("Phaser-Logo-Small");
-		this.load.image("switch");
+		this.load.image("switch-left");
+		this.load.image("switch-right");
+		this.load.json("switch-left-shape");
+		this.load.json("switch-right-shape");
 		this.load.image("border");
 
 		// You should remove this logic; this is only included here to show off the progress bar.

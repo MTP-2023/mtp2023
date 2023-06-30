@@ -20,6 +20,12 @@ const GameComponent: React.FC = () => {
       type: Phaser.AUTO,
       parent: 'game',
       title: 'Avalanche Game',
+      physics: {
+        default: 'matter',
+        matter: {
+          debug: true
+        }
+      }
     };
     
     const game = new Phaser.Game(gameConfig);
