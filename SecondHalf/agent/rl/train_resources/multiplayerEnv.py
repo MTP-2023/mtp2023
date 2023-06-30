@@ -2,11 +2,12 @@ import random
 import sys
 sys.path.append("../../")
 sys.path.append("../")
-from rl.train_resources.avalancheEnv import GameBoardEnv
+from rl.train_resources.avalancheEnv import GameBoardEnv, SingleChallengeTestEnv
 from ray.rllib.env.env_context import EnvContext
 from gymnasium.spaces import Discrete, Box, Dict
 from gameResources.simulation.simulate import run
 from agent.baseline.mcts import mcts
+from copy import deepcopy
 
 class MultiplayerEnv(GameBoardEnv):
 
@@ -78,4 +79,32 @@ class MultiplayerEnv(GameBoardEnv):
                 print(self.goal_board)
                 print(reward)"""
             return obs, reward, done, False, {}
+
+class SingleChallengeTestEnvMultiplayer(SingleChallengeTestEnv):
+    def __init__(self, shallowEnv):
+        super().__init__(shallowEnv)
+        self.observation_space = Dict({
+            "current": Box(low=-2, high=2, shape=(self.height, self.width), dtype=int),
+            "goal": Box(low=-2, high=3, shape=(self.height, self.width), dtype=int)
+        })
+        self.current_player = shallowEnv.current_player
+
+    def reset(self, *, seed=None, options=None):
+        self.n_steps = 0
+        obs = {
+            "current": self.current_board,
+            "goal": self.goal_board
+        }
+        return obs, {}
+
+    def __deepcopy__(self, memo):
+        # Create a new instance of the class with the same configuration
+        new_env = SingleChallengeTestEnvMultiplayer(self.shallowEnv)
+
+        # Copy all attributes of the environment
+        new_env.n_steps = deepcopy(self.n_steps, memo)
+        new_env.current_board = deepcopy(self.current_board, memo)
+        new_env.goal_board = deepcopy(self.goal_board, memo)
+
+        return new_env
 

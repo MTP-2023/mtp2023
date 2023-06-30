@@ -2,7 +2,7 @@ import copy
 import sys
 sys.path.append('../../')
 from gameResources.boardGenerator.generate import generate_random_board
-from generateGoal import generateGoalState
+from gameResources.challengeGenerator.generateGoal import generateGoalState
 import json
 
 def check_existing(states, start, goal):
