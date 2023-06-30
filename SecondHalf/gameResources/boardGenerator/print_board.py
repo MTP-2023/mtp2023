@@ -44,9 +44,9 @@ def print_board(board):
             j = 0
         while j < width - 1:
             if board[i][j] != 0:
-                line += " \\  |"
+                line += "  \\ |"
             else:
-                line += "  / |"
+                line += " /  |"
             j+=2
         line += "\n"
         str_board += line

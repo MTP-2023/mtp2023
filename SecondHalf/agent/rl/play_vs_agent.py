@@ -77,6 +77,15 @@ for step in range(max_turns):
     print("      CURRENT BOARD")
     print_board(current_board)
     player = 1
+    solveEnv = ShallowEnv(current_board, obs["goal"], step + 1, max_turns, len(current_board[0]), len(current_board),
+                          player)
+    # determine if goal is fulfilled
+    _, done = reward(solveEnv)
+    if done:
+        if reward > 0:
+            print("     AGENT WON")
+        else:
+            print("     PLAYER WON")
     paramEnv = ShallowEnv(current_board, obs["goal"], step, max_turns, len(current_board[0]), len(current_board), player)
     action = return_move(agent, paramEnv, obs)
     print("      AGENT MOVE", action+1)
