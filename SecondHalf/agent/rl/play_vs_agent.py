@@ -8,6 +8,7 @@ from ray.air.integrations.wandb import setup_wandb
 from ray.rllib.models import ModelCatalog
 sys.path.append("../../")
 from gameResources.boardGenerator.generate import generate_random_board
+from gameResources.boardGenerator.print_board import print_board
 from gameResources.challengeGenerator.generateGoal import generateGoalState
 from gameResources.challengeGenerator.generateChallenges import merge
 from agent.rl.train_resources.multiplayerEnv import SingleChallengeTestEnvMultiplayer
@@ -70,47 +71,47 @@ obs["goal"] = goal_board
 
 done = False
 for step in range(max_turns):
-    print("STEP", step)
-    print("CURRENT BOARD")
-    print(current_board)
-    print("GOAL BOARD")
-    print(goal_board)
+    print("      STEP", step)
+    print("      GOAL BOARD")
+    print_board(goal_board)
+    print("      CURRENT BOARD")
+    print_board(current_board)
     player = 1
     paramEnv = ShallowEnv(current_board, obs["goal"], step, max_turns, len(current_board[0]), len(current_board), player)
     action = return_move(agent, paramEnv, obs)
-    print("AGENT MOVE", action)
+    print("      AGENT MOVE", action+1)
     current_board = run(action, current_board, player=player)
-    print("CURRENT BOARD")
-    print(current_board)
-    print("GOAL BOARD")
-    print(goal_board)
+    print("      GOAL BOARD")
+    print_board(goal_board)
+    print("      CURRENT BOARD")
+    print_board(current_board)
     solveEnv = ShallowEnv(current_board, obs["goal"], step + 1, max_turns, len(current_board[0]), len(current_board), player)
     # determine if goal is fulfilled
     _, done = reward(solveEnv)
     if done:
-        print("AGENT WON")
+        print("      AGENT WON")
         break
 
     player = -1
     if args.vs == "human":
         print("Input move")
-        action = int(input())
-        print("PLAYER MOVE", action)
+        action = int(input())-1
+        print("      PLAYER MOVE", action+1)
     elif args.vs == "mcts":
         action = mcts(current_board, 10, 1, goal_board, width*2, height, max_turns, step, player)
-        print("MCTS MOVE", action)
+        print("      MCTS MOVE", action+1)
     elif args.vs == "random":
         action = random.randint(2*width)
     current_board = run(action, current_board, player=player)
-    print("CURRENT BOARD")
-    print(current_board)
-    print("GOAL BOARD")
-    print(goal_board)
+    print("      GOAL BOARD")
+    print_board(goal_board)
+    print("      CURRENT BOARD")
+    print_board(current_board)
     solveEnv = ShallowEnv(current_board, obs["goal"], step + 1, max_turns, len(current_board[0]), len(current_board), player)
     # determine if goal is fulfilled
     _, done = reward(solveEnv)
     if done:
-        print("PLAYER WON")
+        print("      PLAYER WON")
         break
 if not done:
-    print("DRAW")
+    print("      DRAW")
