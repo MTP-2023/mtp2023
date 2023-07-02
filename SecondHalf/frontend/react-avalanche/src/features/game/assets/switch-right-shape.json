@@ -1,20 +1,20 @@
 {
   "type": "fromPhysicsEditor",
-  "isStatic": true,
+  "isStatic": false,
   "density": 0.8,
-  "restitution": 0.1,
-  "friction": 0.1,
-  "frictionAir": 0.001,
+  "restitution": 0,
+  "friction": 0.2,
+  "frictionAir": 0.15,
   "frictionStatic": 0.5,
   "collisionFilter": { "group": 0, "category": 1, "mask": 255 },
-  "label": "switch.png",
+  "label": "switch-right.png",
   "centerOfMass": {
     "x": 35,
     "y": 45
   },
   "fixtures": [
     {
-      "label": "switch.png-fixture-0",
+      "label": "fixpoint",
       "isSensor": false,
       "circle": {
         "x": 35,
@@ -23,12 +23,12 @@
       }
     },
     {
-      "label": "switch.png-fixture-1",
+      "label": "head",
       "isSensor": false,
       "vertices": [ [ { "x": 35, "y": 43 }, { "x": 70, "y": 21 }, { "x": 38, "y": 1 } ] ]
     },
     {
-      "label": "switch.png-fixture-2",
+      "label": "tail",
       "isSensor": false,
       "vertices": [
         [
