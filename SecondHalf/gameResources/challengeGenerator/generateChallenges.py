@@ -59,8 +59,8 @@ def merge(goal, goal2, width, height):
 if __name__ == "__main__":
     width = 3
     height = 2
-    minMarbles = 2
-    maxMarbles = 2
+    minMarbles = 1
+    maxMarbles = 1
     train_set = []
     #train_set = json.load(open("../../gameVariants/baseline/training/curriculum2Marbles" + ".json"))
     train_set = {}
@@ -100,6 +100,6 @@ if __name__ == "__main__":
         #print(dict)
     json_object = json.dumps(dict, indent=4)
 
-    with open("../../gameVariants/multiplayer/training/multiplayer_train" + ".json", "w") as outfile:
+    with open("../../gameVariants/multiplayer/training/multiplayer_train1Marble" + ".json", "w") as outfile:
         outfile.write(json_object)
 

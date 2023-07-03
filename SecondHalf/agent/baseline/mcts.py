@@ -36,7 +36,6 @@ def mcts(root_state, max_iterations, exploration_constant, goalstate, width, hei
     startTime = time.time_ns()
     # while time.time_ns - startTime < maxTime / 1000000000:
     for i in range(max_iterations):
-        #print("ITERATION", i)
         node = root_node
         state = root_state
         while len(node.children) == width:
@@ -54,9 +53,10 @@ def mcts(root_state, max_iterations, exploration_constant, goalstate, width, hei
 
 
 def createChild(root, width, player):
-    move = random.randint(0, width)
+    #print("CREATING CHILD")
+    move = random.randint(0, width-1)
     while move in root.createdChildren:
-        move = random.randint(0, width)
+        move = random.randint(0, width-1)
     root.createdChildren.append(move)
     newState = run(move, copy.deepcopy(root.state), player * -1, False)
     child = Node(newState, player, root)
@@ -74,9 +74,10 @@ def evaluate(max_steps, n_steps, current_player, height, width, goal_board, curr
 def simulate(state, width, height, max_steps, n_steps, goalstate, current_player):
     # Play out a random game from the given state and return the result
     # For example, if it's a game, make random moves until the game is over and return the winner
+    #print("PLAYOUT")
     while not reward_module(MCTS_Wrapper(max_steps, n_steps, current_player, height, width, goalstate, state))[1] and n_steps < max_steps:
         current_player *= -1
-        run(random.randint(0, width), copy.deepcopy(state), current_player, False)
+        run(random.randint(0, width-1), copy.deepcopy(state), current_player, False)
         n_steps += 1
 
     result = evaluate(max_steps, n_steps, current_player, height, width, goalstate, state)

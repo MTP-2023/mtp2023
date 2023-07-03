@@ -59,7 +59,7 @@ class MultiplayerEnv(GameBoardEnv):
                 if self.vs == "mcts":
                     enemyAction = mcts(self.current_board, self.mcts_depth, 1, self.goal_board, self.width-2, self.height, self.max_steps, self.n_steps, self.current_player)
                 else:
-                    enemyAction = random.randint(0, self.n_choices)
+                    enemyAction = random.randint(0, self.n_choices-1)
                 #print("ENEMY ACTION", enemyAction)
                 self.current_board = run(enemyAction, self.current_board, self.current_player)
                 #print("ENEMY ACTION", enemyAction)
