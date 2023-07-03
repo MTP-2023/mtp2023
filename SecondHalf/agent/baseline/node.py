@@ -3,7 +3,7 @@ import time
 
 import sys
 sys.path.append('../../')
-from gameResources.simulation.simulate import run
+from SecondHalf.gameResources.simulation.simulate import run
 import copy
 import random
 import math
@@ -26,13 +26,17 @@ class Node:
         log_total = math.log(sum(child.visits for child in self.children))
         best_child = None
         best_score = float('-inf')
+        scores = []
         for child in self.children:
             exploit = child.wins / child.visits
             explore = exploration_constant * math.sqrt(log_total / child.visits)
             score = exploit + explore
+            scores.append(score)
             if score > best_score:
                 best_child = child
                 best_score = score
+        #print(scores)
+        #print("chose", best_score)
         return best_child
 
     def expand(self, state):
