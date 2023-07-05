@@ -23,7 +23,9 @@ const GameComponent: React.FC = () => {
       physics: {
         default: 'matter',
         matter: {
-          debug: true
+          debug: true,
+          velocityIterations: 12,
+          positionIterations: 4
         }
       }
     };

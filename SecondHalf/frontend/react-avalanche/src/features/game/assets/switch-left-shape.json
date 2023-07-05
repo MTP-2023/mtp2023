@@ -7,7 +7,7 @@
   "frictionAir": 0.05,
   "frictionStatic": 0.3,
   "collisionFilter": { "group": 0, "category": 1, "mask": 255 },
-  "label": "switch-left",
+  "label": "switch",
   "centerOfMass": {
     "x": 35,
     "y": 45
@@ -15,7 +15,7 @@
   "fixtures": [
     {
       "label": "fixpoint",
-      "isSensor": false,
+      "isSensor": true,
       "circle": {
         "x": 35,
         "y": 45,
