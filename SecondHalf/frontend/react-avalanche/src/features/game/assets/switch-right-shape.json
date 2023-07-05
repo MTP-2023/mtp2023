@@ -3,11 +3,11 @@
   "isStatic": false,
   "density": 0.8,
   "restitution": 0,
-  "friction": 0.2,
-  "frictionAir": 0.15,
-  "frictionStatic": 0.5,
+  "friction": 1,
+  "frictionAir": 0.05,
+  "frictionStatic": 0.3,
   "collisionFilter": { "group": 0, "category": 1, "mask": 255 },
-  "label": "switch-right.png",
+  "label": "switch-right",
   "centerOfMass": {
     "x": 35,
     "y": 45
