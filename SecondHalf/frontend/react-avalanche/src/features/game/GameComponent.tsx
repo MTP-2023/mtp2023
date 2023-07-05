@@ -24,8 +24,8 @@ const GameComponent: React.FC = () => {
         default: 'matter',
         matter: {
           debug: true,
-          velocityIterations: 12,
-          positionIterations: 4
+          velocityIterations: 48,
+          positionIterations: 16
         }
       }
     };

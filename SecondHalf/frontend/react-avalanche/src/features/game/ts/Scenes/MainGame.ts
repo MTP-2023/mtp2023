@@ -57,7 +57,7 @@ export default class MainGame extends Phaser.Scene {
 		const y = 40;
 		const marbleSprite = this.matter.add.sprite(x, y, "marble", undefined, {shape: switchShape});
 		marbleSprite.setMass(5);
-		let a = 0.95;
+		let a = 0.9;
 		marbleSprite.setDisplaySize(2*this.marbleRadius*a, 2*this.marbleRadius*a);
 		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
 		this.counter = this.counter + 1;
@@ -258,6 +258,17 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.world.on("beforeupdate", () => {
 			//console.log("BEFOREUPDATE")
 			if (this.simulationRunning) {
+				// check if impulse of marble collision event needs to be applied
+				
+				if (this.data.has("impulse")) {
+					console.log("APPLY IMPULSE")
+					const data = this.data.get("impulse");
+					//this.matter.body.applyForce(data.body, data.pos, data.vector);
+					//this.matter.body.setVelocity(data.body, data.vector);
+					this.matter.applyForce(data.body, data.vector);
+					this.data.remove("impulse");
+				}
+
 				const marbles = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "marble");
 				for (const marble of marbles){
 					// Check if the marble is out of bounds
@@ -277,7 +288,7 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private handleCollisions(bodyA: MatterJS.BodyType, bodyB: MatterJS.BodyType) {
-		console.log("THERE IS A COLLISION BETWEEN", bodyA.label, "AND", bodyB.label)
+		//console.log("THERE IS A COLLISION BETWEEN", bodyA.label, "AND", bodyB.label)
 		// determine type of collision and call respective function
 		if (this.checkCollision(bodyA, bodyB, "marble", "head")) {
 			//console.log("SWITCH SHOULD HOLD MARBLE")
@@ -287,6 +298,8 @@ export default class MainGame extends Phaser.Scene {
 			//console.log("SWITCH SHOULD FLIP")
 			const flipSwitch = bodyA.label == "tail" ? bodyA.gameObject : bodyB.gameObject;
 			this.handleSwitchFlip(flipSwitch.body);
+		} else if (this.checkCollision(bodyA, bodyB, "marble", "marble")) {
+			this.handleMarbleCollision(bodyA, bodyB);
 		}
 	}
 
@@ -339,6 +352,26 @@ export default class MainGame extends Phaser.Scene {
 		updateRotation();
 	}
 
+	private handleMarbleCollision(marbleA: MatterJS.BodyType, marbleB: MatterJS.BodyType): void {
+		console.log("MARBLE COLLISION")
+		const fallingMarble = (this.matter.vector.magnitude(marbleA.velocity) > this.matter.vector.magnitude(marbleB.velocity)) ? marbleA : marbleB;
+		//const staticMarble = (fallingMarble === marbleA) ? marbleB : marbleA;
+
+		const impulseMagniutude = 10;
+		const angle = 90;
+		const duration = 0.1;
+
+		const impulseVector = {
+			x: Math.cos(angle) * impulseMagniutude / duration,
+			y: Math.sin(angle) * impulseMagniutude / duration
+		};
+
+		console.log(impulseVector)
+		this.data.set("impulse", { body: fallingMarble, pos: fallingMarble.position, vector: impulseVector })
+		//this.matter.body.setVelocity(fallingMarble, impulseVector);
+		//this.matter.applyForce(fallingMarble, impulseVector);
+	}
+
 	private removeMarble(marble: MatterJS.BodyType): void {
 		marble.gameObject.destroy();
 		this.matter.world.remove(marble);
@@ -352,7 +385,7 @@ export default class MainGame extends Phaser.Scene {
 		for (const body of bodies) {
 			if (["switch", "marble"].includes(body.label)) {
 				const velocityMagnitude = this.matter.vector.magnitude(body.velocity);
-				if (velocityMagnitude < 0.05) continue;
+				if (velocityMagnitude < 0.02) continue;
 				simulationComplete = false;
 				break;
 			}
