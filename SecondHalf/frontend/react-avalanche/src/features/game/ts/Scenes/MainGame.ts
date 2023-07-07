@@ -59,7 +59,7 @@ export default class MainGame extends Phaser.Scene {
 		const y = 40;
 		const marbleSprite = this.matter.add.sprite(x, y, "marble", undefined, {shape: switchShape});
 		marbleSprite.setMass(5);
-		let a = 0.9;
+		let a = 0.875;
 		marbleSprite.setDisplaySize(2*this.marbleRadius*a, 2*this.marbleRadius*a);
 		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
 		this.counter = this.counter + 1;
@@ -87,7 +87,6 @@ export default class MainGame extends Phaser.Scene {
 		);
 
 		borderImage.setDisplaySize(this.borderWidth, this.imgHeight+2*this.borderExtraHeight);
-		//this.extendHiddenBorder(borderX, borderY);
 
 		return borderImage;
 	}
@@ -96,10 +95,7 @@ export default class MainGame extends Phaser.Scene {
 	public create(): void {
 		Utilities.LogSceneMethodEntry("MainGame", "create");
 
-		//this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, "Phaser-Logo-Small");
-
 		// set matter options
-		//this.matter.world.setBounds(0, 0, this.scale.width, this.scale.height);
 		this.matter.world.update60Hz();
 		this.matter.world.setGravity(0, 0.95);
 
@@ -234,7 +230,7 @@ export default class MainGame extends Phaser.Scene {
 				const pin = this.matter.constraint.create({
 					bodyA: switchBody,
 					pointA: { x: 0, y: 0 },
-					bodyB: this.matter.add.rectangle(pinX, pinY, 0, 0, {isStatic:true}),
+					bodyB: this.matter.add.circle(pinX, pinY, 1, { isStatic: true, isSensor: true }),
 					pointB: { x: 0, y: 0 },
 					stiffness: 0.8,
 					length: 0
@@ -327,7 +323,6 @@ export default class MainGame extends Phaser.Scene {
 	private handleMarbleSwitchStop(holdSwitch: Phaser.GameObjects.GameObject, marble: Phaser.GameObjects.GameObject): void {
 		marble.setData("resting", true);
 		holdSwitch.setData("marbleStatus", 1);
-		//console.log(holdSwitch.getData("id"), holdSwitch.getData("marbleStatus"))
 	}
 
 	private checkForBuggedCollisions(): boolean {
@@ -336,6 +331,17 @@ export default class MainGame extends Phaser.Scene {
 		const marbles = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "marble");
 
 		for (const marble of marbles) {
+			/* MAYBE REPLACE COLLISION EVENT HANDLER WITH THIS? BUT DID NOT WORK AS EXPECTED YET
+			const collidedBugRegions = this.matter.intersectBody(marble, bugDetectors);
+			if (collidedBugRegions.length == 1) {
+				const detector = collidedBugRegions[0] as MatterJS.BodyType;
+				const touchesSwitch = this.matter.intersectBody(marble, [detector.gameObject.body]);
+
+				if (touchesSwitch) {
+					this.handleSwitchFlip(detector.gameObject.body);
+				}
+			}*/
+			
 			for (const bugDetector of bugDetectors) {
 				//const isStatic = bugDetector.gameObject.isStatic;
 				const isColliding = this.matter.overlap(marble, [bugDetector]);
@@ -414,14 +420,8 @@ export default class MainGame extends Phaser.Scene {
 				//console.log("REMOVE MARBLE")
 				marble.gameObject.destroy();
 				this.matter.world.remove(marble);
-				//this.removeMarble(marble);
 			}
 		}
-	}
-
-	private removeMarble(marble: MatterJS.BodyType): void {
-		marble.gameObject.destroy();
-		this.matter.world.remove(marble);
 	}
 
 	private checkForCompletedSimulation(): void {
@@ -439,7 +439,6 @@ export default class MainGame extends Phaser.Scene {
 		}
 
 		// If the simulation is complete, enable the button
-		//if (this.marblesFalling == 0 && this.simulationRunning) {
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED");
 			this.simulationRunning = false;
@@ -449,7 +448,7 @@ export default class MainGame extends Phaser.Scene {
 			.filter((body: MatterJS.BodyType) => body.label === "marble")
 			.map((body: MatterJS.BodyType) => [/*body.gameObject.getData("resting"), this.getVelocityMagnitude(body), body.position, MatterJS.Detector.collisions(this.matter.world.engine.pairs, this.matter.world.engine)]);
 			console.log(marbles);*/
-			//this.interpretGameState();
+			this.interpretGameState();
 		}
 	}
 
