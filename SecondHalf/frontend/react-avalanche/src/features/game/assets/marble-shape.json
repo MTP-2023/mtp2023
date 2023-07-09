@@ -1,9 +1,9 @@
 {
   "type": "fromPhysicsEditor",
   "isStatic": false,
-  "density": 2,
-  "restitution": 0.1,
-  "friction": 0.6,
+  "density": 1,
+  "restitution": 0.05,
+  "friction": 0.2,
   "frictionAir": 0.01,
   "frictionStatic": 0.3,
   "collisionFilter": { "group": 0, "category": 1, "mask": 255 },

@@ -22,6 +22,11 @@ export default class MainGame extends Phaser.Scene {
 	counter: number;
 	marbleRadius: number;
 	movementThreshold: number;
+	switchRotationVelocity: number;
+	buttonColor: number;
+	buttonOutlineColor: number;
+	buttonTextColor: string;
+	buttonTextStyle: { fontSize: string; fill: any; };
 
 	constructor() {
 		super({ key: MainGame.Name });
@@ -44,31 +49,21 @@ export default class MainGame extends Phaser.Scene {
 		this.simulationRunning = false;
 		this.counter = 0;
 		this.movementThreshold = 0.02;
+		this.switchRotationVelocity = 0.04;
+
+		// set vars for buttons
+
+		this.buttonColor = 0x000000;
+		this.buttonOutlineColor = 0xffffff;
+		this.buttonTextColor = "#ffffff";
+		this.buttonTextStyle = { fontSize: this.buttonFontSize+"px", fill: this.buttonTextColor };
 	}
 
 	public preload(): void {
 
 	}
 
-	private dropMarble(col: number, boardX: number): void {
-		console.log(col);
-		//const marbleRadius = 13*this.scaleFactor;
-		const switchShape = this.cache.json.get("marble-shape");
-		let x = boardX + this.switchWidth/2 + this.borderWidth + Math.floor((col-1) / 2) * (this.switchWidth + this.borderWidth);
-		x = (col % 2 == 0) ? x + this.switchWidth - this.marbleRadius : x + this.marbleRadius;
-		const y = 40;
-		const marbleSprite = this.matter.add.sprite(x, y, "marble", undefined, {shape: switchShape});
-		marbleSprite.setMass(5);
-		let a = 0.875;
-		marbleSprite.setDisplaySize(2*this.marbleRadius*a, 2*this.marbleRadius*a);
-		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
-		this.counter = this.counter + 1;
-		marbleSprite.setData("id", this.counter);
-		marbleSprite.setData("resting", false);
-		this.simulationRunning = true;
-	}
-
-	private addBorder(row: number, switchIndex: number, boardX: number, boardY: number): Phaser.Physics.Matter.Image {
+	private addBorder(row: number, switchIndex: number, boardX: number, boardY: number): Phaser.GameObjects.Rectangle {
 		// add a border after each switch
 		let borderX =
 			boardX +
@@ -78,17 +73,106 @@ export default class MainGame extends Phaser.Scene {
 		borderX = row % 2 === 0 ? borderX + this.switchWidth / 2 : borderX;
 		const borderY = boardY + this.imgHeight / 2 + row * (this.imgHeight + this.switchSpacingY);
 
-		const borderImage = this.matter.add.image(
+		const borderRectangle = this.matter.add.rectangle(
 			borderX,
 			borderY,
-			"border",
-			undefined,
-			{isStatic: true, label: "border"}
+			this.borderWidth,
+			this.imgHeight+2*this.borderExtraHeight,
+			{ isStatic: true, label: "border"}
+		)
+
+		const borderVisuals = this.add.rectangle(
+			borderX,
+			borderY,
+			this.borderWidth,
+			this.imgHeight + 2 * this.borderExtraHeight,
+			0xffffff // Set the color of the border image
 		);
 
-		borderImage.setDisplaySize(this.borderWidth, this.imgHeight+2*this.borderExtraHeight);
+		borderVisuals.body = borderRectangle;
 
-		return borderImage;
+		return borderVisuals;
+	}
+
+	private addButton(x: number, y: number, content: number, boardX: number): Phaser.GameObjects.Sprite {
+		// Create a circle graphics object
+		const circle = this.add.graphics();
+		circle.lineStyle(2, this.buttonOutlineColor, 1);
+		circle.fillStyle(this.buttonColor, 1);
+		circle.fillCircle(this.buttonRadius, this.buttonRadius, this.buttonRadius);
+		circle.strokeCircle(this.buttonRadius, this.buttonRadius, this.buttonRadius);
+	  
+		// Create a texture from the circle graphics object
+		const textureKey = `circleButtonTexture_${content}`;
+		circle.generateTexture(textureKey, this.buttonRadius * 2, this.buttonRadius * 2);
+	  
+		// Create a sprite using the circle texture
+		const button = this.add.sprite(x, y, textureKey);
+		button.setInteractive();
+	  
+		// Add the number as a text object
+		const text = this.add.text(x, y, content.toString(), this.buttonTextStyle);
+		text.setOrigin(0.5);
+	  
+		// Add the click event listener
+		button.on('pointerdown', () => {
+		  this.dropMarble(content, boardX);
+		});
+	  
+		// Clean up the circle graphics object
+		circle.destroy();
+
+		return button;
+	}
+
+	private addSwitch(boardData: number, row: number, switchIndex: number, x: number, y: number): Phaser.GameObjects.GameObject {
+		// interpret data and set variables accordingly
+		let tilt;
+		if (boardData == 1) {
+			tilt = "left";
+		} else {
+			tilt = "right";
+		}
+
+		const img = "switch-" + tilt;
+		const shape = img + "-shape";
+
+		// create switch and set its data
+		const switchShape = this.cache.json.get(shape);
+		const switchSprite = this.matter.add.sprite(x, y, img, undefined, {shape: switchShape, isStatic: true});
+		const switchID = row.toString() + switchIndex.toString();
+		switchSprite.setData("id", switchID);
+		switchSprite.setData("tilt", tilt);
+		switchSprite.setData("marbleStatus", 0);
+		switchSprite.setData("rotating", false);
+		this.matter.alignBody(switchSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
+
+		switchSprite.setDisplaySize(this.switchWidth, this.imgHeight);
+		
+
+		// add rectangle to act as a sensor to initiate switch flips (collision detection of matter appeared to be buggy sometimes)
+		const detectorHeight = (this.imgHeight - switchShape.centerOfMass.y);
+		const detectorY = y - (this.imgHeight / 2) + switchShape.centerOfMass.y + (detectorHeight / 3);
+		const bugDetector = this.matter.add.rectangle(x, detectorY, this.switchWidth, detectorHeight/3, { label: "bugDetector", isStatic: true, isSensor: true });
+		bugDetector.gameObject = switchSprite;
+		
+		// add pin to let the switch rotate around
+		const pinX = x;
+		const pinY = y - this.imgHeight/2 + switchShape.centerOfMass.y * this.scaleFactor;
+		const switchBody = switchSprite.body as MatterJS.BodyType;
+
+		const pin = this.matter.constraint.create({
+			bodyA: switchBody,
+			pointA: { x: 0, y: 0 },
+			bodyB: this.matter.add.circle(pinX, pinY, 1, { isStatic: true, isSensor: true }),
+			pointB: { x: 0, y: 0 },
+			stiffness: 0.8,
+			length: 0
+		});
+
+		this.matter.world.add(pin);
+
+		return switchSprite;
 	}
 
 
@@ -97,7 +181,7 @@ export default class MainGame extends Phaser.Scene {
 
 		// set matter options
 		this.matter.world.update60Hz();
-		this.matter.world.setGravity(0, 0.95);
+		this.matter.world.setGravity(0, 0.85);
 
 		// load game board state
 		let example = [
@@ -116,56 +200,18 @@ export default class MainGame extends Phaser.Scene {
 		const camera = this.cameras.main;
 		const boardX = (this.scale.width - this.boardWidth) / 2;
 		const boardY = camera.worldView.y + 90 * this.scaleFactor;
-		const buttonStartY = camera.worldView.y + 20 * this.scaleFactor;
+		const buttonStartY = camera.worldView.y + 30 * this.scaleFactor;
 		const switchGroup = this.add.container();
 
 		// button init
-		// set vars for buttons
-
-		const buttonColor = 0x000000;
-		const buttonOutlineColor = 0xffffff;
-		const buttonTextColor = "#ffffff";
-		const buttonTextStyle = { fontSize: this.buttonFontSize+"px", fill: buttonTextColor };
+		
 		const buttonGroup = this.add.container();
 
 		// BUTTONS -----------------------------------------------------------
 		for (let i = 1; i < 7; i++) {
-			// Create the circle graphics
-			const circle = this.add.graphics();
-			circle.lineStyle(2, buttonOutlineColor, 1);
-			circle.fillStyle(buttonColor, 1);
-			circle.fillCircle(this.buttonRadius, this.buttonRadius, this.buttonRadius);
-			circle.strokeCircle(this.buttonRadius, this.buttonRadius, this.buttonRadius);
-
-			// Create the number text
-			const numberText = this.add.text(
-				this.buttonRadius, // Set the x position relative to the circle's x position
-				this.buttonRadius, // Set the y position relative to the circle's y position
-				i.toString(),
-				buttonTextStyle
-			);
-			numberText.setOrigin(0.5);
-
-			// Add the circle and text to the scene
-			const container = this.add.container(
-				boardX + (this.boardWidth / 8) * i + (i % 2 + 1) * this.borderWidth,
-				buttonStartY,
-				[circle, numberText]
-			);
-
-			// Set the size of the container
-			container.setSize(this.buttonRadius * 2, this.buttonRadius * 2);
-
-			// Make the container interactive
-			container.setInteractive();
-
-			// Handle container click event
-			container.on("pointerdown", () => {
-				this.dropMarble(parseInt(numberText.text), boardX);
-				//console.log(numberText.text);
-			});
-
-			buttonGroup.add(container);
+			const buttonX = boardX + (this.boardWidth / 8) * i + (i % 2 + 1) * this.borderWidth;
+			const button = this.addButton(buttonX, buttonStartY, i, boardX);
+			buttonGroup.add(button);
 		}
 
 		// SWITCHES -----------------------------------------------------------
@@ -194,55 +240,17 @@ export default class MainGame extends Phaser.Scene {
 					this.matter.add.rectangle(boardX + this.boardWidth - this.borderWidth/2, y, this.borderWidth, this.imgHeight, {isStatic: true, label: "border"});
 				}
 
-				let tilt;
-				// Create and position the switch sprite
-				if (gameBoard[row][switchIndex] == 1) {
-					tilt = "left";
-				} else {
-					tilt = "right";
-				}
-
-				const img = "switch-" + tilt;
-				const shape = img + "-shape";
-
-				const switchShape = this.cache.json.get(shape);
-				const switchSprite = this.matter.add.sprite(x, y, img, undefined, {shape: switchShape, isStatic: true});
-				const switchID = row.toString() + switchIndex.toString();
-				switchSprite.setData("id", switchID);
-				switchSprite.setData("tilt", tilt);
-				switchSprite.setData("marbleStatus", 0);
-				this.matter.alignBody(switchSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
-
-				switchSprite.setDisplaySize(this.switchWidth, this.imgHeight);
+				// add switch
+				const switchSprite = this.addSwitch(gameBoard[row][switchIndex], row, switchIndex, x, y);
 				switchGroup.add(switchSprite);
 
-				// add rectangle to recognize bugged collisions between marble and switch tail
-				const detectorHeight = (this.imgHeight - switchShape.centerOfMass.y);
-				const detectorY = boardY + row * (this.imgHeight + this.switchSpacingY) + switchShape.centerOfMass.y + detectorHeight / 2;
-				const bugDetector = this.matter.add.rectangle(x, detectorY, this.switchWidth, detectorHeight, { label: "bugDetector", isStatic: true, isSensor: true });
-				bugDetector.gameObject = switchSprite;
-				
-				// add pin to let the switch rotate around
-				const pinX = x;
-				const pinY = y - this.imgHeight/2 + switchShape.centerOfMass.y * this.scaleFactor;
-				const switchBody = switchSprite.body as MatterJS.BodyType;
-
-				const pin = this.matter.constraint.create({
-					bodyA: switchBody,
-					pointA: { x: 0, y: 0 },
-					bodyB: this.matter.add.circle(pinX, pinY, 1, { isStatic: true, isSensor: true }),
-					pointB: { x: 0, y: 0 },
-					stiffness: 0.8,
-					length: 0
-				});
-
-				this.matter.world.add(pin);
-
+				// add first border of the row if required
 				if (switchIndex == 0) {
 					const borderImage = this.addBorder(row, -1, boardX, boardY);
 					switchGroup.add(borderImage);
 				}
 
+				// add a border after each switch
 				const borderImage = this.addBorder(row, switchIndex, boardX, boardY);
 				switchGroup.add(borderImage);
 			}
@@ -256,7 +264,7 @@ export default class MainGame extends Phaser.Scene {
 		switchGroup.setX(camera.worldView.x);
 		switchGroup.setY(camera.worldView.y);
 
-		// collision handling
+		// listen for collision events detected by matter
 		this.matter.world.on("collisionstart", (event: MatterJS.IEventCollision<MatterJS.BodyType>, bodyA: MatterJS.BodyType, bodyB: MatterJS.BodyType) => {
 			this.handleCollisions(bodyA, bodyB);
 		});
@@ -283,31 +291,47 @@ export default class MainGame extends Phaser.Scene {
 
 		this.matter.world.on("afterupdate", () => {
 			if (this.simulationRunning){
-				const buggedCollisionsToHandle = this.checkForBuggedCollisions();
+				const buggedCollisionsToHandle = this.checkIfSwitchFlipRequired();
 				if (!buggedCollisionsToHandle) this.checkForCompletedSimulation();
 			} 
 		});
 	}
 
+	private dropMarble(col: number, boardX: number): void {
+		console.log(col);
+		//const marbleRadius = 13*this.scaleFactor;
+		const switchShape = this.cache.json.get("marble-shape");
+		let x = boardX + this.switchWidth/2 + this.borderWidth + Math.floor((col-1) / 2) * (this.switchWidth + this.borderWidth);
+		x = (col % 2 == 0) ? x + this.switchWidth - this.marbleRadius : x + this.marbleRadius;
+		const y = 40;
+		const marbleSprite = this.matter.add.sprite(x, y, "marble", undefined, {shape: switchShape });
+		marbleSprite.setMass(5);
+		let a = 0.925;
+		marbleSprite.setDisplaySize(2*this.marbleRadius*a, 2*this.marbleRadius*a);
+		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
+		this.counter = this.counter + 1;
+		marbleSprite.setData("id", this.counter);
+		this.simulationRunning = true;
+	}
+
 	// determine type of collision and call respective function
-	private handleCollisions(bodyA: MatterJS.BodyType, bodyB: MatterJS.BodyType) {
+	private handleCollisions(bodyA: MatterJS.BodyType, bodyB: MatterJS.BodyType): void {
 		//console.log("THERE IS A COLLISION BETWEEN", bodyA.label, "AND", bodyB.label)
 		if (this.checkCollision(bodyA, bodyB, "marble", "head")) {
 			//console.log("SWITCH SHOULD HOLD MARBLE")
 			const holdSwitch = bodyA.label == "head" ? bodyA.gameObject : bodyB.gameObject;
-			const marble = bodyA.gameObject == holdSwitch ? bodyB.gameObject : bodyA.gameObject;
-			this.handleMarbleSwitchStop(holdSwitch, marble);
-		} else if (this.checkCollision(bodyA, bodyB, "marble", "tail")) {
-			//console.log("SWITCH SHOULD FLIP")
-			const flipSwitch = bodyA.label == "tail" ? bodyA.gameObject : bodyB.gameObject;
-			this.handleSwitchFlip(flipSwitch.body);
+			this.handleMarbleSwitchStop(holdSwitch);
 		} else if (this.checkCollision(bodyA, bodyB, "marble", "marble")) {
 			this.handleMarbleCollision(bodyA, bodyB);
-		}
+		} // original code block that used to initiate switch flips but turned out to be buggy, reason why marbles got stuck could not be found as of now
+		//else if (this.checkCollision(bodyA, bodyB, "marble", "tail")) {
+			//console.log("SWITCH SHOULD FLIP")
+			//const flipSwitch = bodyA.label == "tail" ? bodyA.gameObject : bodyB.gameObject;
+			//this.handleSwitchFlip(flipSwitch.body);}
+		
 	}
 
 	private checkCollision(bodyA: MatterJS.BodyType, bodyB: MatterJS.BodyType, type1: string, type2: string): boolean {
-		//console.log("CHECK COLLISION", bodyA.label, bodyB.label)
 		const isA1 = bodyA.label === type1;
 		const isB1 = bodyB.label === type1;
 		const isA2 = bodyA.label === type2;
@@ -320,35 +344,25 @@ export default class MainGame extends Phaser.Scene {
 		return this.matter.vector.magnitude(obj.velocity);
 	}
 
-	private handleMarbleSwitchStop(holdSwitch: Phaser.GameObjects.GameObject, marble: Phaser.GameObjects.GameObject): void {
-		marble.setData("resting", true);
+	private handleMarbleSwitchStop(holdSwitch: Phaser.GameObjects.GameObject): void {
 		holdSwitch.setData("marbleStatus", 1);
 	}
 
-	private checkForBuggedCollisions(): boolean {
+	private checkIfSwitchFlipRequired(): boolean {
 		let result = false;
 		const bugDetectors = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "bugDetector");
 		const marbles = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "marble");
 
 		for (const marble of marbles) {
-			/* MAYBE REPLACE COLLISION EVENT HANDLER WITH THIS? BUT DID NOT WORK AS EXPECTED YET
-			const collidedBugRegions = this.matter.intersectBody(marble, bugDetectors);
-			if (collidedBugRegions.length == 1) {
-				const detector = collidedBugRegions[0] as MatterJS.BodyType;
-				const touchesSwitch = this.matter.intersectBody(marble, [detector.gameObject.body]);
-
-				if (touchesSwitch) {
-					this.handleSwitchFlip(detector.gameObject.body);
-				}
-			}*/
-			
 			for (const bugDetector of bugDetectors) {
-				//const isStatic = bugDetector.gameObject.isStatic;
 				const isColliding = this.matter.overlap(marble, [bugDetector]);
 
-				if (this.getVelocityMagnitude(marble) < this.movementThreshold && isColliding){
-					console.log("BUGGED COLLISION REGISTERED")
-					this.handleSwitchFlip(bugDetector.gameObject.body);
+				if (isColliding){
+					//console.log("BUGGED COLLISION REGISTERED")
+					if (!bugDetector.gameObject.getData("rotating")) {
+						bugDetector.gameObject.setData("rotating", true);
+						this.handleSwitchFlip(bugDetector.gameObject.body);
+					}
 					result = true;
 				}
 			}
@@ -360,14 +374,19 @@ export default class MainGame extends Phaser.Scene {
 	private handleSwitchFlip(flipSwitch: MatterJS.BodyType): void {
 		//console.log("TRIGGERED");
 		this.matter.body.setStatic(flipSwitch, false);
-		//flipSwitch.ignoreGravity = true;
 		flipSwitch.gameObject.setData("marbleStatus", 0);
 		//console.log(flipSwitch.gameObject.getData("id"), flipSwitch.gameObject.getData("marbleStatus"))
 	  
 		const sign = flipSwitch.gameObject.getData("tilt") == "left" ? 1 : -1;
-		const rotationSpeed = sign * 0.025; // Adjust the rotation speed as needed
-		let steps = 0;
-	  
+		const rotationSpeed = sign * this.switchRotationVelocity; // Adjust the rotation speed as needed
+		
+		//let steps = 0;
+		//const targetAngle = flipSwitch.angle + (sign * 0.9);
+		//console.log(targetAngle, rotationSpeed)
+
+		// use steps as additional check to allow switch to start rotation
+	  	let steps = 0;
+		
 		const updateRotation = () => {
 			this.matter.body.rotate(flipSwitch, rotationSpeed); // Rotate the switch
 
@@ -380,6 +399,7 @@ export default class MainGame extends Phaser.Scene {
 			if (collidesWithBorder && steps > 10) {
 				const newTilt = sign < 0 ? "left" : "right";
 				flipSwitch.gameObject.setData("tilt", newTilt);
+				flipSwitch.gameObject.setData("rotating", false);
 				this.matter.body.setStatic(flipSwitch, true);
 				//console.log("Rotation complete");
 			} else {
@@ -387,17 +407,18 @@ export default class MainGame extends Phaser.Scene {
 			  	requestAnimationFrame(updateRotation);
 			}
 		};
-	  
+
 		updateRotation();
 	}
 
+	// NOT WORKING YET
 	private handleMarbleCollision(marbleA: MatterJS.BodyType, marbleB: MatterJS.BodyType): void {
 		//console.log("MARBLE COLLISION")
-		const fallingMarble = (this.getVelocityMagnitude(marbleA) > this.getVelocityMagnitude(marbleB)) ? marbleA : marbleB;
+		const fallingMarble = (marbleA.position.y > marbleB.position.y) ? marbleA : marbleB;
 		//const staticMarble = (fallingMarble === marbleA) ? marbleB : marbleA;
 
 		const impulseMagniutude = 10;
-		const angle = 90;
+		const angle = Math.atan2(marbleB.position.y - marbleA.position.y, marbleB.position.x - marbleA.position.x);
 		const duration = 0.1;
 
 		const impulseVector = {
@@ -406,16 +427,15 @@ export default class MainGame extends Phaser.Scene {
 		};
 
 		//console.log(impulseVector)
-		this.data.set("impulse", { body: fallingMarble, pos: fallingMarble.position, vector: impulseVector })
+		//this.data.set("impulse", { body: fallingMarble, pos: fallingMarble.position, vector: impulseVector })
 		//this.matter.body.setVelocity(fallingMarble, impulseVector);
-		//this.matter.applyForce(fallingMarble, impulseVector);
+		this.matter.applyForceFromPosition(fallingMarble, fallingMarble.position, 0.1, angle);
 	}
 
 	private checkForMarbleDeletion(): void {
 		const marbles = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "marble");
 		for (const marble of marbles){
 			// Check if the marble is out of bounds
-			//console.log(marble.position.y, this.scale.height)
 			if (marble.position.y > this.scale.height - this.marbleRadius) {
 				//console.log("REMOVE MARBLE")
 				marble.gameObject.destroy();
@@ -442,12 +462,6 @@ export default class MainGame extends Phaser.Scene {
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED");
 			this.simulationRunning = false;
-			// DEBUG: print all marbles
-			/*const all = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "tail");
-			const marbles = this.matter.world.getAllBodies()
-			.filter((body: MatterJS.BodyType) => body.label === "marble")
-			.map((body: MatterJS.BodyType) => [/*body.gameObject.getData("resting"), this.getVelocityMagnitude(body), body.position, MatterJS.Detector.collisions(this.matter.world.engine.pairs, this.matter.world.engine)]);
-			console.log(marbles);*/
 			this.interpretGameState();
 		}
 	}
