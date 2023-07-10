@@ -1,5 +1,5 @@
 export function interpretBoard(board: number[][]): number[][] {
-    let interpretedBoard = [];
+    let interpretedBoard: number[][] = [];
 
     board.forEach((row, idx) => {
         let currentRow = []
@@ -10,9 +10,9 @@ export function interpretBoard(board: number[][]): number[][] {
 
         for (let i=0; i < row.length; i+=2) {
             if (row[i] > 0) {
-                currentRow.push(1);
+                currentRow.push(row[i]);
             } else {
-                currentRow.push(-1);
+                currentRow.push(-row[i]);
             }
         }
         interpretedBoard.push(currentRow);

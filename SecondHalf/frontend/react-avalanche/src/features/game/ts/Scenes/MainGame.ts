@@ -1,5 +1,8 @@
 import Utilities from "../Utilities";
 import { interpretBoard } from "../Helper/BoardInterpreter";
+import { AbstractGameMode } from "../GameModes/GameModeResources";
+import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
+import Victory from "./Victory";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -27,6 +30,7 @@ export default class MainGame extends Phaser.Scene {
 	buttonOutlineColor: number;
 	buttonTextColor: string;
 	buttonTextStyle: { fontSize: string; fill: any; };
+	gameMode: AbstractGameMode | undefined;
 
 	constructor() {
 		super({ key: MainGame.Name });
@@ -57,6 +61,8 @@ export default class MainGame extends Phaser.Scene {
 		this.buttonOutlineColor = 0xffffff;
 		this.buttonTextColor = "#ffffff";
 		this.buttonTextStyle = { fontSize: this.buttonFontSize+"px", fill: this.buttonTextColor };
+
+		this.gameMode = undefined;
 	}
 
 	public preload(): void {
@@ -175,14 +181,24 @@ export default class MainGame extends Phaser.Scene {
 		return switchSprite;
 	}
 
-
-	public create(): void {
+	public create(data: { gameModeHandle: string }): void {
 		Utilities.LogSceneMethodEntry("MainGame", "create");
 
 		// set matter options
 		this.matter.world.update60Hz();
 		this.matter.world.setGravity(0, 0.85);
 
+		// initialize gameMode
+		switch (data.gameModeHandle) {
+			case "singlePlayerChallenge":
+				this.gameMode = new SinglePlayerChallenge();
+		}
+
+		const startBoard = this.gameMode!.getStartBoard();
+
+		// PLACEHOLDER for GameMode.getChallenge();
+
+		/*
 		// load game board state
 		let example = [
 		[0, 0, 1, 1, 0, 1, 0, 0],
@@ -194,7 +210,7 @@ export default class MainGame extends Phaser.Scene {
 		let gameBoard = interpretBoard(example);
 		console.log(gameBoard);
 		// DEBUG
-		// gameBoard = [[1,1,1], [1,1,1,1], [1,1,1], [1,1,1,1]]
+		// gameBoard = [[1,1,1], [1,1,1,1], [1,1,1], [1,1,1,1]]*/
 
 		// initialize vars
 		const camera = this.cameras.main;
@@ -202,10 +218,12 @@ export default class MainGame extends Phaser.Scene {
 		const boardY = camera.worldView.y + 90 * this.scaleFactor;
 		const buttonStartY = camera.worldView.y + 30 * this.scaleFactor;
 		const switchGroup = this.add.container();
+		switchGroup.setName("gameBoard");
 
 		// button init
 		
 		const buttonGroup = this.add.container();
+		buttonGroup.setName("buttons");
 
 		// BUTTONS -----------------------------------------------------------
 		for (let i = 1; i < 7; i++) {
@@ -241,7 +259,7 @@ export default class MainGame extends Phaser.Scene {
 				}
 
 				// add switch
-				const switchSprite = this.addSwitch(gameBoard[row][switchIndex], row, switchIndex, x, y);
+				const switchSprite = this.addSwitch(startBoard[row][switchIndex], row, switchIndex, x, y);
 				switchGroup.add(switchSprite);
 
 				// add first border of the row if required
@@ -311,7 +329,19 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
 		this.counter = this.counter + 1;
 		marbleSprite.setData("id", this.counter);
+		this.toggleClickableButtons(false);
 		this.simulationRunning = true;
+	}
+
+	// enable/disable all marble buttons during simulation
+	private toggleClickableButtons(clickable: boolean): void {
+		const buttonGroup = this.children.getByName("buttons") as Phaser.GameObjects.Container;
+		buttonGroup.getAll().forEach((child: Phaser.GameObjects.GameObject) => {
+			if (child instanceof Phaser.GameObjects.Sprite) {
+			  const button = child as Phaser.GameObjects.Sprite;
+			  button.input!.enabled = clickable;
+			}
+		});
 	}
 
 	// determine type of collision and call respective function
@@ -461,6 +491,7 @@ export default class MainGame extends Phaser.Scene {
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED");
+			this.toggleClickableButtons(true);
 			this.simulationRunning = false;
 			this.interpretGameState();
 		}
@@ -473,7 +504,7 @@ export default class MainGame extends Phaser.Scene {
 		.map((body: MatterJS.BodyType) => body.gameObject);
 
 		let switch_orientation: String[][] = [];
-		let holds_marble: Boolean[][] = [];
+		let holds_marble: number[][] = [];
 
 		for (let row = 0; row < this.rowCount.length; row++) {
 			const switchesInRow = this.rowCount[row];
@@ -482,12 +513,35 @@ export default class MainGame extends Phaser.Scene {
 			for (let switchIndex = 0; switchIndex < switchesInRow; switchIndex++) {
 				const current_switch = switches.shift();
 				switch_orientation[row].push(current_switch.getData("tilt"));
-				holds_marble[row].push(current_switch.getData("marbleStatus"));
+				const hasMarble = current_switch.getData("marbleStatus") ? 2 : 0;
+				holds_marble[row].push(hasMarble);
 			}
 		}
 
 		console.log(switch_orientation, holds_marble);
+
+		// PLACEHOLDER FOR GameMode.interpretGameState(board); 
+		// precending logic potentially to be adapted
+		const evalResult = this.gameMode!.interpretGameState(holds_marble);
+		if (evalResult.hasWinner) {
+			this.scene.launch(Victory.Name);
+		}
 	}
+
+	public destroyBodies(): void {
+		const bodies = this.matter.world.getAllBodies();
+	  
+		for (const body of bodies) {
+		  this.matter.world.remove(body);
+		  if (body.gameObject) {
+			body.gameObject.destroy();
+		  }
+		}
+	  }
+	  
+	  public shutdown(): void {
+		this.destroyBodies();
+	  }
 
 	//public update(/*time: number, delta: number*/): void {
 		

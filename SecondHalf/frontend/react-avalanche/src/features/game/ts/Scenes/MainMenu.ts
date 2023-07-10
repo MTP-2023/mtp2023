@@ -24,7 +24,7 @@ export default class MainMenu extends Phaser.Scene {
 			.setAlign("center")
 			.setOrigin(0.5);
 		newGameText.setInteractive();
-		newGameText.on("pointerdown", () => { this.scene.start(MainGame.Name); }, this);
+		newGameText.on("pointerdown", () => { this.scene.start(MainGame.Name, { gameModeHandle: "singlePlayerChallenge" }); }, this);
 
 		const settingsText = this.add.text(this.cameras.main.centerX, textYPosition * 2, "Settings");
 		settingsText.setOrigin(0.5);

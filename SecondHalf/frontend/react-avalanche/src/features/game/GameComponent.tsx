@@ -7,6 +7,7 @@ import SplashScreen from "./ts/Scenes/SplashScreen";
 import Utilities from "./ts/Utilities";
 import MainGame from "./ts/Scenes/MainGame";
 import MainSettings from "./ts/Scenes/MainSettings";
+import Victory from './ts/Scenes/Victory';
 
 const GameComponent: React.FC = () => {
   useEffect(() => {
@@ -40,6 +41,7 @@ const GameComponent: React.FC = () => {
     game.scene.add(SplashScreen.Name, SplashScreen);
     game.scene.add(MainGame.Name, MainGame);
     game.scene.add(MainSettings.Name, MainSettings);
+    game.scene.add(Victory.Name, Victory);
 
     // Start the Boot scene
     game.scene.start(Boot.Name);
