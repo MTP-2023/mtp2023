@@ -31,7 +31,6 @@ export default class Victory extends Phaser.Scene {
         victoryText.setOrigin(0.5);
 
         setTimeout(() => {
-            this.scene.stop(MainGame.Name);
             this.scene.stop(Victory.Name);
             this.scene.start(MainMenu.Name);
         }, 3000);

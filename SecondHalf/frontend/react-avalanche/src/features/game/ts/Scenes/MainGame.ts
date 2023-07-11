@@ -79,14 +79,6 @@ export default class MainGame extends Phaser.Scene {
 		borderX = row % 2 === 0 ? borderX + this.switchWidth / 2 : borderX;
 		const borderY = boardY + this.imgHeight / 2 + row * (this.imgHeight + this.switchSpacingY);
 
-		const borderRectangle = this.matter.add.rectangle(
-			borderX,
-			borderY,
-			this.borderWidth,
-			this.imgHeight+2*this.borderExtraHeight,
-			{ isStatic: true, label: "border"}
-		)
-
 		const borderVisuals = this.add.rectangle(
 			borderX,
 			borderY,
@@ -95,7 +87,11 @@ export default class MainGame extends Phaser.Scene {
 			0xffffff // Set the color of the border image
 		);
 
-		borderVisuals.body = borderRectangle;
+		this.matter.add.gameObject(borderVisuals, {
+			shape: { type: "rectangle", width: this.borderWidth, height: this.imgHeight + 2 * this.borderExtraHeight },
+			isStatic: true,
+			label: "border"
+		});
 
 		return borderVisuals;
 	}
@@ -524,24 +520,10 @@ export default class MainGame extends Phaser.Scene {
 		// precending logic potentially to be adapted
 		const evalResult = this.gameMode!.interpretGameState(holds_marble);
 		if (evalResult.hasWinner) {
+			this.scene.stop();
 			this.scene.launch(Victory.Name);
 		}
 	}
-
-	public destroyBodies(): void {
-		const bodies = this.matter.world.getAllBodies();
-	  
-		for (const body of bodies) {
-		  this.matter.world.remove(body);
-		  if (body.gameObject) {
-			body.gameObject.destroy();
-		  }
-		}
-	  }
-	  
-	  public shutdown(): void {
-		this.destroyBodies();
-	  }
 
 	//public update(/*time: number, delta: number*/): void {
 		
