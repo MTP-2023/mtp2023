@@ -127,10 +127,10 @@ export default class MainGame extends Phaser.Scene {
 		return button;
 	}
 
-	private addSwitch(boardData: number, row: number, switchIndex: number, x: number, y: number): Phaser.GameObjects.GameObject {
+	private addSwitch(startBoardData: number, goalBoardData: number, row: number, switchIndex: number, x: number, y: number): Phaser.GameObjects.GameObject {
 		// interpret data and set variables accordingly
 		let tilt;
-		if (boardData == 1) {
+		if (startBoardData == 1) {
 			tilt = "left";
 		} else {
 			tilt = "right";
@@ -174,6 +174,9 @@ export default class MainGame extends Phaser.Scene {
 
 		this.matter.world.add(pin);
 
+		const indicatorHeight = this.imgHeight + 2 * this.borderExtraHeight;
+		this.gameMode?.addChallengeIndicator(this, goalBoardData, x, y, this.switchWidth, indicatorHeight, 2);
+
 		return switchSprite;
 	}
 
@@ -191,6 +194,7 @@ export default class MainGame extends Phaser.Scene {
 		}
 
 		const startBoard = this.gameMode!.getStartBoard();
+		const goalBoard = this.gameMode!.getGoalBoard();
 
 		// PLACEHOLDER for GameMode.getChallenge();
 
@@ -255,7 +259,7 @@ export default class MainGame extends Phaser.Scene {
 				}
 
 				// add switch
-				const switchSprite = this.addSwitch(startBoard[row][switchIndex], row, switchIndex, x, y);
+				const switchSprite = this.addSwitch(startBoard[row][switchIndex], goalBoard[row][switchIndex], row, switchIndex, x, y);
 				switchGroup.add(switchSprite);
 
 				// add first border of the row if required

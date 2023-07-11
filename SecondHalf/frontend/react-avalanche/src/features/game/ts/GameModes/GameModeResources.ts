@@ -39,6 +39,12 @@ export abstract class AbstractGameMode {
         return this.challenge.startBoard;
     }
 
+    public getGoalBoard(): number[][] {
+        return this.challenge.goalBoard;
+    }
+
+    public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {}
+
     // function that evaluates game state after each move and decides whether the game is over
     public abstract interpretGameState(board: number[][]): GameEvaluation;
 }
