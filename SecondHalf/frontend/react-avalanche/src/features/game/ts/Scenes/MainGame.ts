@@ -225,7 +225,8 @@ export default class MainGame extends Phaser.Scene {
 
 		// BUTTONS -----------------------------------------------------------
 		for (let i = 1; i < 7; i++) {
-			const buttonX = boardX + (this.boardWidth / 8) * i + (i % 2 + 1) * this.borderWidth;
+			const buttonX = boardX + (this.boardWidth / 8) * i + (i % 2 + 2) * this.borderWidth;
+			console.log(i, buttonX-boardX, this.boardWidth)
 			const button = this.addButton(buttonX, buttonStartY, i, boardX);
 			buttonGroup.add(button);
 		}
