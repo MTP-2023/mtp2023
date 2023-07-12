@@ -107,14 +107,19 @@ async def staticBoard():
         [1,0,1,0,1,0,0,1]]
 
 @app.get("/challenge", tags=["challenge"])
-async def returnChallenge(width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
-    start_board = generate_random_board(width, height)
-    goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)
+async def returnChallenge(mode: str = "singlePlayer", width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
+    if mode == "singlePlayer":
+        start_board = generate_random_board(width, height)
+        goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)
 
-    return {
-        "start": start_board,
-        "goal": goal_board
-    }
+        return {
+            "start": start_board,
+            "goal": goal_board
+        }
+    elif mode == "twoPlayers":
+        # add code
+        pass
+
 
 # request to simulate a throw, return game board and marble states
 @app.post("/interpret/", tags=["interpret"])
