@@ -1,8 +1,8 @@
 import random
 import sys
 #sys.path.append("../")
-sys.path.append("../../../")
-from SecondHalf.gameResources.simulation.simulate import run
+sys.path.append("../../")
+from gameResources.simulation.simulate import run
 import copy
 
 # board = start board produced by generator
@@ -28,7 +28,7 @@ def generateBoard(board, minMarbles, maxMarbles, turnlimit, availableMarbles, wi
     #print("trying to generate with maxTurns", maxTurns)
     player = 1
     for _ in range(turnlimit):
-        move = random.randint(0, width)
+        move = random.randint(0, width-1)
         #print("WIDTH", width)
         #print("MOVE", move)
         result = run(move, board, True)

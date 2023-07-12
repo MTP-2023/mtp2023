@@ -1,30 +1,37 @@
 def reward(env):
-        player = env.current_player
-        done = True
-        if env.n_steps > env.max_steps:
-            if player == 1:
-                return -1, done
-            if player == -1:
-                return 0, done
+    """print("CHECKING REWARD")
+    print(env.current_board)
+    print(env.goal_board)
+    print("PLAYER", env.current_player)"""
+    player = env.current_player
+    done = True
+    if env.n_steps > env.max_steps:
+        #print("MAX STEPS")
+        if player == 1:
+            return -1, done
+        if player == -1:
+            return 0, done
 
-        i = 0
-        while i < env.height:
-            j = 0
-            if i%2 == 0:
-                j = 1
-            while j < env.width - 1:
-                if env.goal_board[i][j] == 2*player or env.goal_board[i][j+1] == 2*player or env.goal_board[i][j] == 3 or env.goal_board[i][j+1] == 3:
-                    if env.current_board[i][j] != 2*player and env.current_board[i][j+1] != 2*player:
-                        done = False
-                        break
-                j+=2
-            if not done:
-                break
-            i += 1
+    i = 0
+    while i < env.height:
+        j = 0
+        if i%2 == 0:
+            j = 1
+        while j < env.width - 1:
+            if env.goal_board[i][j] == 2*player or env.goal_board[i][j+1] == 2*player or env.goal_board[i][j] == 3 or env.goal_board[i][j+1] == 3:
+                if env.current_board[i][j] != 2*player and env.current_board[i][j+1] != 2*player:
+                    done = False
+                    break
+            j+=2
+        if not done:
+            break
+        i += 1
+        #print("CHECKED FIRST PLAYER", done)
 
-        reward = (1 + env.max_steps - env.n_steps)*player if done else 0
+    reward = (1 + env.max_steps - env.n_steps)*player if done else 0
+    #print("REWARD", reward)
 
-        return reward, done
+    return reward, done
      
 
 def simple_agent_metrics(self):

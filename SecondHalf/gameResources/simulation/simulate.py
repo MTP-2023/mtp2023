@@ -1,7 +1,9 @@
 import copy
 
 def run(start_col: int, input_board: list, player, return_intermediate_data = False):
-    start_col += 1 
+    start_col += 1
+    if start_col >= len(input_board[0])-1 or start_col < 1:
+        print("ILLEGAL MOVE", start_col)
     # format: list of items where [current_row, col_idx] represents a marble rolling down
     active_marbles = [[0, start_col, player]]
 

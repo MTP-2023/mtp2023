@@ -88,7 +88,7 @@ parser.add_argument(
 parser.add_argument(
     "--config",
     default="default_ppo",
-    help="Sefine which algorrithm should be applied."
+    help="Define which algorithm should be applied."
 )
 
 parser.add_argument(
@@ -126,9 +126,15 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--multiplayer",
-    default=True,
-    action=argparse.BooleanOptionalAction
+    "--vs",
+    default="random",
+    help="Agent to train against (only relevant for multiplayer)"
+)
+
+parser.add_argument(
+    "--mcts_depth",
+    default=100,
+    help="MCTS opponent search depth for multiplayer training"
 )
 
 args = parser.parse_args()
@@ -178,8 +184,10 @@ if args.algo == "PPO":
     config = PPOConfig()
     if args.online:
         env_class = OnlineLearningEnv
-    elif args.multiplayer:
+    elif "multiplayer" in args.variant:
         env_class = MultiplayerEnv
+        env_setup["vs"] = args.vs
+        env_setup["mcts_depth"] = int(args.mcts_depth)
     else:
         env_class = GameBoardEnv
 elif args.algo == "AlphaZero":

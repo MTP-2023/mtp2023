@@ -2,11 +2,13 @@ import json
 import time
 
 import sys
+
 sys.path.append('../../')
-from gameResources.simulation.simulate import run
+from SecondHalf.gameResources.simulation.simulate import run
 import copy
 import random
 import math
+import mcts
 
 
 class Node:
@@ -35,7 +37,7 @@ class Node:
         return best_child
 
     def expand(self, state):
-        child = Node(state, self.player * -1,parent=self)
+        child = Node(state, self.player * -1, parent=self)
         child.depth = self.depth + 1
         self.children.append(child)
 
@@ -44,9 +46,6 @@ class Node:
     def update(self, result):
         self.visits += 1
         self.wins += result
-
-
-
 
 
 if __name__ == "__main__":
@@ -61,7 +60,6 @@ if __name__ == "__main__":
         startboards = []
         endboards = []
         max_steps = []
-
 
         for i in range(len(level)):
             startboards.append(level[i]['start_board'])
@@ -83,13 +81,13 @@ if __name__ == "__main__":
                 # print("making move", move)
                 run(move, startboard, player, False)
                 if evaluate(startboard, endboard):
-                    #print("Solved in ", i, "steps")
+                    # print("Solved in ", i, "steps")
                     totalwins += 1
                     levelwins += 1
                     break
-            #print("finished challenge", j)
-        print("level", levelnumber, ": ", levelwins, "out of", len(level), "=", levelwins/len(level)*100, "%")
+            # print("finished challenge", j)
+        print("level", levelnumber, ": ", levelwins, "out of", len(level), "=", levelwins / len(level) * 100, "%")
         levelnumber += 1
-    print('totalwins ', totalwins, 'out of', (j + 1)*len(data['training_levels']))
-    percent = totalwins / ((j + 1)*len(data['training_levels']))*100
+    print('totalwins ', totalwins, 'out of', (j + 1) * len(data['training_levels']))
+    percent = totalwins / ((j + 1) * len(data['training_levels'])) * 100
     print('percent', percent)
