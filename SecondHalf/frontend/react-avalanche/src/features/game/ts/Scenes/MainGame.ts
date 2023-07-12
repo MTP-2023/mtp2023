@@ -30,7 +30,7 @@ export default class MainGame extends Phaser.Scene {
 	buttonOutlineColor: number;
 	buttonTextColor: string;
 	buttonTextStyle: { fontSize: string; fill: any; };
-	gameMode: AbstractGameMode | undefined;
+	gameMode: AbstractGameMode;
 
 	constructor() {
 		super({ key: MainGame.Name });
@@ -61,8 +61,6 @@ export default class MainGame extends Phaser.Scene {
 		this.buttonOutlineColor = 0xffffff;
 		this.buttonTextColor = "#ffffff";
 		this.buttonTextStyle = { fontSize: this.buttonFontSize+"px", fill: this.buttonTextColor };
-
-		this.gameMode = undefined;
 	}
 
 	public preload(): void {
