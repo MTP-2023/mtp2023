@@ -8,6 +8,7 @@ sys.path.append('../../agent/rl')
 from simulation.simulate import run
 from boardGenerator.generate import generate_random_board
 from challengeGenerator.generateGoal import generateGoalState
+from challengeGenerator.generateChallenges import merge
 from collections import OrderedDict
 import numpy as np
 from apply_policy import return_move, solve_challenge
@@ -108,17 +109,17 @@ async def staticBoard():
 
 @app.get("/challenge", tags=["challenge"])
 async def returnChallenge(mode: str = "singlePlayer", width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
+    start_board = generate_random_board(width, height)
     if mode == "singlePlayer":
-        start_board = generate_random_board(width, height)
         goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)
-
-        return {
-            "start": start_board,
-            "goal": goal_board
-        }
     elif mode == "twoPlayers":
-        # add code
-        pass
+        goal1 = generateGoalState(randomBoard, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
+        goal2 = generateGoalState(randomBoard, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
+        goal_board = merge(goal1, goal2, width, height)
+    return {
+                "start": start_board,
+                "goal": goal_board
+            }
 
 
 # request to simulate a throw, return game board and marble states
