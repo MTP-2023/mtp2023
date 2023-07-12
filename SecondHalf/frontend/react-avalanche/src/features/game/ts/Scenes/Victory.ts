@@ -15,7 +15,7 @@ export default class Victory extends Phaser.Scene {
 	public create(): void {
 		Utilities.LogSceneMethodEntry("Victory", "create");
 		
-        const overlayHeight = this.cameras.main.height / 2;
+        const overlayHeight = this.cameras.main.height;
         const overlayWidth = this.cameras.main.width;
 
         const graphics = this.add.graphics();
@@ -31,6 +31,7 @@ export default class Victory extends Phaser.Scene {
         victoryText.setOrigin(0.5);
 
         setTimeout(() => {
+            this.scene.stop(MainGame.Name);
             this.scene.stop(Victory.Name);
             this.scene.start(MainMenu.Name);
         }, 3000);

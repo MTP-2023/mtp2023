@@ -524,7 +524,6 @@ export default class MainGame extends Phaser.Scene {
 		// precending logic potentially to be adapted
 		const evalResult = this.gameMode!.interpretGameState(holds_marble);
 		if (evalResult.hasWinner) {
-			this.scene.stop();
 			this.scene.launch(Victory.Name);
 		}
 	}
