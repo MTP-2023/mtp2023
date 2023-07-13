@@ -132,8 +132,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--agent_player",
+    default=1
+)
+
+parser.add_argument(
     "--mcts_depth",
-    default=100,
+    default=10,
     help="MCTS opponent search depth for multiplayer training"
 )
 
@@ -188,6 +193,7 @@ if args.algo == "PPO":
         env_class = MultiplayerEnv
         env_setup["vs"] = args.vs
         env_setup["mcts_depth"] = int(args.mcts_depth)
+        env_setup["agent_player"] = int(args.agent_player)
     else:
         env_class = GameBoardEnv
 elif args.algo == "AlphaZero":

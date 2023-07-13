@@ -5,15 +5,15 @@ import sys
 
 sys.path.append('../../')
 sys.path.append("../")
-from SecondHalf.gameResources.simulation.simulate import run
+from gameResources.simulation.simulate import run
 import copy
 import random
-from SecondHalf.agent.baseline.node import Node
-from SecondHalf.gameVariants.multiplayer.reward import reward as reward_module
+from agent.baseline.node import Node
+from gameVariants.multiplayer.reward import reward as reward_module
 
 
 class MCTS_Wrapper:
-    def __init__(self, max_steps, n_steps, current_player, height, width, goal_board, current_board):
+    def __init__(self, max_steps, n_steps, current_player, height, width, goal_board, current_board, agent_player=1):
         self.max_steps = max_steps
         self.n_steps = n_steps
         self.current_player = current_player
@@ -21,6 +21,7 @@ class MCTS_Wrapper:
         self.width = width
         self.goal_board = goal_board
         self.current_board = current_board
+        self.agent_player = agent_player
 
 
 def propagate(node, result):

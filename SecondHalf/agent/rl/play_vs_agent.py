@@ -22,8 +22,8 @@ from copy import deepcopy
 import math
 
 class ShallowEnv:
-    def __init__(self, current_board, goal_board, n_steps, max_steps, width, height, player):
-        self.current_board = current_board
+    def __init__(self, current_board, goal_board, n_steps, max_steps, width, height, player, agent_player=1):
+        self.current_board = deepcopy(current_board)
         self.goal_board = goal_board
         self.n_steps = n_steps
         self.max_steps = max_steps
@@ -31,6 +31,7 @@ class ShallowEnv:
         self.height = height
         self.variant = "multiplayer"
         self.current_player = player
+        self.agent_player = agent_player
 
 def return_move(agent, shallowEnv, obs):
     # create "empty" env to obtain preprocessor
@@ -177,13 +178,11 @@ for leveli in range(noOfLevels):
                 break
             player = -1
             if args.player2 == "agent":
-                flipped_board = flip_board(deepcopy(current_board))
-                flipped_goal = flip_board(deepcopy(goal_board))
-                flipped_obs = OrderedDict()
-                flipped_obs["current"] = flipped_board
-                flipped_obs["goal"] = flipped_goal
-                paramEnv = ShallowEnv(flipped_board, flipped_goal, step, max_turns, len(current_board[0]), len(current_board), 1)
-                action = return_move(agent, paramEnv, flipped_obs)
+                obs = OrderedDict()
+                obs["current"] = current_board
+                obs["goal"] = goal_board
+                paramEnv = ShallowEnv(current_board, goal_board, step, max_turns, len(current_board[0]), len(current_board), -1, -1)
+                action = return_move(agent, paramEnv, obs)
             elif args.player2 == "mcts":
                 action = mcts(current_board, int(args.mcts_depth), math.sqrt(2), goal_board, width*2, height, max_turns, step, player)
             elif args.player2 == "random":

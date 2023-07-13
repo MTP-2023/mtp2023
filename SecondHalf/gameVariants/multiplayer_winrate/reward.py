@@ -4,6 +4,7 @@ def reward(env):
     print(env.goal_board)
     print("PLAYER", env.current_player)"""
     player = env.current_player
+    agent_player = env.agent_player
     done = True
     if env.n_steps > env.max_steps:
         #print("MAX STEPS")
@@ -30,7 +31,7 @@ def reward(env):
 
     reward = 0
     if done:
-        if player == 1:
+        if player == agent_player:
             reward = 1
     #print("REWARD", reward)
 
