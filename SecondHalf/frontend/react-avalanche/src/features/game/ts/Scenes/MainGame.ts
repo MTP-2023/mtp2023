@@ -1,5 +1,4 @@
 import Utilities from "../Utilities";
-import { interpretBoard } from "../Helper/BoardInterpreter";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import Victory from "./Victory";
@@ -40,8 +39,8 @@ export default class MainGame extends Phaser.Scene {
 		this.switchWidth = this.scaleFactor * 70;
 		this.imgHeight = this.scaleFactor * 104;
 		this.borderWidth = this.scaleFactor * 5;
-		this.switchSpacingY = this.scaleFactor * 50;
-		this.borderExtraHeight = this.scaleFactor * 0.3 * this.switchSpacingY;
+		this.switchSpacingY = this.scaleFactor * 60;
+		this.borderExtraHeight = this.scaleFactor * 0.4 * this.switchSpacingY;
 		this.boardWidth = 4 * this.switchWidth + 5 * this.borderWidth;
 		this.marbleRadius = 13 * this.scaleFactor;
 
@@ -178,7 +177,7 @@ export default class MainGame extends Phaser.Scene {
 		return switchSprite;
 	}
 
-	public create(data: { gameModeHandle: string }): void {
+	public async create(data: { gameModeHandle: string }): Promise<void> {
 		Utilities.LogSceneMethodEntry("MainGame", "create");
 
 		// set matter options
@@ -191,8 +190,12 @@ export default class MainGame extends Phaser.Scene {
 				this.gameMode = new SinglePlayerChallenge();
 		}
 
-		const startBoard = this.gameMode!.getStartBoard();
+		// retrieve challenge
+		await this.gameMode.initChallenge();
+
+		const startBoard =  this.gameMode!.getStartBoard();
 		const goalBoard = this.gameMode!.getGoalBoard();
+		console.log(goalBoard)
 
 		// PLACEHOLDER for GameMode.getChallenge();
 
@@ -226,7 +229,7 @@ export default class MainGame extends Phaser.Scene {
 		// BUTTONS -----------------------------------------------------------
 		for (let i = 1; i < 7; i++) {
 			const buttonX = boardX + (this.boardWidth / 8) * i + (i % 2 + 2) * this.borderWidth;
-			console.log(i, buttonX-boardX, this.boardWidth)
+			//console.log(i, buttonX-boardX, this.boardWidth)
 			const button = this.addButton(buttonX, buttonStartY, i, boardX);
 			buttonGroup.add(button);
 		}

@@ -1,16 +1,13 @@
 import { Challenge, GameEvaluation, AbstractGameMode } from "./GameModeResources";
 import { interpretBoard } from "../Helper/BoardInterpreter";
+import { fetchChallenge } from "../../cAPICalls";
 
 export class SinglePlayerChallenge extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
 
-    constructor() {
-        super();
-        this.initChallenge();
-    }
-
-    protected initChallenge(): void {
+    public async initChallenge(): Promise<void> {
        // load game board state, to be replaced by API calls
+       /*
        const start = ([
             [0, 0, 1, 1, 0, 1, 0, 0],
             [0, 1, 1, 0, 0, 1, 1, 0],
@@ -23,9 +20,11 @@ export class SinglePlayerChallenge extends AbstractGameMode {
             [0, 1, 1, 0, 0, 1, 1, 0],
             [0, 0, 1, 0, 1, 1, 0, 0],
             [1, 0, 0, 1, 1, 0, 1, 0],
-        ]);
+        ]);*/
 
-        this.challenge = new Challenge(start, goal);
+        const challengeData = await fetchChallenge("singlePlayer");
+        console.log(challengeData.goal)
+        this.challenge = new Challenge(challengeData.start, challengeData.goal);
     }
 
     public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {
