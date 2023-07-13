@@ -14,9 +14,9 @@ export function interpretBoard(board: number[][]): number[][] {
         if (isStartBoard) {
             for (let i=0; i < row.length; i+=2) {
                 if (row[i] > 0) {
-                    currentRow.push(row[i]);
+                    currentRow.push(1);
                 } else {
-                    currentRow.push(-row[i]);
+                    currentRow.push(-1);
                 }
             }
         } 
