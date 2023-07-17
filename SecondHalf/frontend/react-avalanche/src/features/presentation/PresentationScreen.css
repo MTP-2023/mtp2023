@@ -1,8 +1,10 @@
 .presentation-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
+  font-family: Futura, sans-serif;
+  background-color: #0f0f0f;
+}
+
+.presentation-container section {
+  height: 100vh;
 }
 
 .header {
@@ -27,15 +29,12 @@ p {
   line-height: 1.5;
 }
 
-section {
-  margin-bottom: 30px;
-}
-
 .section-content {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 4rem;
+  max-height: 100%;
 }
 
 .reverse {
@@ -44,17 +43,13 @@ section {
 
 .column {
   flex: 1;
+  max-width: 100%;
+  max-height: 100vh;
 }
 
 .column h2,
 .column p {
   margin: 0;
-}
-
-.column img {
-  height: auto;
-  display: block;
-  margin-top: 20px;
 }
 
 .footer {
@@ -83,4 +78,75 @@ section {
   p {
     font-size: 14px;
   }
+}
+
+.hero {
+  background: "#0c0c0c";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 0 3rem;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+      180deg rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.6) 100%
+    ),
+    linear-gradient(180deg rgba(0, 0, 0, 0.4) 0%, transparent 0%);
+  z-index: 2;
+}
+
+.hero__background {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero__background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__content {
+  z-index: 3;
+}
+
+.hero__content h1 {
+  color: white;
+  font-size: 10rem;
+  box-shadow: rgba(0, 0, 0, 0.4);
+  font-weight: 100;
+  background: -webkit-linear-gradient(#ffffff, #abd1f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sections section {
+  max-height: 100vh;
+
+  margin-bottom: 4rem;
+}
+
+.column img {
+  display: block;
+  max-width: 100%;
+  height: 100vh;
+  object-fit: cover;
 }
