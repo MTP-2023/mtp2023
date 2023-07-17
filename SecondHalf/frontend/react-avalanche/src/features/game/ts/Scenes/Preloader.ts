@@ -16,6 +16,8 @@ export default class Preloader extends Phaser.Scene {
 		this.load.image("switch-left");
 		this.load.image("switch-right");
 		this.load.image("marble");
+		this.load.image("marble-p1");
+		this.load.image("marble-p2");
 		this.load.json("switch-left-shape");
 		this.load.json("switch-right-shape");
 		this.load.json("marble-shape");

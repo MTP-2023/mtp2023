@@ -1,7 +1,8 @@
 import Utilities from "../Utilities";
+import Victory from "./GameEnd";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
-import Victory from "./Victory";
+import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -30,6 +31,7 @@ export default class MainGame extends Phaser.Scene {
 	buttonTextColor: string;
 	buttonTextStyle: { fontSize: string; fill: any; };
 	gameMode: AbstractGameMode;
+	turn: number = -1;
 
 	constructor() {
 		super({ key: MainGame.Name });
@@ -185,9 +187,14 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.world.setGravity(0, 0.85);
 
 		// initialize gameMode
+		console.log(data.gameModeHandle)
 		switch (data.gameModeHandle) {
 			case "singlePlayerChallenge":
 				this.gameMode = new SinglePlayerChallenge();
+				break;
+			case "local1v1":
+				this.gameMode = new LocalMultiPlayer();
+				break;
 		}
 
 		// retrieve challenge
@@ -313,13 +320,18 @@ export default class MainGame extends Phaser.Scene {
 		let x = boardX + this.switchWidth/2 + this.borderWidth + Math.floor((col-1) / 2) * (this.switchWidth + this.borderWidth);
 		x = (col % 2 == 0) ? x + this.switchWidth - this.marbleRadius : x + this.marbleRadius;
 		const y = 40;
-		const marbleSprite = this.matter.add.sprite(x, y, "marble", undefined, {shape: switchShape });
+		let marblePNG = "marble";
+		if (this.gameMode.isLocal) {
+			[ marblePNG, this.turn ] = this.gameMode.handleTurnSwitch(this.turn);
+		}
+		let marbleSprite = this.matter.add.sprite(x, y, marblePNG, undefined, { shape: switchShape });
 		marbleSprite.setMass(5);
 		let a = 0.925;
 		marbleSprite.setDisplaySize(2*this.marbleRadius*a, 2*this.marbleRadius*a);
 		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
 		this.counter = this.counter + 1;
 		marbleSprite.setData("id", this.counter);
+		marbleSprite.setData("player", this.turn);
 		this.toggleClickableButtons(false);
 		this.simulationRunning = true;
 	}
@@ -341,7 +353,8 @@ export default class MainGame extends Phaser.Scene {
 		if (this.checkCollision(bodyA, bodyB, "marble", "head")) {
 			//console.log("SWITCH SHOULD HOLD MARBLE")
 			const holdSwitch = bodyA.label == "head" ? bodyA.gameObject : bodyB.gameObject;
-			this.handleMarbleSwitchStop(holdSwitch);
+			const marblePlayer = holdSwitch == bodyA.gameObject ? bodyB.gameObject.getData("player"): bodyA.gameObject.getData("player");
+			this.handleMarbleSwitchStop(holdSwitch, marblePlayer);
 		} else if (this.checkCollision(bodyA, bodyB, "marble", "marble")) {
 			this.handleMarbleCollision(bodyA, bodyB);
 		} // original code block that used to initiate switch flips but turned out to be buggy, reason why marbles got stuck could not be found as of now
@@ -365,9 +378,9 @@ export default class MainGame extends Phaser.Scene {
 		return this.matter.vector.magnitude(obj.velocity);
 	}
 
-	private handleMarbleSwitchStop(holdSwitch: Phaser.GameObjects.GameObject): void {
-		console.log("SWITCH HOLDS MARBLE");
-		holdSwitch.setData("marbleStatus", 1);
+	private handleMarbleSwitchStop(holdSwitch: Phaser.GameObjects.GameObject, marblePlayer: number): void {
+		console.log("SWITCH HOLDS MARBLE", marblePlayer);
+		holdSwitch.setData("marbleStatus", marblePlayer * 2);
 	}
 
 	private checkIfSwitchFlipRequired(): boolean {
@@ -505,8 +518,7 @@ export default class MainGame extends Phaser.Scene {
 			for (let switchIndex = 0; switchIndex < switchesInRow; switchIndex++) {
 				const current_switch = switches.shift();
 				switch_orientation[row].push(current_switch.getData("tilt"));
-				const hasMarble = current_switch.getData("marbleStatus") ? 2 : 0;
-				holds_marble[row].push(hasMarble);
+				holds_marble[row].push(current_switch.getData("marbleStatus"));
 			}
 		}
 
@@ -516,7 +528,21 @@ export default class MainGame extends Phaser.Scene {
 		// precending logic potentially to be adapted
 		const evalResult = this.gameMode!.interpretGameState(holds_marble);
 		if (evalResult.hasWinner) {
-			this.scene.launch(Victory.Name);
+			let gameEndText = '';
+			if (evalResult.isMultiplayer) {
+				switch (evalResult.winner.length) {
+					case 1:
+						gameEndText = "Player " + evalResult.winner[0] + " has won!";
+						break;
+					case 2:
+						gameEndText = "It's a draw!";
+						break;
+				}
+			} else {
+				gameEndText = "Congratulation! You won!"
+			}
+
+			this.scene.launch(Victory.Name, { displayText: gameEndText });
 		}
 	}
 

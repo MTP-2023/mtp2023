@@ -1,9 +1,9 @@
 import { Challenge, GameEvaluation, AbstractGameMode } from "./GameModeResources";
-import { interpretBoard } from "../Helper/BoardInterpreter";
 import { fetchChallenge } from "../../cAPICalls";
 
 export class SinglePlayerChallenge extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
+    isLocal: boolean = true;
     playerColor = 0xffa500;
 
     public async initChallenge(): Promise<void> {
@@ -30,6 +30,7 @@ export class SinglePlayerChallenge extends AbstractGameMode {
 
     public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {
         // Check if switch should hold a marble to fulfill the winning requirements
+        console.log("HERE")
         if (data == 2) {
             // add indicator, here a semi-transparent, orange rectangle
             const indicatorRectangle = scene.add.rectangle(x, y, width, height, this.playerColor, 0.5);
@@ -43,6 +44,14 @@ export class SinglePlayerChallenge extends AbstractGameMode {
         const playerStatusContainer = scene.add.container(x, y);
         const playerNameText = scene.add.text(0, 0, "Player 1", { fontSize: 16,  color: this.playerColor.toString()});
         playerStatusContainer.add(playerNameText);*/
+    }
+
+    public handleTurnSwitch(playerTurn: number): [ marblePNG: string, turn: number ] {
+        const newSpritePNG = "marble-p1";
+        return [
+            newSpritePNG,
+            1
+        ]
     }
 
     public interpretGameState(board: number[][]): GameEvaluation {

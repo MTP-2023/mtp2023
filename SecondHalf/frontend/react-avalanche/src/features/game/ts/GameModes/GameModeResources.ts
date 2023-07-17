@@ -2,12 +2,12 @@
 export class GameEvaluation {
     isMultiplayer: boolean;
     hasWinner: boolean;
-    winner: number;
+    winner: number[];
 
-    constructor(multi: boolean, finished: boolean, playerWon: number = 0) {
+    constructor(multi: boolean, finished: boolean, playerWon: number[] = []) {
         this.isMultiplayer = multi;
         this.hasWinner = finished;
-        this.winner = (this.isMultiplayer && this.hasWinner) ? playerWon : 0;
+        this.winner = (this.isMultiplayer && this.hasWinner) ? playerWon : [];
     }
 }
 
@@ -24,6 +24,7 @@ export class Challenge {
 
 export abstract class AbstractGameMode {
     abstract challenge: Challenge;
+    isLocal: boolean = false;
 
     // function that obtains the challenge data, i.e. requests a start and goal board from the server, and initializes the class variable 'challenge'
     public initChallenge(): void {
@@ -40,9 +41,11 @@ export abstract class AbstractGameMode {
         return this.challenge.goalBoard;
     }
 
-    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardWidth: number): void {};
+    public abstract createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardWidth: number): void;
 
-    public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {};
+    public abstract addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void;
+
+    public abstract handleTurnSwitch(playerTurn: number): [ marblePNG: string, turn: number ];
 
     // function that evaluates game state after each move and decides whether the game is over
     public abstract interpretGameState(board: number[][]): GameEvaluation;

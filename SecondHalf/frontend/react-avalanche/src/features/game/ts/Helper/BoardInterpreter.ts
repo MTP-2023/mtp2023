@@ -23,8 +23,9 @@ export function interpretBoard(board: number[][]): number[][] {
         // for goal board interpretation, only focusing on relevant switches
         else {
             for (let i=0; i < row.length; i+=2) {
-                const switchVal = Math.max(...[row[i], row[i+1]]);
-                if (switchVal > 1) {
+                //const switchVal = Math.max(...[row[i], row[i+1]]);
+                const switchVal = row[i] != 0 ? row[i] : row[i+1];
+                if (![0, 1].includes(switchVal)) {
                     currentRow.push(switchVal);
                 } else {
                     currentRow.push(0);

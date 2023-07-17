@@ -1,11 +1,12 @@
 import { Challenge, GameEvaluation, AbstractGameMode } from "./GameModeResources";
-import { interpretBoard } from "../Helper/BoardInterpreter";
 import { fetchChallenge } from "../../cAPICalls";
 
 export class LocalMultiPlayer extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
+    isLocal: boolean = true;
     player1Color = 0xffa500;
     player2Color = 0x0000ff;
+    mixedColor = 0x925e6d;
 
     public async initChallenge(): Promise<void> {
         const challengeData = await fetchChallenge("twoPlayers");
@@ -20,7 +21,10 @@ export class LocalMultiPlayer extends AbstractGameMode {
             indicatorRectangle.setDepth(-1);
         } else if (data == -2) {
             const indicatorRectangle = scene.add.rectangle(x, y, width, height, this.player2Color, 0.5);
-            indicatorRectangle.setDepth(-1);
+            indicatorRectangle.setDepth(-2);
+        } else if (data == 3) {
+            const indicatorRectangle = scene.add.rectangle(x, y, width, height, this.mixedColor, 0.5);
+            indicatorRectangle.setDepth(-3);
         }
     }
 
@@ -32,19 +36,66 @@ export class LocalMultiPlayer extends AbstractGameMode {
         playerStatusContainer.add(playerNameText);*/
     }
 
+    public handleTurnSwitch(playerTurn: number): [ marblePNG: string, turn: number ] {
+        const newTurn = playerTurn * (-1);
+        let newSpritePNG = "marble";
+
+        switch (newTurn) {
+            case 1:
+                newSpritePNG = "marble-p1";
+                break;
+            case -1:
+                newSpritePNG = "marble-p2";
+                break;
+        }
+
+        return [
+            newSpritePNG,
+            newTurn
+        ]
+    }
+
     public interpretGameState(board: number[][]): GameEvaluation {
-        let finished = true;
+        let playerStatus = [
+            {
+                "id": 1,
+                "won": true,
+                "handle": 1
+            },
+            {
+                "id": -1,
+                "won": true,
+                "handle": 2
+            }
+        ];
         
         const flattenedGoal = this.challenge.goalBoard.flat();
         const flattenedBoard = board.flat();
 
-        for (const [idx, val] of flattenedGoal.entries()) {
-            if (val == 2 && flattenedBoard[idx] != 2) {
-                finished = false;
-                break;
+        for (const player of playerStatus) {
+            const target = 2 * player.id;
+            for (const [idx, val] of flattenedGoal.entries()) {
+                if ((val == target || val == 3) && flattenedBoard[idx] != target) {
+                    player.won = false;
+                    break;
+                }
             }
         }
 
-        return new GameEvaluation(false, finished);
+        const p1 = playerStatus[0];
+        const p2 = playerStatus[1];
+
+        let finished = p1.won || p2.won;
+
+        let winnerList = [];
+        if (finished) {
+            for (const player of playerStatus) {
+                if (player.won) {
+                    winnerList.push(player.handle)
+                }
+            }
+        }
+
+        return new GameEvaluation(true, finished, winnerList);
     }
 }

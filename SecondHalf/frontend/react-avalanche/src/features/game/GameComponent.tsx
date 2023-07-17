@@ -6,7 +6,7 @@ import MainMenu from "./ts/Scenes/MainMenu";
 import SplashScreen from "./ts/Scenes/SplashScreen";
 import MainGame from "./ts/Scenes/MainGame";
 import MainSettings from "./ts/Scenes/MainSettings";
-import Victory from './ts/Scenes/Victory';
+import Victory from './ts/Scenes/GameEnd';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 const GameComponent: React.FC = () => {

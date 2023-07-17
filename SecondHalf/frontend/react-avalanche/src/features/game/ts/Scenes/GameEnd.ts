@@ -6,14 +6,14 @@ export default class Victory extends Phaser.Scene {
 	/**
 	 * Unique name of the scene.
 	 */
-	public static Name = "Victory";
+	public static Name = "GameEnd";
 
 	public preload(): void {
 		// Preload as needed.
 	}
 
-	public create(): void {
-		Utilities.LogSceneMethodEntry("Victory", "create");
+	public create(data: { displayText: string }): void {
+		Utilities.LogSceneMethodEntry("GameEnd", "create");
 		
         const overlayHeight = this.cameras.main.height;
         const overlayWidth = this.cameras.main.width;
@@ -25,7 +25,7 @@ export default class Victory extends Phaser.Scene {
         const victoryText = this.add.text(
         overlayWidth / 2,
         overlayHeight / 2,
-        'Victory',
+        data.displayText,
         { fontSize: '48px', color: '#ffffff' }
         );
         victoryText.setOrigin(0.5);
