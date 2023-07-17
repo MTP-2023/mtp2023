@@ -12,6 +12,7 @@ from gameResources.boardGenerator.print_board import print_board
 from gameResources.challengeGenerator.generateGoal import generateGoalState
 from gameResources.challengeGenerator.generateChallenges import merge
 from agent.rl.train_resources.multiplayerEnv import SingleChallengeTestEnvMultiplayer
+from agent.rl.train_resources.flip_board import flip_board
 from collections import OrderedDict
 #from apply_policy import return_move
 from gameResources.simulation.simulate import run
@@ -42,16 +43,6 @@ def return_move(agent, shallowEnv, obs):
     move = agent.compute_single_action(flat_obs)
     return move[0]
 
-def flip_board(board):
-    flipped_board = deepcopy(board)
-    for i in range(len(board)):
-        for j in range(len(board[i])):
-            if board[i][j]==2:
-                board[i][j]=-2
-            elif board[i][j]==-2:
-                board[i][j]=2
-    return flipped_board
-
 parser = argparse.ArgumentParser()
 
 parser.add_argument(
@@ -79,7 +70,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumVer2Fix/checkpoint_random1marblewinrate:v99', type='model')
+artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumVer2Fix/checkpoint_agentplayerone:v94', type='model')
 artifact_dir = artifact.download()
 
 agent = Policy.from_checkpoint(artifact_dir+'/policies/default_policy')
@@ -96,7 +87,7 @@ if args.challenges == "random":
     goal2 = generateGoalState(current_board, minMarbles, maxMarbles, max_turns, 42, width*2, False)
     goal_board = merge(goal, goal2, width, height)
     training_levels = []
-    training_levels.append({"start_board": current_board, "goal_board": goal_board, "max_turns": max_turns})
+    training_levels.append([{"start_board": current_board, "goal_board": goal_board, "max_turns": max_turns}])
 
 else:
     challenges = json.load(open("../../gameVariants/multiplayer/training/" + args.challenges + ".json"))
@@ -156,7 +147,7 @@ for leveli in range(noOfLevels):
             elif args.player1 == "mcts":
                 action = mcts(current_board, int(args.mcts_depth), math.sqrt(2), goal_board, width * 2, height, max_turns, step, player)
             elif args.player1 == "random":
-                action = random.randint(2 * width)
+                action = random.randint(0, 2 * width-1)
             elif args.player1 == "human":
                 print("      GOAL BOARD")
                 print_board(goal_board)
@@ -178,11 +169,21 @@ for leveli in range(noOfLevels):
                 break
             player = -1
             if args.player2 == "agent":
-                obs = OrderedDict()
-                obs["current"] = current_board
-                obs["goal"] = goal_board
-                paramEnv = ShallowEnv(current_board, goal_board, step, max_turns, len(current_board[0]), len(current_board), -1, -1)
-                action = return_move(agent, paramEnv, obs)
+                #obs = OrderedDict()
+                #obs["current"] = current_board
+                #obs["goal"] = goal_board
+                #paramEnv = ShallowEnv(current_board, goal_board, step, max_turns, len(current_board[0]), len(current_board), -1, -1)
+                #action = return_move(agent, paramEnv, obs)
+
+                flipped_board = flip_board(deepcopy(current_board))
+                print("FLIPPED BOARD")
+                print(print_board(flipped_board))
+                flipped_goal = flip_board(deepcopy(goal_board))
+                flipped_obs = OrderedDict()
+                flipped_obs["current"] = flipped_board
+                flipped_obs["goal"] = flipped_goal
+                paramEnv = ShallowEnv(flipped_board, flipped_goal, step, max_turns, len(current_board[0]), len(current_board), 1)
+                action = return_move(agent, paramEnv, flipped_obs)
             elif args.player2 == "mcts":
                 action = mcts(current_board, int(args.mcts_depth), math.sqrt(2), goal_board, width*2, height, max_turns, step, player)
             elif args.player2 == "random":

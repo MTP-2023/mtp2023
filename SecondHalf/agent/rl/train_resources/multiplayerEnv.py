@@ -3,6 +3,7 @@ import sys
 sys.path.append("../../")
 sys.path.append("../")
 from rl.train_resources.avalancheEnv import GameBoardEnv, SingleChallengeTestEnv
+from agent.rl.train_resources.flip_board import flip_board
 from ray.rllib.env.env_context import EnvContext
 from gymnasium.spaces import Discrete, Box, Dict
 from gameResources.simulation.simulate import run
@@ -22,11 +23,7 @@ class MultiplayerEnv(GameBoardEnv):
         self.agent_player = config.get("agent_player", 1)
         self.vs = config.get("vs", "random")
         self.mcts_depth = config.get("mcts_depth", 100)
-
-        if self.agent_player == -1:
-            enemyAction = self.getEnemyAction()
-            self.current_board = run(enemyAction, self.current_board, self.current_player)
-            self.current_player *= -1
+        self.challenge_side = 0
 
     def getEnemyAction(self):
         if self.vs == "mcts":
@@ -99,19 +96,30 @@ class MultiplayerEnv(GameBoardEnv):
         # return [self.cur_pos], {}
 
         self.n_steps = 0
+        self.current_player = 1
 
-        # iterate over challenges
-        # if not self.online:
-        if self.training_index < len(self.training_states) - 1:
-            self.training_index += 1
-        else:
-            # print("RESET: All challenges played.")
-            self.training_index = 0
+        if self.challenge_side == 1:
+            self.challenge_side = 0
+            self.agent_player = 1
+            # iterate over challenges
+            # if not self.online:
+            if self.training_index < len(self.training_states) - 1:
+                self.training_index += 1
+            else:
+                # print("RESET: All challenges played.")
+                self.training_index = 0
+            self.current_board = np.array(self.training_states[self.training_index]["start_board"])
+            self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
+            self.max_steps = self.training_states[self.training_index]["max_turns"]
+
+        elif self.challenge_side == 0:
+            self.challenge_side = 1
+            self.agent_player = -1
+            self.current_board = np.array(flip_board(self.training_states[self.training_index]["start_board"]))
+            self.goal_board = np.array(flip_board(self.training_states[self.training_index]["goal_board"]))
 
             # reset env to next challenge
-        self.current_board = np.array(self.training_states[self.training_index]["start_board"])
-        self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
-        self.max_steps = self.training_states[self.training_index]["max_turns"]
+
 
         if self.agent_player == -1:
             enemyAction = self.getEnemyAction()
