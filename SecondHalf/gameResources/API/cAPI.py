@@ -1,31 +1,56 @@
-from fastapi import FastAPI, HTTPException
+import random
+
+import fastapi
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 import sys
+
 sys.path.append('../')
 sys.path.append('../../agent/rl')
+from lobby.message import Message, MessageTypes
+from uuid import UUID
+from fastapi_sessions.backends.implementations import InMemoryBackend
 from simulation.simulate import run
+from lobby.lobby import Lobby
 from boardGenerator.generate import generate_random_board
 from challengeGenerator.generateGoal import generateGoalState
 from challengeGenerator.generateChallenges import merge
 from collections import OrderedDict
+from pydantic import BaseModel
 import numpy as np
-from apply_policy import return_move, solve_challenge
+from agent.rl.apply_policy import return_move, solve_challenge
 from ray.rllib.policy.policy import Policy
+from uuid import uuid4
+from uuid import UUID
+from fastapi_sessions.backends.implementations import InMemoryBackend
+from fastapi import FastAPI, Response
+from fastapi_sessions.frontends.implementations import SessionCookie, CookieParameters
 import os
+import json
+from simulation.simulate import run
 from ray.rllib.models import ModelCatalog
+import SecondHalf.gameResources.lobby
 
 # initialize agents
 agent_handles = [
-    #'SimpleAgent',
-    #'MCTS',
-    'PPO', # checkpoint_gpu_14_675:v2
-    'AlphaZero' # curriculum2Marbles, 100 simulations, complex model
+    # 'SimpleAgent',
+    # 'MCTS',
+    'PPO',  # checkpoint_gpu_14_675:v2
+    'AlphaZero'  # curriculum2Marbles, 100 simulations, complex model
 ]
 
+
+class SessionData(BaseModel):
+    username: str
+
+
+backend = InMemoryBackend[UUID, SessionData]()
+
 # register models required for alphazero
-from train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
+from SecondHalf.agent.rl.train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
+
 ModelCatalog.register_custom_model("default_alphazero_model", DefaultModel)
 ModelCatalog.register_custom_model("simpler_alphazero_model", SimplerModel)
 ModelCatalog.register_custom_model("complex_alphazero_model", ComplexModel)
@@ -34,7 +59,7 @@ agent_dict = {}
 
 # load policies if possible
 for agent_handle in agent_handles:
-    artifact_dir ='../../gameResources/trainedAgents/'+agent_handle+'/policies/default_policy'
+    artifact_dir = '../../gameResources/trainedAgents/' + agent_handle + '/policies/default_policy'
     if os.path.isdir(artifact_dir):
         agent = Policy.from_checkpoint(artifact_dir)
         agent_dict[agent_handle] = agent
@@ -67,9 +92,9 @@ tags_metadata = [
     }
 ]
 
-
 # documentation is available at "/docs"
-app = FastAPI(title = "Logic API for the frontend of the Avalanche marble game", docs_url="/docs", openapi_tags=tags_metadata)
+app = FastAPI(title="Logic API for the frontend of the Avalanche marble game", docs_url="/docs",
+              openapi_tags=tags_metadata)
 
 origins = ["*"]
 
@@ -85,39 +110,224 @@ app.add_middleware(
 default_width = 3
 default_height = 2
 
+cookie_params = CookieParameters()
+
+lobbies = {}
+
+# Uses UUID
+cookie = SessionCookie(
+    cookie_name="cookie",
+    identifier="general_verifier",
+    auto_error=True,
+    secret_key="DONOTUSE",
+    cookie_params=cookie_params,
+)
+
 
 class SimulationDTO(BaseModel):
     marble_throw: int
     board: list
 
+
 class ChallengeDTO(BaseModel):
     current: list
     goal: list
 
-class Mode(BaseModel):
-    modeHandle: str = "singlePlayer"
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, data: Lobby):
+        for connection in self.active_connections:
+            await connection.send_json(data)
+
+
+manager = ConnectionManager()
+
+
+@app.websocket("/lobbies/{client_id}")
+async def websocket_endpoint_create(player: str):
+    code = random.randint(0, 999999)
+    while lobbies.keys().__contains__(code):
+        code = random.randint(0, 999999)
+    websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + code)
+    res = returnChallenge()
+    startBoard = res["start"]
+    goalBoard = res["goal"]
+    lobby = Lobby(player, startBoard, goalBoard, code, websocket)
+    lobbies[code] = lobby
+    await manager.connect(websocket)
+    await manager.broadcast(lobby)
+    try:
+        while True:
+            message: Message = await websocket.receive_json()
+            if message.type == MessageTypes.MOVE:
+                lobby = lobbies[message.data["code"]]
+                run(message.data["move"], lobby.currentBoard, message.data["player"], False)
+                lobby.recentMove = message.data["move"]
+                await manager.broadcast(lobby)
+            elif message.Type == MessageTypes.NEWCHALLENGE:
+                lobby = lobbies[message.data["code"]]
+                start_board = generate_random_board(lobby.width, lobby.height)
+                goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
+                                          lobby.width * 2, False)
+                goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
+                                          lobby.width * 2, False)
+                goal_board = merge(goal1, goal2, lobby.width, lobby.height)
+                lobby.currentBoard = start_board
+                lobby.goalBoard = goal_board
+                await manager.broadcast(lobby)
+            elif message.type == MessageTypes.CHANGESETTINGS:
+                lobby = lobbies[message.data["code"]]
+                lobby.width = message.data["width"]
+                lobby.height = message.data["height"]
+                lobby.minMarbles = message.data["minMarbles"]
+                lobby.maxMarbles = message.data["maxMarbles"]
+                lobby.turnLimit = message.data["turnLimit"]
+                lobby.availableMarbles = message.data["availableMarbles"]
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        lobby.player2_name = ""
+        lobby.player2_wins = 0
+        start_board = generate_random_board(lobby.width, lobby.height)
+        goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
+                                  lobby.width * 2, False)
+        goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
+                                  lobby.width * 2, False)
+        goal_board = merge(goal1, goal2, lobby.width, lobby.height)
+        lobby.currentBoard = start_board
+        lobby.goalBoard = goal_board
+        await manager.broadcast(lobby)
+
+
+@app.get("/join", tags=["join"])
+async def join(code: int, name: str):
+    if lobbies.keys().__contains__(code):
+        lobby = lobbies[code]
+        if lobby.isFull:
+            return "full"
+        else:
+            lobby.player2_name = name
+            websocket = lobby.socket
+            await manager.connect(websocket)
+            try:
+                while True:
+                    message: Message = await websocket.receive_json()
+                    if message.type == MessageTypes.MOVE:
+                        lobby = lobbies[message.data["code"]]
+                        run(message.data["move"], lobby.currentBoard, message.data["player"], False)
+                        lobby.recentMove = message.data["move"]
+                        await manager.broadcast(lobby)
+                    elif message.Type == MessageTypes.NEWCHALLENGE:
+                        lobby = lobbies[message.data["code"]]
+                        start_board = generate_random_board(lobby.width, lobby.height)
+                        goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
+                                                  lobby.width * 2,
+                                                  False)
+                        goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
+                                                  lobby.width * 2,
+                                                  False)
+                        goal_board = merge(goal1, goal2, lobby.width, lobby.height)
+                        lobby.currentBoard = start_board
+                        lobby.goalBoard = goal_board
+                        await manager.broadcast(lobby)
+                    elif message.type == MessageTypes.CHANGESETTINGS:
+                        lobby = lobbies[message.data["code"]]
+                        lobby.width = message.data["width"]
+                        lobby.height = message.data["height"]
+                        lobby.minMarbles = message.data["minMarbles"]
+                        lobby.maxMarbles = message.data["maxMarbles"]
+                        lobby.turnLimit = message.data["turnLimit"]
+                        lobby.availableMarbles = message.data["availableMarbles"]
+            except WebSocketDisconnect:
+                manager.disconnect(websocket)
+                lobby.player1_name = ""
+                lobby.player1_wins = 0
+                start_board = generate_random_board(lobby.width, lobby.height)
+                goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
+                                          lobby.width * 2, False)
+                goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
+                                          lobby.width * 2, False)
+                goal_board = merge(goal1, goal2, lobby.width, lobby.height)
+                lobby.currentBoard = start_board
+                lobby.goalBoard = goal_board
+                await manager.broadcast(lobby)
+    else:
+        return "not found"
+
+
+@app.post("/create", tags=["create"])
+def createLobby(player: str = "Player 1"):
+    code = random.randint(0, 999999)
+    while lobbies.keys().__contains__(code):
+        code = random.randint(0, 999999)
+    socket = fastapi.WebSocket("ws://localhost:8000/ws/" + code)
+    res = returnChallenge()
+    startBoard = res["start"]
+    goalBoard = res["goal"]
+    lobby = Lobby(player, startBoard, goalBoard, code, socket)
+    lobbies[code] = lobby
+    return lobbies[code]
+
+
+# renew challenge in lobby
+@app.post("/newChallenge", tags=["newChallenge"])
+async def new_challenge(lobby_code: int):
+    lobby = lobbies[lobby_code]
+    start_board = generate_random_board(lobby.width, lobby.height)
+    goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42, lobby.width * 2,
+                              False)
+    goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42, lobby.width * 2,
+                              False)
+    goal_board = merge(goal1, goal2, lobby.width, lobby.height)
+    lobby.currentBoard = start_board
+    lobby.goalBoard = goal_board
+    return lobbies[lobby_code]
+
 
 # request new random board
 @app.get("/randomboard", tags=["randomboard"])
 async def randomBoard(width: int = default_width, height: int = default_height):
     return generate_random_board(width, height)
 
+
+@app.post("/updateSettings", tags="changeSettings")
+async def update_settings(width: int = default_width, height: int = default_height,
+                          minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, ):
+    return
+
+
 # get some fixed board
 @app.get("/staticboard", tags=["staticboard"])
 async def staticBoard():
-    return [[0,0,1,1,0,1,0,0],
-        [1,0,0,1,1,0,1,0],
-        [0,1,0,0,1,0,1,0],
-        [1,0,1,0,1,0,0,1]]
+    return [[0, 0, 1, 1, 0, 1, 0, 0],
+            [1, 0, 0, 1, 1, 0, 1, 0],
+            [0, 1, 0, 0, 1, 0, 1, 0],
+            [1, 0, 1, 0, 1, 0, 0, 1]]
+
 
 @app.post("/challenge", tags=["challenge"])
-async def returnChallenge(mode: Mode, width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
+async def returnChallenge(mode: str = "singlePlayer", width: int = default_width, height: int = default_height,
+                          minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100,
+                          fallthrough: bool = False):
     start_board = generate_random_board(width, height)
-    if mode.modeHandle == "singlePlayer":
-        goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)
-    elif mode.modeHandle == "twoPlayers":
-        goal1 = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
-        goal2 = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
+    if mode == "singlePlayer":
+        goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width * 2,
+                                       fallthrough)
+    elif mode == "twoPlayers":
+        goal1 = generateGoalState(randomBoard, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
+        goal2 = generateGoalState(randomBoard, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
         goal_board = merge(goal1, goal2, width, height)
     return {
         "start": start_board,
@@ -128,8 +338,9 @@ async def returnChallenge(mode: Mode, width: int = default_width, height: int = 
 # request to simulate a throw, return game board and marble states
 @app.post("/interpret/", tags=["interpret"])
 async def runSimulation(gameBoard: SimulationDTO):
-    updatedStates = run(gameBoard.marble_throw, gameBoard.board, player=1,return_intermediate_data = True)
+    updatedStates = run(gameBoard.marble_throw, gameBoard.board, player=1, return_intermediate_data=True)
     return updatedStates
+
 
 # request the available agent options
 @app.get("/agent_options/", tags=["agent_options"])
@@ -137,6 +348,7 @@ async def returnAgentList():
     return {
         "agents": agent_handles
     }
+
 
 # request the solution for a challenge from a specified agent
 @app.post("/solve/{agent_handle}", tags=["solve"])
@@ -158,6 +370,6 @@ async def requestSolution(challenge: ChallengeDTO, agent_handle: str, max_steps:
         # obtain solution of agent
         solution = solve_challenge(agent_dict[agent_handle], obs, max_steps, is_alphazero)
 
-        #print(solution)
+        # print(solution)
 
     return solution
