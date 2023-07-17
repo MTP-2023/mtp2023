@@ -71,17 +71,13 @@ export abstract class AbstractGameMode {
             rectangle.strokeRect(x, y, width, height);
 
             // Start blinking the rectangle
-            const startBlinking = () => {
-                const blinkInterval = setInterval(() => {
-                    rectangle.visible = !rectangle.visible;
-                }, 500); // Change blinking speed here (e.g., 500ms for half-second interval)
+            const blinkInterval = setInterval(() => {
+                rectangle.visible = !rectangle.visible;
+            }, 500); // Change blinking speed here (e.g., 500ms for half-second interval)
 
-                // Save the interval ID and rectangle as properties of the Text object
-                foundText.setData("blinkInterval", blinkInterval);
-                foundText.setData("blinkRectangle", rectangle);
-            }
-            
-            setTimeout(startBlinking, 500);
+            // Save the interval ID and rectangle as properties of the Text object
+            foundText.setData("blinkInterval", blinkInterval);
+            foundText.setData("blinkRectangle", rectangle);
         }
     }
 
