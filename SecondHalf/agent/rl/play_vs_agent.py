@@ -70,7 +70,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumVer2Fix/checkpoint_agentplayerone:v94', type='model')
+artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumVer2Fix/checkpoint_doubletrain07:v0', type='model')
 artifact_dir = artifact.download()
 
 agent = Policy.from_checkpoint(artifact_dir+'/policies/default_policy')
@@ -176,8 +176,8 @@ for leveli in range(noOfLevels):
                 #action = return_move(agent, paramEnv, obs)
 
                 flipped_board = flip_board(deepcopy(current_board))
-                print("FLIPPED BOARD")
-                print(print_board(flipped_board))
+                #print("FLIPPED BOARD")
+                #print(print_board(flipped_board))
                 flipped_goal = flip_board(deepcopy(goal_board))
                 flipped_obs = OrderedDict()
                 flipped_obs["current"] = flipped_board

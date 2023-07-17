@@ -65,7 +65,7 @@ class MultiplayerEnv(GameBoardEnv):
             print(reward)"""
             return obs, reward, done, False, {}
         else:
-            self.current_player *= -1
+            self.current_player = -1
             reward, done = self.reward_module.reward(self)
             if not done:
                 enemyAction = self.getEnemyAction()
@@ -75,7 +75,7 @@ class MultiplayerEnv(GameBoardEnv):
                 #print(self.current_board)
 
                 reward, done = self.reward_module.reward(self)
-            self.current_player *= -1
+            self.current_player = 1
             obs = {
                 "current": self.current_board,
                 "goal": self.goal_board
@@ -98,7 +98,19 @@ class MultiplayerEnv(GameBoardEnv):
         self.n_steps = 0
         self.current_player = 1
 
-        if self.challenge_side == 1:
+
+        if self.challenge_side == 0:
+            self.challenge_side = 1
+            self.current_board = np.array(flip_board(self.training_states[self.training_index]["start_board"]))
+            self.goal_board = np.array(flip_board(self.training_states[self.training_index]["goal_board"]))
+            self.current_player = -1
+            enemyAction = self.getEnemyAction()
+            self.current_board = run(enemyAction, self.current_board, self.current_player)
+            self.current_player *= -1
+
+            # reset env to next challenge
+
+        elif self.challenge_side == 1:
             self.current_player = 1
             self.challenge_side = 0
             self.agent_player = 1
@@ -112,18 +124,6 @@ class MultiplayerEnv(GameBoardEnv):
             self.current_board = np.array(self.training_states[self.training_index]["start_board"])
             self.goal_board = np.array(self.training_states[self.training_index]["goal_board"])
             self.max_steps = self.training_states[self.training_index]["max_turns"]
-
-        elif self.challenge_side == 0:
-            self.challenge_side = 1
-            self.agent_player = -1
-            self.current_board = np.array(flip_board(self.training_states[self.training_index]["start_board"]))
-            self.goal_board = np.array(flip_board(self.training_states[self.training_index]["goal_board"]))
-            enemyAction = self.getEnemyAction()
-            self.current_player = -1
-            self.current_board = run(enemyAction, self.current_board, self.current_player)
-            self.current_player *= -1
-
-            # reset env to next challenge
         obs = {
             "current": self.current_board,
             "goal": self.goal_board
