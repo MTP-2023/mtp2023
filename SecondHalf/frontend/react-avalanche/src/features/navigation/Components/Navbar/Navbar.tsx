@@ -10,6 +10,10 @@ const Navbar = () => {
           <div className="logo">AVALANCHE</div>
         </Link>
 
+        <Link to="/test">
+          <div className="logo2">Project Timeline</div>
+        </Link>
+
         <li className="navbar__item">
           <a href="#aboutAvalanche" className="navbar__link">
             About Avalanche

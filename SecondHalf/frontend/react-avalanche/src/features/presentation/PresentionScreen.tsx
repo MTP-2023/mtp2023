@@ -8,6 +8,7 @@ import sandbox from "../../assets/sandbox.png";
 import challenge from "../../assets/challenge.png";
 import aishowcase from "../../assets/aishowcase.png";
 import video from "../../assets/video/avalanche3.mp4";
+import TestComponent from "../test/TimePage";
 
 const PresentationScreen = () => {
   return (

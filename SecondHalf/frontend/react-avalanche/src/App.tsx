@@ -9,6 +9,7 @@ import { ChallengeProvider } from "./features/challenge/ChallengeContext";
 import AiShowcaseScreen from "./features/aiShowcase/aiShowcaseScreen";
 import PresentionScreen from "./features/presentation/PresentionScreen";
 import GameComponent from "./features/game/GameComponent";
+import TestComponent from "./features/test/TimePage";
 
 function Layout() {
   return (
@@ -26,7 +27,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<PresentionScreen />} />
-          <Route path="game" element={<GameComponent/>} />
+          <Route path="game" element={<GameComponent />} />
+          <Route path="test" element={<TestComponent />} />
           <Route
             path="sandbox"
             element={
