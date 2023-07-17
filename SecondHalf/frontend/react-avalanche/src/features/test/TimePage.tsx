@@ -1,7 +1,7 @@
 import React from "react";
 import timelineElements from "../test/TimeLineElements";
-import { ReactComponent as WorkIcon } from "./work.svg";
-import { ReactComponent as SchoolIcon } from "../../assets/svg/school.svg";
+import WorkSvg from "../../assets/svg/work.svg";
+import SchoolSvg from "../../assets/svg/school.svg";
 
 import {
   VerticalTimeline,
@@ -9,6 +9,10 @@ import {
 } from "react-vertical-timeline-component";
 
 import "react-vertical-timeline-component/style.min.css";
+
+const SVGComponent = () => {
+  return <img src={WorkSvg} alt="work" />;
+};
 
 const TimePage = () => {
   return (
@@ -24,11 +28,10 @@ const TimePage = () => {
 
           return (
             <VerticalTimelineElement
-              key={element.key}
+              key={"hi"}
               date={element.date}
               dateClassName="date"
-              iconStyle={isWorkIcon ? workIconStyles : schoolIconStyles}
-              icon={isWorkIcon ? <WorkIcon /> : <SchoolIcon />}
+              icon={<SVGComponent />}
             >
               <h3 className="vertical-timeline-element-title">
                 {element.title}
@@ -56,3 +59,11 @@ const TimePage = () => {
 };
 
 export default TimePage;
+
+/*
+const TimePage = () => {
+  return <div>Test</div>;
+};
+
+export default TimePage;
+*/
