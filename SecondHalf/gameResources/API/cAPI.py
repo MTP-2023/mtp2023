@@ -31,7 +31,6 @@ import os
 import json
 from simulation.simulate import run
 from ray.rllib.models import ModelCatalog
-import SecondHalf.gameResources.lobby
 
 # initialize agents
 agent_handles = [
@@ -49,7 +48,7 @@ class SessionData(BaseModel):
 backend = InMemoryBackend[UUID, SessionData]()
 
 # register models required for alphazero
-from SecondHalf.agent.rl.train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
+from agent.rl.train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
 
 ModelCatalog.register_custom_model("default_alphazero_model", DefaultModel)
 ModelCatalog.register_custom_model("simpler_alphazero_model", SimplerModel)
@@ -148,7 +147,7 @@ class ConnectionManager:
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
 
-    async def broadcast(self, data: Lobby):
+    async def broadcast(self, data: str):
         for connection in self.active_connections:
             await connection.send_json(data)
 
@@ -156,19 +155,23 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.websocket("/lobbies/{client_id}")
-async def websocket_endpoint_create(player: str):
+@app.websocket("/lobbies/")
+async def websocket_endpoint_create(websocket: WebSocket, player: str):
+    
     code = random.randint(0, 999999)
     while lobbies.keys().__contains__(code):
         code = random.randint(0, 999999)
-    websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + code)
-    res = returnChallenge()
-    startBoard = res["start"]
-    goalBoard = res["goal"]
-    lobby = Lobby(player, startBoard, goalBoard, code, websocket)
+    #websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
+    start_board = generate_random_board(3, 2)
+
+    goal1 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
+    goal2 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
+    goal_board = merge(goal1, goal2, 3, 2)
+    lobby = Lobby(player, start_board, goal_board, code, websocket)
     lobbies[code] = lobby
+    print("connecting", websocket.state)
     await manager.connect(websocket)
-    await manager.broadcast(lobby)
+    await manager.broadcast(lobby.toJSON())
     try:
         while True:
             message: Message = await websocket.receive_json()
@@ -211,15 +214,15 @@ async def websocket_endpoint_create(player: str):
         await manager.broadcast(lobby)
 
 
-@app.get("/join", tags=["join"])
-async def join(code: int, name: str):
+@app.websocket("/join")
+async def join(websocket: WebSocket, code: int, name: str):
     if lobbies.keys().__contains__(code):
         lobby = lobbies[code]
         if lobby.isFull:
             return "full"
         else:
             lobby.player2_name = name
-            websocket = lobby.socket
+            #websocket = lobby.socket
             await manager.connect(websocket)
             try:
                 while True:
@@ -273,10 +276,12 @@ def createLobby(player: str = "Player 1"):
     while lobbies.keys().__contains__(code):
         code = random.randint(0, 999999)
     socket = fastapi.WebSocket("ws://localhost:8000/ws/" + code)
-    res = returnChallenge()
-    startBoard = res["start"]
-    goalBoard = res["goal"]
-    lobby = Lobby(player, startBoard, goalBoard, code, socket)
+    start_board = generate_random_board(3, 2)
+
+    goal1 = generateGoalState(randomBoard, 3, 3, 12, 42, 3 * 2, False)
+    goal2 = generateGoalState(randomBoard, 3, 3, 12, 42, 3 * 2, False)
+    goal_board = merge(goal1, goal2, 3, 2)
+    lobby = Lobby(player, start_board, goal_board, code, socket)
     lobbies[code] = lobby
     return lobbies[code]
 

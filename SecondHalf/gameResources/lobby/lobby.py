@@ -26,8 +26,24 @@ class Lobby:
         self.lobby_code = random.randint(10000, 99999)
         self.currentBoard = startBoard
         self.goalBoard = goalBoard
-        self.socket = socket
         self.lobby_code = code
 
-    def toJson(self):
-        return json.dumps(self)
+    def toJSON(self):
+        return json.dumps({
+            "player1_name" : self.player1_name,
+            "player2_name" : self.player2_name,
+            "player1_wins" : self.player1_wins,
+            "player2_wins" : self.player2_wins,
+            "currentPlayer" : self.currentPlayer,
+            "lobby_code" : self.lobby_code,
+            "currentBoard" : self.currentBoard,
+            "goalBoard" : self.goalBoard,
+            "width" : self.width,
+            "height" : self.height,
+            "minMarbles" : self.minMarbles,
+            "maxMarbles" : self.maxMarbles,
+            "turnLimit" : self.turnLimit,
+            "availableMarbles" : self.availableMarbles,
+            "isFull" : self.isFull,
+            "recentMove" : self.recentMove
+        })
