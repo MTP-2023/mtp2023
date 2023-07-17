@@ -2,37 +2,24 @@ import { Challenge, GameEvaluation, AbstractGameMode } from "./GameModeResources
 import { interpretBoard } from "../Helper/BoardInterpreter";
 import { fetchChallenge } from "../../cAPICalls";
 
-export class SinglePlayerChallenge extends AbstractGameMode {
+export class LocalMultiPlayer extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
-    playerColor = 0xffa500;
+    player1Color = 0xffa500;
+    player2Color = 0x0000ff;
 
     public async initChallenge(): Promise<void> {
-       // load game board state, to be replaced by API calls
-       /*
-       const start = ([
-            [0, 0, 1, 1, 0, 1, 0, 0],
-            [0, 1, 1, 0, 0, 1, 1, 0],
-            [0, 0, 1, 0, 1, 1, 0, 0],
-            [1, 0, 0, 1, 1, 0, 1, 0],
-        ]);
-
-        const goal = interpretBoard([
-            [0, 0, 1, 1, 0, 2, 0, 0],
-            [0, 1, 1, 0, 0, 1, 1, 0],
-            [0, 0, 1, 0, 1, 1, 0, 0],
-            [1, 0, 0, 1, 1, 0, 1, 0],
-        ]);*/
-
-        const challengeData = await fetchChallenge("singlePlayer");
-        console.log(challengeData.goal)
+        const challengeData = await fetchChallenge("twoPlayers");
+        //console.log(challengeData.goal)
         this.challenge = new Challenge(challengeData.start, challengeData.goal);
     }
 
     public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {
         // Check if switch should hold a marble to fulfill the winning requirements
         if (data == 2) {
-            // add indicator, here a semi-transparent, orange rectangle
-            const indicatorRectangle = scene.add.rectangle(x, y, width, height, this.playerColor, 0.5);
+            const indicatorRectangle = scene.add.rectangle(x, y, width, height, this.player1Color, 0.5);
+            indicatorRectangle.setDepth(-1);
+        } else if (data == -2) {
+            const indicatorRectangle = scene.add.rectangle(x, y, width, height, this.player2Color, 0.5);
             indicatorRectangle.setDepth(-1);
         }
     }

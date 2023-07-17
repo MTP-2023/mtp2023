@@ -195,23 +195,6 @@ export default class MainGame extends Phaser.Scene {
 
 		const startBoard =  this.gameMode!.getStartBoard();
 		const goalBoard = this.gameMode!.getGoalBoard();
-		console.log(goalBoard)
-
-		// PLACEHOLDER for GameMode.getChallenge();
-
-		/*
-		// load game board state
-		let example = [
-		[0, 0, 1, 1, 0, 1, 0, 0],
-		[0, 1, 1, 0, 0, 1, 1, 0],
-		[0, 0, 1, 0, 1, 1, 0, 0],
-		[1, 0, 0, 1, 1, 0, 1, 0],
-		];
-
-		let gameBoard = interpretBoard(example);
-		console.log(gameBoard);
-		// DEBUG
-		// gameBoard = [[1,1,1], [1,1,1,1], [1,1,1], [1,1,1,1]]*/
 
 		// initialize vars
 		const camera = this.cameras.main;
@@ -221,8 +204,14 @@ export default class MainGame extends Phaser.Scene {
 		const switchGroup = this.add.container();
 		switchGroup.setName("gameBoard");
 
+		// player UI
+		const playerStatusWidth = boardX * 0.8;
+		const playerStatusHeight = this.imgHeight;
+		const playerStatusX = (boardX - playerStatusWidth) / 2;
+		const playerStatusY = boardY;
+		this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth);
+
 		// button init
-		
 		const buttonGroup = this.add.container();
 		buttonGroup.setName("buttons");
 
@@ -318,7 +307,7 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private dropMarble(col: number, boardX: number): void {
-		console.log(col);
+		console.log("PLAYER TRHOWS MARBLE INTO", col);
 		//const marbleRadius = 13*this.scaleFactor;
 		const switchShape = this.cache.json.get("marble-shape");
 		let x = boardX + this.switchWidth/2 + this.borderWidth + Math.floor((col-1) / 2) * (this.switchWidth + this.borderWidth);
@@ -377,6 +366,7 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private handleMarbleSwitchStop(holdSwitch: Phaser.GameObjects.GameObject): void {
+		console.log("SWITCH HOLDS MARBLE");
 		holdSwitch.setData("marbleStatus", 1);
 	}
 
@@ -404,7 +394,7 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private handleSwitchFlip(flipSwitch: MatterJS.BodyType): void {
-		//console.log("TRIGGERED");
+		console.log("SWITCH FLIP TRIGGERED");
 		this.matter.body.setStatic(flipSwitch, false);
 		flipSwitch.gameObject.setData("marbleStatus", 0);
 		//console.log(flipSwitch.gameObject.getData("id"), flipSwitch.gameObject.getData("marbleStatus"))
@@ -469,7 +459,7 @@ export default class MainGame extends Phaser.Scene {
 		for (const marble of marbles){
 			// Check if the marble is out of bounds
 			if (marble.position.y > this.scale.height - this.marbleRadius) {
-				//console.log("REMOVE MARBLE")
+				console.log("MARBLE FELL OUT OF THE BOARD, REMOVE IT")
 				marble.gameObject.destroy();
 				this.matter.world.remove(marble);
 			}
@@ -492,7 +482,7 @@ export default class MainGame extends Phaser.Scene {
 
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
-			console.log("SIMULATION HAS FINISHED");
+			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
 			this.toggleClickableButtons(true);
 			this.simulationRunning = false;
 			this.interpretGameState();

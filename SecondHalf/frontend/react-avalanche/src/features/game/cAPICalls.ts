@@ -5,7 +5,7 @@ export const fetchChallenge = async (gameMode: string) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            mode: gameMode
+            modeHandle: gameMode
         }),
       });
     return await response.json();

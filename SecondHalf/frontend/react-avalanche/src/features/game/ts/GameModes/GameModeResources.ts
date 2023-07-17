@@ -32,8 +32,6 @@ export abstract class AbstractGameMode {
         }
     };
 
-    //public createPlayerUI(scene: Phaser.Scene): void;
-
     public getStartBoard(): number[][] {
         return this.challenge.startBoard;
     }
@@ -41,6 +39,8 @@ export abstract class AbstractGameMode {
     public getGoalBoard(): number[][] {
         return this.challenge.goalBoard;
     }
+
+    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardWidth: number): void {};
 
     public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {};
 

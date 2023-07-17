@@ -94,6 +94,9 @@ class ChallengeDTO(BaseModel):
     current: list
     goal: list
 
+class Mode(BaseModel):
+    modeHandle: str = "singlePlayer"
+
 # request new random board
 @app.get("/randomboard", tags=["randomboard"])
 async def randomBoard(width: int = default_width, height: int = default_height):
@@ -108,18 +111,18 @@ async def staticBoard():
         [1,0,1,0,1,0,0,1]]
 
 @app.post("/challenge", tags=["challenge"])
-async def returnChallenge(mode: str = "singlePlayer", width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
+async def returnChallenge(mode: Mode, width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
     start_board = generate_random_board(width, height)
-    if mode == "singlePlayer":
+    if mode.modeHandle == "singlePlayer":
         goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)
-    elif mode == "twoPlayers":
-        goal1 = generateGoalState(randomBoard, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
-        goal2 = generateGoalState(randomBoard, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
+    elif mode.modeHandle == "twoPlayers":
+        goal1 = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
+        goal2 = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, 42, width * 2, False)
         goal_board = merge(goal1, goal2, width, height)
     return {
-                "start": start_board,
-                "goal": goal_board
-            }
+        "start": start_board,
+        "goal": goal_board
+    }
 
 
 # request to simulate a throw, return game board and marble states
