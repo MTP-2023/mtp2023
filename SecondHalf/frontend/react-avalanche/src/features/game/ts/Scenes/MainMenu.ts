@@ -33,8 +33,8 @@ export default class MainMenu extends Phaser.Scene {
 
 		// first element is the default mode
 		const gameModeOptions = [
-			{ text: "Single Player", value: "singlePlayerChallenge"},
-			{ text: "Local 1v1", value: "local1v1"}
+			{ text: "Local 1v1", value: "local1v1" },
+			{ text: "Single Player", value: "singlePlayerChallenge" }
 		];
 
 		// set default game mode
@@ -47,7 +47,6 @@ export default class MainMenu extends Phaser.Scene {
             background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 0, 0xffa500),
             icon: this.rexUI.add.roundRectangle(0, 0, 20, 20, 10, 0xffd580),
             text: this.add.text(0, 0, gameModeOptions[0].text, { fontSize: 20, align: "center" }).setFixedSize(this.cameras.main.width/3, 0),
-
             space: {
                 left: 10,
                 right: 10,
@@ -55,9 +54,7 @@ export default class MainMenu extends Phaser.Scene {
                 bottom: 10,
                 icon: 10
             },
-
             options: gameModeOptions,
-
             list: {
 				createBackgroundCallback: () => {
 					return this.rexUI.add.roundRectangle(0, 0, 2, 2, 0, 0x8b4000);
@@ -96,9 +93,7 @@ export default class MainMenu extends Phaser.Scene {
 				},
 			},
 			value: gameModeOptions[0].value
-			
         };
-
 		const dropDownList = this.rexUI.add.dropDownList(dropDownConfig).layout();
 	}
 

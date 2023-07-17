@@ -4,6 +4,7 @@ import { fetchChallenge } from "../../cAPICalls";
 export class LocalMultiPlayer extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
     isLocal: boolean = true;
+    isMultiplayer: boolean = true;
     player1Color = 0xffa500;
     player2Color = 0x0000ff;
     mixedColor = 0x925e6d;
@@ -28,19 +29,20 @@ export class LocalMultiPlayer extends AbstractGameMode {
         }
     }
 
-    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardWidth: number): void {
+    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number): void {
+        const playerNameText1 = scene.add.text(x, y, "Player 1", { fontSize: 30,  color: this.convertToCSS(this.player1Color), align: "center" });
+        playerNameText1.setData("playerText", 1);
+
+        const playerNameText2 = scene.add.text(boardEnd + x, y, "Player 2", { fontSize: 30,  color: this.convertToCSS(this.player2Color), align: "center" });  
+        playerNameText2.setData("playerText", -1);
         
-        /*
-        const playerStatusContainer = scene.add.container(x, y);
-        const playerNameText = scene.add.text(0, 0, "Player 1", { fontSize: 16,  color: this.playerColor.toString()});
-        playerStatusContainer.add(playerNameText);*/
+        this.indicateTurn(1, scene);
     }
 
-    public handleTurnSwitch(playerTurn: number): [ marblePNG: string, turn: number ] {
-        const newTurn = playerTurn * (-1);
+    public getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string {
         let newSpritePNG = "marble";
 
-        switch (newTurn) {
+        switch (playerTurn) {
             case 1:
                 newSpritePNG = "marble-p1";
                 break;
@@ -49,10 +51,7 @@ export class LocalMultiPlayer extends AbstractGameMode {
                 break;
         }
 
-        return [
-            newSpritePNG,
-            newTurn
-        ]
+        return newSpritePNG;
     }
 
     public interpretGameState(board: number[][]): GameEvaluation {
@@ -96,6 +95,6 @@ export class LocalMultiPlayer extends AbstractGameMode {
             }
         }
 
-        return new GameEvaluation(true, finished, winnerList);
+        return new GameEvaluation(finished, winnerList);
     }
 }
