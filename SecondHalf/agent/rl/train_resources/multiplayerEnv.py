@@ -99,6 +99,7 @@ class MultiplayerEnv(GameBoardEnv):
         self.current_player = 1
 
         if self.challenge_side == 1:
+            self.current_player = 1
             self.challenge_side = 0
             self.agent_player = 1
             # iterate over challenges
@@ -117,15 +118,12 @@ class MultiplayerEnv(GameBoardEnv):
             self.agent_player = -1
             self.current_board = np.array(flip_board(self.training_states[self.training_index]["start_board"]))
             self.goal_board = np.array(flip_board(self.training_states[self.training_index]["goal_board"]))
-
-            # reset env to next challenge
-
-
-        if self.agent_player == -1:
             enemyAction = self.getEnemyAction()
+            self.current_player = -1
             self.current_board = run(enemyAction, self.current_board, self.current_player)
             self.current_player *= -1
 
+            # reset env to next challenge
         obs = {
             "current": self.current_board,
             "goal": self.goal_board
