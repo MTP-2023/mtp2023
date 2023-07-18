@@ -13,6 +13,7 @@ export class LocalVsAi extends AbstractGameMode {
     mixedColor = 0x925e6d;
 
     public async initChallenge(): Promise<void> {
+        console.log("here")
         const challengeData = await fetchChallenge("twoPlayers");
         //console.log(challengeData.goal)
         this.challenge = new Challenge(challengeData.start, challengeData.goal);
