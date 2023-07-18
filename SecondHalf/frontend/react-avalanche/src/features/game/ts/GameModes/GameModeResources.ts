@@ -13,10 +13,16 @@ import { interpretBoard } from "../Helper/BoardInterpreter";
 export class Challenge {
     startBoard: number[][];
     goalBoard: number[][];
+    originalGoal: number[][];
+    originalStart: number[][];
 
     constructor(start: number[][], goal: number[][]) {
         this.startBoard = interpretBoard(start);
         this.goalBoard = interpretBoard(goal);
+        this.originalGoal = goal;
+        this.originalStart = start;
+        console.log("ORIGINAL GOAL")
+        console.log(this.originalGoal)
     }
 }
 
@@ -24,6 +30,8 @@ export abstract class AbstractGameMode {
     abstract challenge: Challenge;
     isLocal: boolean = false;
     isMultiplayer: boolean = false;
+    isVsAi: boolean = false;
+    currentBoard: number[][] = [];
 
     // function that obtains the challenge data, i.e. requests a start and goal board from the server, and initializes the class variable 'challenge'
     public initChallenge(): void {
@@ -43,6 +51,18 @@ export abstract class AbstractGameMode {
 
     public getGoalBoard(): number[][] {
         return this.challenge.goalBoard;
+    }
+
+    public getOriginalStartBoard(): number[][] {
+        return this.challenge.startBoard;
+    }
+
+    public getOriginalGoalBoard(): number[][] {
+        return this.challenge.goalBoard;
+    }
+
+    public getCurrentBoard(): number[][]{
+        return this.currentBoard;
     }
 
     public switchTurns(currentPlayer: number, scene: Phaser.Scene): number {

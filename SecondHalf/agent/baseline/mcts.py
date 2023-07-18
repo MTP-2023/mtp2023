@@ -5,11 +5,11 @@ import sys
 
 sys.path.append('../../')
 sys.path.append("../")
-from SecondHalf.gameResources.simulation.simulate import run
+from gameResources.simulation.simulate import run
 import copy
 import random
-from SecondHalf.agent.baseline.node import Node
-from SecondHalf.gameVariants.multiplayer.reward import reward as reward_module
+from agent.baseline.node import Node
+from gameVariants.multiplayer.reward import reward as reward_module
 
 
 class MCTS_Wrapper:

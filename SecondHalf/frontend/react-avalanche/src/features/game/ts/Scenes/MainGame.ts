@@ -3,6 +3,8 @@ import Victory from "./GameEnd";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
+import { LocalVsAi} from "../GameModes/LocalVsAi";
+import { interpretBoardReverse } from "../Helper/BoardInterpreter";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -188,6 +190,9 @@ export default class MainGame extends Phaser.Scene {
 				break;
 			case "local1v1":
 				this.gameMode = new LocalMultiPlayer();
+				break;
+			case "localvsai":
+				this.gameMode = new LocalVsAi();
 				break;
 		}
 
@@ -517,6 +522,9 @@ export default class MainGame extends Phaser.Scene {
 		}
 
 		console.log(switch_orientation, holds_marble);
+		if(this.gameMode.isVsAi) {
+			this.gameMode.currentBoard = interpretBoardReverse(switch_orientation, holds_marble);
+		}
 
 		// PLACEHOLDER FOR GameMode.interpretGameState(board); 
 		// precending logic potentially to be adapted
