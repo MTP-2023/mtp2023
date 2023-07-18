@@ -1,12 +1,12 @@
 let timelineElements = [
   {
     id: 1,
-    title: "Frontend Developer",
-    location: "Dragontail, Ascana",
+    title: "Beginn of Project",
+    location: "Germany, Mannheim",
     description:
-      "Converting data to a graphical interface, through the use of HTML, CSS, and JavaScript, so that users can view and interact with that data.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Imperdiet proin fermentum leo vel orci. Neque ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Nulla facilisi cras fermentum odio eu feugiat pretium nibh ipsum. Pellentesque habitant morbi tristique senectus et netus et. Sagittis orci a scelerisque purus semper. Sit amet est placerat in egestas erat imperdiet sed.",
     buttonText: "View Frontend Projects",
-    date: "August 2016 - present",
+    date: "Feburary 15 - present",
     icon: "work",
   },
   {
@@ -14,7 +14,7 @@ let timelineElements = [
     title: "Backend Developer",
     location: "Skystead, Craonia",
     description:
-      "Working hand-in-hand with front-end developers by providing the outward facing web application elements server-side logic. Creating the logic to make the web app function properly, and accomplishing this through the use of server-side scripting languages.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Imperdiet proin fermentum leo vel orci. Neque ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Nulla facilisi cras fermentum odio eu feugiat pretium nibh ipsum. Pellentesque habitant morbi tristique senectus et netus et. Sagittis orci a scelerisque purus semper. Sit amet est placerat in egestas erat imperdiet sed.",
     buttonText: "View Backend Projects",
     date: "June 2013 - August 2016",
     icon: "work",
@@ -51,6 +51,15 @@ let timelineElements = [
   },
   {
     id: 6,
+    title: "Marble Hills Grammar School",
+    location: "Dragontail, Ascana",
+    description:
+      "Highschool - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec scelerisque sagittis tellus, non ultrices lacus tempus vel.",
+    date: "2003 - 2007",
+    icon: "school",
+  },
+  {
+    id: 7,
     title: "Marble Hills Grammar School",
     location: "Dragontail, Ascana",
     description:

@@ -9,6 +9,7 @@ import challenge from "../../assets/challenge.png";
 import aishowcase from "../../assets/aishowcase.png";
 import video from "../../assets/video/avalanche3.mp4";
 import TestComponent from "../test/TimePage";
+import backgroundImage from "../../assets/Timeline_background.jpg";
 
 const PresentationScreen = () => {
   return (
@@ -48,7 +49,17 @@ const PresentationScreen = () => {
             <div className="section-content reverse">
               <div className="column">
                 <h2>About the Game</h2>
-                <p>Play ya game</p>
+                <p>
+                  {" "}
+                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Imperdiet proin fermentum leo vel orci. Neque ornare aenean
+                  euismod elementum nisi quis eleifend quam adipiscing. Nulla
+                  facilisi cras fermentum odio eu feugiat pretium nibh ipsum.
+                  Pellentesque habitant morbi tristique senectus et netus et.
+                  Sagittis orci a scelerisque purus semper. Sit amet est
+                  placerat in egestas erat imperdiet sed.",
+                </p>
               </div>
               <div className="column">
                 <img src={present} alt="Masters Project" />

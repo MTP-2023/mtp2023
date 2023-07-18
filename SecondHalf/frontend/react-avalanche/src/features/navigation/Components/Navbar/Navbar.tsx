@@ -15,9 +15,9 @@ const Navbar = () => {
         </Link>
 
         <li className="navbar__item">
-          <a href="#aboutAvalanche" className="navbar__link">
+          <Link to="/#aboutAvalanche" className="navbar__link">
             About Avalanche
-          </a>
+          </Link>
         </li>
         <li className="navbar__item">
           <a href="#aboutProject" className="navbar__link">
