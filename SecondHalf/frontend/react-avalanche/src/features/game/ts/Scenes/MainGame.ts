@@ -49,10 +49,7 @@ export default class MainGame extends Phaser.Scene {
 		this.marbleRadius = 13 * this.scaleFactor;
 
 		this.buttonRadius = this.scaleFactor * 10;
-		this.buttonFontSize = this.scaleFactor * 18;
-
-		this.simulationRunning = false;
-		this.counter = 0;
+		this.buttonFontSize = this.scaleFactor * 18
 
 		// set vars for buttons
 
@@ -202,6 +199,9 @@ export default class MainGame extends Phaser.Scene {
 
 		// retrieve challenge
 		await this.gameMode.initChallenge();
+		this.simulationRunning = false;
+		this.counter = 0;
+		this.boardMarbles = 0;
 		this.turn = 1;
 
 		const startBoard =  this.gameMode!.getStartBoard();
@@ -500,6 +500,7 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private checkForCompletedSimulation(): void {
+		console.log("CHECKING COMPLETE");
 		//const bodies = this.matter.world.getAllBodies();
 		//let simulationComplete = true;
 
@@ -526,6 +527,9 @@ export default class MainGame extends Phaser.Scene {
 		}
 
 		const simulationComplete = (marblesStopped == this.boardMarbles);
+		console.log("SIMULATION COMPLETE?", simulationComplete);
+		console.log("NUMBER OF MARBLES STOPPED", marblesStopped);
+		console.log("NUMBER OF BOARDMARBLES", this.boardMarbles);
 
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
@@ -566,6 +570,7 @@ export default class MainGame extends Phaser.Scene {
 		// PLACEHOLDER FOR GameMode.interpretGameState(board); 
 		// precending logic potentially to be adapted
 		const evalResult = this.gameMode!.interpretGameState(holds_marble);
+		console.log("MULTIPLAYER?", this.gameMode.isMultiplayer)
 		if (evalResult.hasWinner) {
 			let gameEndText = '';
 			if (this.gameMode.isMultiplayer) {
@@ -583,6 +588,7 @@ export default class MainGame extends Phaser.Scene {
 
 			this.scene.launch(GameEnd.Name, { displayText: gameEndText });
 		} else if (this.gameMode.isMultiplayer) {
+			console.log("SWITCH TURNS CALLED")
 			this.turn = this.gameMode.switchTurns(this.turn, this);
 			if (this.gameMode.isVsAi && this.turn == -1){
 				this.toggleClickableButtons(false);

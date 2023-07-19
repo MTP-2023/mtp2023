@@ -120,7 +120,7 @@ async def staticBoard():
         [1,0,1,0,1,0,0,1]]
 
 @app.post("/challenge", tags=["challenge"])
-async def returnChallenge(mode: Mode, width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
+async def returnChallenge(mode: Mode, width: int = default_width, height: int = default_height, minMarbles: int = 1, maxMarbles: int = 1, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
     start_board = generate_random_board(width, height)
     if mode.modeHandle == "singlePlayer":
         goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)

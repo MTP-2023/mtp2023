@@ -69,9 +69,12 @@ export abstract class AbstractGameMode {
     }
 
     public switchTurns(currentPlayer: number, scene: Phaser.Scene): number {
+        console.log("SWITCHING TURNS", currentPlayer);
         this.stopIndicator(currentPlayer, scene);
+        console.log("STOPPED INDICATOR");
         const nextPlayer = currentPlayer * (-1);
         this.indicateTurn(nextPlayer, scene);
+        console.log("STARTED INDICATOR", nextPlayer);
         return nextPlayer;
     }
 
