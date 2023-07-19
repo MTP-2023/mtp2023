@@ -13,6 +13,9 @@ const Navbar = () => {
         <Link to="/test">
           <div className="logo2">Project Timeline</div>
         </Link>
+        <Link to="/gallery">
+          <div className="logo2">Gallery</div>
+        </Link>
 
         <li className="navbar__item">
           <Link to="/#aboutAvalanche" className="navbar__link">
