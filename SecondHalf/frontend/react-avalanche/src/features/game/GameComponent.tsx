@@ -12,8 +12,8 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 const GameComponent: React.FC = () => {
   useEffect(() => {
     // Initialize your Phaser game logic here
-    const game_width = 800;
-    const game_height = 600;
+    const game_width = 1600;
+    const game_height = 1200;
 
     const gameConfig: Phaser.Types.Core.GameConfig = {
       width: game_width,

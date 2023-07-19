@@ -2,7 +2,7 @@
   "type": "fromPhysicsEditor",
   "isStatic": false,
   "density": 1,
-  "restitution": 0.05,
+  "restitution": 0.0005,
   "friction": 0.2,
   "frictionAir": 0.01,
   "frictionStatic": 0.3,

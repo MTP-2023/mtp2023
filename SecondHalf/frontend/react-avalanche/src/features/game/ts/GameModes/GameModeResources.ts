@@ -46,7 +46,6 @@ export abstract class AbstractGameMode {
     }
 
     public switchTurns(currentPlayer: number, scene: Phaser.Scene): number {
-        console.log("SWITCH TURNS")
         this.stopIndicator(currentPlayer, scene);
         const nextPlayer = currentPlayer * (-1);
         this.indicateTurn(nextPlayer, scene);
@@ -54,7 +53,6 @@ export abstract class AbstractGameMode {
     }
 
     protected indicateTurn(playerID: number, scene: Phaser.Scene): void {
-        console.log("TURN ON", playerID)
         // Find the Text object based on its custom ID
         const foundText = scene.children.getChildren().find((child) => child.getData("playerText") === playerID);
 
@@ -82,7 +80,6 @@ export abstract class AbstractGameMode {
     }
 
     protected stopIndicator(playerID: number, scene: Phaser.Scene): void {
-        console.log("TURN OFF", playerID)
         // Find the Text object based on its custom ID
         const foundText = scene.children.getChildren().find((child) => child.getData("playerText") === playerID);
         

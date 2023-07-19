@@ -26,7 +26,7 @@ export default class Victory extends Phaser.Scene {
         overlayWidth / 2,
         overlayHeight / 2,
         data.displayText,
-        { fontSize: '48px', color: '#ffffff' }
+        { fontSize: '72px', color: '#ffffff' }
         );
         victoryText.setOrigin(0.5);
 

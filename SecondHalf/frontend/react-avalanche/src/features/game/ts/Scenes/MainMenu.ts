@@ -24,7 +24,7 @@ export default class MainMenu extends Phaser.Scene {
 		const newGameText = this.add.text(this.cameras.main.centerX, textYPosition, "PLAY");
 		newGameText
 			.setFontFamily("monospace")
-			.setFontSize(40)
+			.setFontSize(70)
 			.setFill("#fff")
 			.setAlign("center")
 			.setOrigin(0.5);
@@ -46,7 +46,7 @@ export default class MainMenu extends Phaser.Scene {
 			y: textYPosition * 2,
             background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 0, 0xffa500),
             icon: this.rexUI.add.roundRectangle(0, 0, 20, 20, 10, 0xffd580),
-            text: this.add.text(0, 0, gameModeOptions[0].text, { fontSize: 20, align: "center" }).setFixedSize(this.cameras.main.width/3, 0),
+            text: this.add.text(0, 0, gameModeOptions[0].text, { fontSize: 60, align: "center" }).setFixedSize(this.cameras.main.width/3, 0),
             space: {
                 left: 10,
                 right: 10,
@@ -63,7 +63,7 @@ export default class MainMenu extends Phaser.Scene {
                     const text = option.text;
                     const button = mainMenuScene.rexUI.add.label({
                         background: mainMenuScene.rexUI.add.roundRectangle(0, 0, 2, 2, 0),
-                        text: scene.add.text(0, 0, text, { fontSize: 20 }),
+                        text: scene.add.text(0, 0, text, { fontSize: 50 }),
 						align: "center",
                         space: {
                             left: 10,
