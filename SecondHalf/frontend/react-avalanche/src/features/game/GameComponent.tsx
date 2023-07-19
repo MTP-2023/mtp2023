@@ -27,7 +27,8 @@ const GameComponent: React.FC = () => {
           debug: true,
           velocityIterations: 36,
           positionIterations: 24,
-          constraintIterations: 12
+          constraintIterations: 12,
+          "plugins.attractors": true
         }
       },
       plugins: {

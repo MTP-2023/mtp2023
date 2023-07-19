@@ -15,11 +15,11 @@
   "fixtures": [
     {
       "label": "fixpoint",
-      "isSensor": true,
+      "isSensor": false,
       "circle": {
         "x": 35,
         "y": 45,
-        "radius": 4
+        "radius": 6
       }
     },
     {

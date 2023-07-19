@@ -33,6 +33,7 @@ export default class MainGame extends Phaser.Scene {
 	gameMode: AbstractGameMode;
 	turn: number = 1;
 	boardMarbles: number = 0;
+	//activeAttractors: Map;
 
 	constructor() {
 		super({ key: MainGame.Name });
@@ -180,7 +181,7 @@ export default class MainGame extends Phaser.Scene {
 
 		// set matter options
 		this.matter.world.update60Hz();
-		this.matter.world.setGravity(0, 0.85);
+		this.matter.world.setGravity(0, 0.9);
 
 		// initialize gameMode
 		switch (data.gameModeHandle) {
@@ -201,7 +202,7 @@ export default class MainGame extends Phaser.Scene {
 		// initialize vars
 		const camera = this.cameras.main;
 		const boardX = (this.scale.width - this.boardWidth) / 2;
-		const boardY = camera.worldView.y + 90 * this.scaleFactor;
+		const boardY = camera.worldView.y + 120 * this.scaleFactor;
 		const buttonStartY = camera.worldView.y + 30 * this.scaleFactor;
 		const switchGroup = this.add.container();
 		switchGroup.setName("gameBoard");
@@ -294,6 +295,8 @@ export default class MainGame extends Phaser.Scene {
 					this.matter.applyForce(data.body, data.vector);
 					this.data.remove("impulse");
 				}*/
+
+				//this.applyRepulsiveForceOnMarbles();
 				
 				this.checkForMarbleDeletion();
 			}
@@ -301,11 +304,13 @@ export default class MainGame extends Phaser.Scene {
   
 
 		this.matter.world.on("afterupdate", () => {
-			if (this.simulationRunning){
-				const buggedCollisionsToHandle = this.checkIfSwitchFlipRequired();
-				if (!buggedCollisionsToHandle) this.checkForCompletedSimulation();
+			if (this.simulationRunning) {
+				const flipSwitchsToHandle = this.checkIfSwitchFlipRequired();
+				if (!flipSwitchsToHandle) this.checkForCompletedSimulation();
 			} 
 		});
+
+		//this.activeAttractors = new Map();
 	}
 
 	private dropMarble(col: number, boardX: number): void {
@@ -322,12 +327,15 @@ export default class MainGame extends Phaser.Scene {
 		}
 		let marbleSprite = this.matter.add.sprite(x, y, marblePNG, undefined, { shape: switchShape });
 		marbleSprite.setMass(5);
-		let a = 0.95;
+		let a = 0.98;
 		marbleSprite.setDisplaySize(2*this.marbleRadius*a, 2*this.marbleRadius*a);
 		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
 		this.counter = this.counter + 1;
 		marbleSprite.setData("id", this.counter);
 		marbleSprite.setData("player", this.turn);
+		marbleSprite.setData("activeRow", -1);
+
+
 		this.toggleClickableButtons(false);
 		this.simulationRunning = true;
 	}
@@ -375,24 +383,31 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private handleMarbleSwitchStop(holdSwitch: Phaser.GameObjects.GameObject, marblePlayer: number): void {
-		console.log("SWITCH HOLDS MARBLE", marblePlayer);
+		//console.log("SWITCH HOLDS MARBLE", marblePlayer);
 		holdSwitch.setData("marbleStatus", marblePlayer * 2);
 	}
 
 	private checkIfSwitchFlipRequired(): boolean {
 		let result = false;
-		const bugDetectors = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "bugDetector");
+		const actionDetectors = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "bugDetector");
 		const marbles = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "marble");
 
 		for (const marble of marbles) {
-			for (const bugDetector of bugDetectors) {
-				const isColliding = this.matter.overlap(marble, [bugDetector]);
+			for (const actionDetector of actionDetectors) {
+				const isColliding = this.matter.overlap(marble, [actionDetector]);
 
 				if (isColliding){
-					//console.log("BUGGED COLLISION REGISTERED")
-					if (!bugDetector.gameObject.getData("rotating")) {
-						bugDetector.gameObject.setData("rotating", true);
-						this.handleSwitchFlip(bugDetector.gameObject.body);
+					const currentMarbleRow =  marble.gameObject.getData("activeRow");
+					const isSameRow = currentMarbleRow.toString() == actionDetector.gameObject.getData("id")[0];
+					if (currentMarbleRow < (actionDetector.gameObject.getData("id")[0] as number)) {
+						marble.gameObject.setData("activeRow", currentMarbleRow + 1);
+						console.log("marble moved to row", currentMarbleRow + 1);
+					}
+					if (isSameRow && !actionDetector.gameObject.getData("rotating")) {
+						console.log("MARBLE TAIL COLLISION; START ROTATION", isSameRow)
+						marble.gameObject.setData("activeRow", currentMarbleRow + 1);
+						actionDetector.gameObject.setData("rotating", true);
+						this.handleSwitchFlip(actionDetector.gameObject.body);
 					}
 					result = true;
 				}
@@ -403,7 +418,7 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private handleSwitchFlip(flipSwitch: MatterJS.BodyType): void {
-		console.log("SWITCH FLIP TRIGGERED");
+		//console.log("SWITCH FLIP TRIGGERED");
 		this.matter.body.setStatic(flipSwitch, false);
 		flipSwitch.gameObject.setData("marbleStatus", 0);
 		//console.log(flipSwitch.gameObject.getData("id"), flipSwitch.gameObject.getData("marbleStatus"))
@@ -417,7 +432,9 @@ export default class MainGame extends Phaser.Scene {
 
 		// use steps as additional check to allow switch to start rotation
 	  	let steps = 0;
+		let currentAngle = flipSwitch.angle;
 		
+		/*
 		const updateRotation = () => {
 			if (!flipSwitch.gameObject.getData("rotating")) return;
 			this.matter.body.rotate(flipSwitch, rotationSpeed); // Rotate the switch
@@ -437,6 +454,37 @@ export default class MainGame extends Phaser.Scene {
 			} else {
 				steps += 1;
 			  	requestAnimationFrame(updateRotation);
+			}
+		};*/
+
+		
+		const updateRotation = () => {
+			if (!flipSwitch.gameObject.getData("rotating")) return;
+		
+			// Calculate the new rotation angle based on the current angle and rotation speed
+			const newAngle = currentAngle + rotationSpeed;
+			this.matter.body.setAngle(flipSwitch, newAngle, true); // Set the new angle
+		
+			// Update the current angle with the new angle
+			currentAngle = newAngle;
+		
+			// Filter the bodies based on their label property
+			const borders = this.matter.world.getAllBodies().filter(
+			  (body: MatterJS.BodyType) => body.label === "border"
+			);
+		
+			// Check for collision with a border
+			const collidesWithBorder =
+			  this.matter.query.region(borders, flipSwitch.bounds).length > 0;
+		
+			if (collidesWithBorder) {
+			  const newTilt = sign < 0 ? "left" : "right";
+			  flipSwitch.gameObject.setData("tilt", newTilt);
+			  flipSwitch.gameObject.setData("rotating", false);
+			  this.matter.body.setStatic(flipSwitch, true);
+			  console.log("Rotation complete", flipSwitch.gameObject.getData("id"));
+			} else {
+			  requestAnimationFrame(updateRotation);
 			}
 		};
 
@@ -465,12 +513,60 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.applyForceFromPosition(fallingMarble, fallingMarble.position, 0.1, angle);
 	}*/
 
+	/*private applyRepulsiveForceOnMarbles(): void {
+		// Loop through each marble and apply the anti-magnetic force to the others
+		const marbles = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "marble");
+		const antiMagneticRange = 100;
+		marbles.forEach((marbleA) => {
+			marbles.forEach((marbleB) => {
+				if (marbleA !== marbleB) {
+					// Calculate the distance between the two marbles
+					const distance = Phaser.Math.Distance.Between(
+						marbleA.position.x,
+						marbleA.position.y,
+						marbleB.position.x,
+						marbleB.position.y
+					);
+
+					// If the distance is within the range, apply an anti-magnetic force
+					if (distance < antiMagneticRange) {
+						// Generate a unique identifier for this pair of marbles
+						const key = `${marbleA.id}-${marbleB.id}`;
+
+						// Check if an attractor already exists for this pair
+						if (!this.activeAttractors.has(key)) {
+							const antiMagneticForce = 0.001; // Adjust the strength of the force as needed
+							const attractor = this.matter.add.attractor(
+								marbleA.x,
+								marbleA.y,
+								antiMagneticRange,
+								antiMagneticForce
+							);
+							this.matter.body.addAttractor(marbleB, attractor);
+
+							// Store the attractor in the Map with the unique key
+							activeAttractors.set(key, attractor);
+						}
+					} else {
+						// If the distance is outside the range, check if there is an attractor for this pair and remove it
+						const key = `${marbleA.id}-${marbleB.id}`;
+						if (activeAttractors.has(key)) {
+							const attractor = activeAttractors.get(key);
+							this.matter.body.removeAttractor(attractor.target, attractor);
+							activeAttractors.delete(key);
+						}
+					}
+				}
+			});
+		});
+	}*/
+
 	private checkForMarbleDeletion(): void {
 		const marbles = this.matter.world.getAllBodies().filter((body: MatterJS.BodyType) => body.label === "marble");
 		for (const marble of marbles){
 			// Check if the marble is out of bounds
 			if (marble.position.y > this.scale.height - this.marbleRadius) {
-				console.log("MARBLE FELL OUT OF THE BOARD, REMOVE IT")
+				//console.log("MARBLE FELL OUT OF THE BOARD, REMOVE IT")
 				marble.gameObject.destroy();
 				this.matter.world.remove(marble);
 				this.boardMarbles -= 1;
@@ -479,20 +575,27 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private checkForCompletedSimulation(): void {
-		//const bodies = this.matter.world.getAllBodies();
-		//let simulationComplete = true;
+		const bodies = this.matter.world.getAllBodies();
+		let marblesMoving = false;
 
 		// Check if any bodies are still moving
-		/* OUTDATED
 		for (const body of bodies) {
+			switch (body.label) {
+				case "marble":
+					const velocityMagnitude = this.getVelocityMagnitude(body);
+					if (velocityMagnitude < this.movementThreshold) continue;
+					marblesMoving = true;
+					break;
+			}
 			if (["switch", "marble"].includes(body.label)) {
 				const velocityMagnitude = this.getVelocityMagnitude(body);
 				if (velocityMagnitude < this.movementThreshold) continue;
-				simulationComplete = false;
+				marblesMoving = true;
 				break;
 			}
-		}*/
+		}
 
+		/*
 		const switches = this.matter.world.getAllBodies()
 		.filter((body: MatterJS.BodyType) => body.label === "switch")
 		.map((body: MatterJS.BodyType) => body.gameObject);
@@ -502,9 +605,9 @@ export default class MainGame extends Phaser.Scene {
 			if ([-2,2].includes(gameSwitch.getData("marbleStatus"))) {
 				marblesStopped += 1;
 			}
-		}
+		}*/
 
-		const simulationComplete = (marblesStopped == this.boardMarbles);
+		const simulationComplete = !marblesMoving //&& (marblesStopped == this.boardMarbles);
 
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
@@ -535,7 +638,7 @@ export default class MainGame extends Phaser.Scene {
 			}
 		}
 
-		console.log(switch_orientation, holds_marble);
+		//console.log(switch_orientation, holds_marble);
 
 		// PLACEHOLDER FOR GameMode.interpretGameState(board); 
 		// precending logic potentially to be adapted
