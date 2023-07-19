@@ -1,12 +1,11 @@
 import { Challenge, GameEvaluation, AbstractGameMode } from "./GameModeResources";
-import { fetchChallenge } from "../../cAPICalls";
+import {agentMove, fetchChallenge} from "../../cAPICalls";
 
 export class LocalMultiPlayer extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
     isLocal: boolean = true;
     isMultiplayer: boolean = true;
-    player1Color = 0xffa500;
-    player2Color = 0x0000ff;
+    isVsAi: boolean = false;
     mixedColor = 0x925e6d;
 
     public async initChallenge(): Promise<void> {
@@ -27,16 +26,6 @@ export class LocalMultiPlayer extends AbstractGameMode {
             const indicatorRectangle = scene.add.rectangle(x, y, width, height, this.mixedColor, 0.5);
             indicatorRectangle.setDepth(-3);
         }
-    }
-
-    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number): void {
-        const playerNameText1 = scene.add.text(x, y, "Player 1", { fontSize: 30,  color: this.convertToCSS(this.player1Color), align: "center" });
-        playerNameText1.setData("playerText", 1);
-
-        const playerNameText2 = scene.add.text(boardEnd + x, y, "Player 2", { fontSize: 30,  color: this.convertToCSS(this.player2Color), align: "center" });  
-        playerNameText2.setData("playerText", -1);
-        
-        this.indicateTurn(1, scene);
     }
 
     public getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string {
@@ -96,5 +85,9 @@ export class LocalMultiPlayer extends AbstractGameMode {
         }
 
         return new GameEvaluation(finished, winnerList);
+    }
+
+    public async getAgentMove(): Promise<number> {
+        return 0;
     }
 }

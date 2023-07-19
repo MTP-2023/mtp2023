@@ -215,8 +215,20 @@ export default class MainGame extends Phaser.Scene {
 		const playerStatusHeight = this.imgHeight;
 		const playerStatusX = (boardX - playerStatusWidth) / 2;
 		const playerStatusY = camera.worldView.y + 30 * this.scaleFactor;
-		this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth+boardX);
 
+		if(this.gameMode.isMultiplayer) {
+			let player1Text = "Player 1";
+			let player2Text = "Player 2";
+			if(!this.gameMode.isLocal) {
+				player1Text = "You";
+				player2Text = "Enemy";
+			}
+			if(this.gameMode.isVsAi){
+				player1Text = "You";
+				player2Text = "AI";
+			}
+			this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth + boardX, player1Text, player2Text);
+		}
 		// button init
 		const buttonGroup = this.add.container();
 		buttonGroup.setName("buttons");
@@ -496,7 +508,7 @@ export default class MainGame extends Phaser.Scene {
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
 			this.interpretGameState();
-			if(this.turn==1) {
+			if(this.turn==1 || !this.gameMode.isVsAi) {
 				this.toggleClickableButtons(true);
 			}
 			this.simulationRunning = false;

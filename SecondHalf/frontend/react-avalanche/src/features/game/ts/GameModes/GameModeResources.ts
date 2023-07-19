@@ -32,6 +32,8 @@ export abstract class AbstractGameMode {
     isMultiplayer: boolean = false;
     isVsAi: boolean = false;
     currentBoard: number[][] = [];
+    player1Color = 0xffa500;
+    player2Color = 0x0000ff;
 
     // function that obtains the challenge data, i.e. requests a start and goal board from the server, and initializes the class variable 'challenge'
     public initChallenge(): void {
@@ -121,9 +123,17 @@ export abstract class AbstractGameMode {
         }
     }
 
-    public abstract getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string;
+    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number, player1Text: string, player2Text: string): void {
+        const playerNameText1 = scene.add.text(x, y, player1Text, { fontSize: 30,  color: this.convertToCSS(this.player1Color), align: "center" });
+        playerNameText1.setData("playerText", 1);
 
-    public abstract createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardWidth: number): void;
+        const playerNameText2 = scene.add.text(boardEnd + x, y, player2Text, { fontSize: 30,  color: this.convertToCSS(this.player2Color), align: "center" });
+        playerNameText2.setData("playerText", -1);
+
+        this.indicateTurn(1, scene);
+    }
+
+    public abstract getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string;
 
     public abstract addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void;
 
