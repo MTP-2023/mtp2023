@@ -1,7 +1,8 @@
 import React from "react";
 import "./TimePage.css";
+
 import timelineElements from "../test/TimeLineElements";
-import WorkSvg from "../../assets/svg/work.svg";
+import WorkSvg from "../../assets/aishowcase.png";
 import SkiisSvg from "../../assets/svg/snow-flake-com.svg";
 import SkiPng from "../../assets/ski-svgrepo-com.png";
 import SchoolSvg from "../../assets/svg/school.svg";
