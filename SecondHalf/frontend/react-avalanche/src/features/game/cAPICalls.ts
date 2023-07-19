@@ -10,3 +10,18 @@ export const fetchChallenge = async (gameMode: string) => {
       });
     return await response.json();
 };
+
+export const agentMove = async (current: number[][], goal: number[][], player: number) => {
+    const response = await fetch("http://127.0.0.1:8000/agent_move/MultiPlayer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            current: current,
+            goal: goal,
+            player: player
+        }),
+      });
+    return await response.json();
+};

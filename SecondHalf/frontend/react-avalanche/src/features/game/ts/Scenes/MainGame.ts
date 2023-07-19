@@ -3,6 +3,8 @@ import Victory from "./GameEnd";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
+import { LocalVsAi} from "../GameModes/LocalVsAi";
+import { interpretBoardReverse } from "../Helper/BoardInterpreter";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -190,6 +192,9 @@ export default class MainGame extends Phaser.Scene {
 			case "local1v1":
 				this.gameMode = new LocalMultiPlayer();
 				break;
+			case "localvsai":
+				this.gameMode = new LocalVsAi();
+				break;
 		}
 
 		// retrieve challenge
@@ -211,8 +216,20 @@ export default class MainGame extends Phaser.Scene {
 		const playerStatusHeight = this.imgHeight;
 		const playerStatusX = (boardX - playerStatusWidth) / 2;
 		const playerStatusY = camera.worldView.y + 30 * this.scaleFactor;
-		this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth+boardX);
 
+		if(this.gameMode.isMultiplayer) {
+			let player1Text = "Player 1";
+			let player2Text = "Player 2";
+			if(!this.gameMode.isLocal) {
+				player1Text = "You";
+				player2Text = "Enemy";
+			}
+			if(this.gameMode.isVsAi){
+				player1Text = "You";
+				player2Text = "AI";
+			}
+			this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth + boardX, player1Text, player2Text);
+		}
 		// button init
 		const buttonGroup = this.add.container();
 		buttonGroup.setName("buttons");
@@ -304,7 +321,7 @@ export default class MainGame extends Phaser.Scene {
 			if (this.simulationRunning){
 				const buggedCollisionsToHandle = this.checkIfSwitchFlipRequired();
 				if (!buggedCollisionsToHandle) this.checkForCompletedSimulation();
-			} 
+			}
 		});
 	}
 
@@ -509,13 +526,15 @@ export default class MainGame extends Phaser.Scene {
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
-			this.toggleClickableButtons(true);
-			this.simulationRunning = false;
 			this.interpretGameState();
+			if(this.turn==1 || !this.gameMode.isVsAi) {
+				this.toggleClickableButtons(true);
+			}
+			this.simulationRunning = false;
 		}
 	}
 
-	private interpretGameState(): void {
+	private async interpretGameState(): Promise<void> {
 		// Filter the bodies based on their label property
 		const switches = this.matter.world.getAllBodies()
 		.filter((body: MatterJS.BodyType) => body.label === "switch")
@@ -536,6 +555,9 @@ export default class MainGame extends Phaser.Scene {
 		}
 
 		console.log(switch_orientation, holds_marble);
+		if(this.gameMode.isVsAi) {
+			this.gameMode.currentBoard = interpretBoardReverse(switch_orientation, holds_marble);
+		}
 
 		// PLACEHOLDER FOR GameMode.interpretGameState(board); 
 		// precending logic potentially to be adapted
@@ -558,6 +580,13 @@ export default class MainGame extends Phaser.Scene {
 			this.scene.launch(Victory.Name, { displayText: gameEndText });
 		} else if (this.gameMode.isMultiplayer) {
 			this.turn = this.gameMode.switchTurns(this.turn, this);
+			if (this.gameMode.isVsAi && this.turn == -1){
+				this.toggleClickableButtons(false);
+				this.simulationRunning = false;
+				await new Promise(f => setTimeout(f, 500));
+				let agentTurn = await this.gameMode.getAgentMove()+1;
+				this.dropMarble(agentTurn, (this.scale.width - this.boardWidth) / 2);
+			}
 		}
 	}
 

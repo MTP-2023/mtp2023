@@ -1,17 +1,23 @@
 import { Challenge, GameEvaluation, AbstractGameMode } from "./GameModeResources";
-import {agentMove, fetchChallenge} from "../../cAPICalls";
+import { fetchChallenge } from "../../cAPICalls";
+import { agentMove } from "../../cAPICalls";
 
-export class LocalMultiPlayer extends AbstractGameMode {
+export class LocalVsAi extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
     isLocal: boolean = true;
     isMultiplayer: boolean = true;
-    isVsAi: boolean = false;
+    isVsAi: boolean = true;
+    aiPlayer: number = -1;
+    player1Color = 0xffa500;
+    player2Color = 0x0000ff;
     mixedColor = 0x925e6d;
 
     public async initChallenge(): Promise<void> {
+        console.log("here")
         const challengeData = await fetchChallenge("twoPlayers");
         //console.log(challengeData.goal)
         this.challenge = new Challenge(challengeData.start, challengeData.goal);
+        this.currentBoard = this.challenge.originalStart;
     }
 
     public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {
@@ -56,7 +62,7 @@ export class LocalMultiPlayer extends AbstractGameMode {
                 "handle": 2
             }
         ];
-        
+
         const flattenedGoal = this.challenge.goalBoard.flat();
         const flattenedBoard = board.flat();
 
@@ -87,7 +93,15 @@ export class LocalMultiPlayer extends AbstractGameMode {
         return new GameEvaluation(finished, winnerList);
     }
 
+    public getOriginalStartBoard(): number[][] {
+        return this.challenge.originalStart;
+    }
+
+    public getOriginalGoalBoard(): number[][] {
+        return this.challenge.originalGoal;
+    }
+
     public async getAgentMove(): Promise<number> {
-        return 0;
+        return await agentMove(this.currentBoard, this.getOriginalGoalBoard(), this.aiPlayer);
     }
 }

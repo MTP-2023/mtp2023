@@ -34,7 +34,8 @@ export default class MainMenu extends Phaser.Scene {
 		// first element is the default mode
 		const gameModeOptions = [
 			{ text: "Local 1v1", value: "local1v1" },
-			{ text: "Single Player", value: "singlePlayerChallenge" }
+			{ text: "Single Player", value: "singlePlayerChallenge" },
+			{ text: "Local vs AI", value: "localvsai"}
 		];
 
 		// set default game mode
