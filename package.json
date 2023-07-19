@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "react-image-gallery": "^1.2.12",
-    "react-router-dom": "^6.14.1",
-    "react-router-hash-link": "^2.4.3",
-    "react-vertical-timeline-component": "^3.6.0"
-  }
-}
