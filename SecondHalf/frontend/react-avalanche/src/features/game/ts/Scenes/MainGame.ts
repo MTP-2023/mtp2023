@@ -12,32 +12,33 @@ export default class MainGame extends Phaser.Scene {
 	public static Name = "MainGame";
 
 	// global var definition
-	scaleFactor: number = 0.8;
+	scaleFactor: number;
 	switchWidth: number;
 	imgHeight: number;
 	borderWidth: number;
 	borderExtraHeight: number;
 	switchSpacingY: number;
 	boardWidth: number;
-	rowCount: Array<number> = [3, 4, 3, 4];
+	rowCount: Array<number>;
 	buttonRadius: number;
 	buttonFontSize: number;
 	simulationRunning: boolean;
 	counter: number;
 	marbleRadius: number;
-	movementThreshold: number = 0.01;
-	switchRotationVelocity: number = 0.04;
+	movementThreshold: number;
+	switchRotationVelocity: number;
 	buttonColor: number;
 	buttonOutlineColor: number;
 	buttonTextColor: string;
 	buttonTextStyle: { fontSize: string; fill: any; };
 	gameMode: AbstractGameMode;
-	turn: number = 1;
+	turn: number = -1;
 
 	constructor() {
 		super({ key: MainGame.Name });
 		// CONST VARS FOR INITIALIZATION
 		// set vars for images
+		this.scaleFactor = 0.8;
 		this.switchWidth = this.scaleFactor * 70;
 		this.imgHeight = this.scaleFactor * 104;
 		this.borderWidth = this.scaleFactor * 5;
@@ -46,11 +47,15 @@ export default class MainGame extends Phaser.Scene {
 		this.boardWidth = 4 * this.switchWidth + 5 * this.borderWidth;
 		this.marbleRadius = 13 * this.scaleFactor;
 
+		this.rowCount = [3, 4, 3, 4]; // Define the number of switches per row.
+
 		this.buttonRadius = this.scaleFactor * 10;
 		this.buttonFontSize = this.scaleFactor * 18;
 
 		this.simulationRunning = false;
 		this.counter = 0;
+		this.movementThreshold = 0.02;
+		this.switchRotationVelocity = 0.04;
 
 		// set vars for buttons
 
@@ -115,7 +120,7 @@ export default class MainGame extends Phaser.Scene {
 		button.on('pointerdown', () => {
 		  this.dropMarble(content, boardX);
 		});
-	  
+	    
 		// Clean up the circle graphics object
 		circle.destroy();
 
@@ -183,6 +188,7 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.world.setGravity(0, 0.85);
 
 		// initialize gameMode
+		console.log(data.gameModeHandle)
 		switch (data.gameModeHandle) {
 			case "singlePlayerChallenge":
 				this.gameMode = new SinglePlayerChallenge();
@@ -213,8 +219,8 @@ export default class MainGame extends Phaser.Scene {
 		const playerStatusWidth = boardX * 0.8;
 		const playerStatusHeight = this.imgHeight;
 		const playerStatusX = (boardX - playerStatusWidth) / 2;
-		const playerStatusY = camera.worldView.y + 30 * this.scaleFactor;
-		this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth+boardX);
+		const playerStatusY = boardY;
+		this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth);
 
 		// button init
 		const buttonGroup = this.add.container();
@@ -283,6 +289,14 @@ export default class MainGame extends Phaser.Scene {
 			this.handleCollisions(bodyA, bodyB);
 		});
 
+		//Event Handler
+		if(!this.gameMode.isLocal && this.gameMode.isMultiplayer){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			onlinegame.gameOverEvent.on("gameOver", this.handleGameOver, this);
+			onlinegame.moveEvent.on("move", this.handleMove, this);
+		}
+		
+
 		// Register the beforeupdate event
 		this.matter.world.on("beforeupdate", () => {
 			//console.log("BEFOREUPDATE")
@@ -310,6 +324,19 @@ export default class MainGame extends Phaser.Scene {
 			} 
 		});
 	}
+
+	 // Event handler for the "gameOverEvent"
+	 private handleGameOver() {
+		// Game over logic here
+		console.log("Game Over!");
+	  }
+	  // Event handler for the "scoreUpdateEvent"
+	  private handleMove(col: number) {
+		// Score update logic here
+		const boardX = (this.scale.width - this.boardWidth) / 2;
+		this.dropMarble(col, boardX);
+	  }
+	
 
 	private dropMarble(col: number, boardX: number): void {
 		console.log("PLAYER TRHOWS MARBLE INTO", col);
@@ -542,7 +569,6 @@ export default class MainGame extends Phaser.Scene {
 
 			this.scene.launch(Victory.Name, { displayText: gameEndText });
 		} else if (this.gameMode.isMultiplayer) {
-			console.log("BEFORE",this.turn)
 			this.turn = this.gameMode.switchTurns(this.turn, this);
 		}
 	}

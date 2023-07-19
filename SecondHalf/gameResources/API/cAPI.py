@@ -158,18 +158,15 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.websocket("/lobbies/create/")
-async def websocket_endpoint_create(websocket: WebSocket, player: str):
-    code = random.randint(0, 999999)
-    while lobbies.keys().__contains__(code):
-        code = random.randint(0, 999999)
+@app.websocket("/lobbies/{code:int}")
+async def websocket_endpoint_create(code: int, websocket: WebSocket, player: str):
     # websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
     start_board = generate_random_board(3, 2)
 
     goal1 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
     goal2 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
     goal_board = merge(goal1, goal2, 3, 2)
-    lobby = Lobby(player, start_board, goal_board, code, websocket)
+    lobby = Lobby(player, start_board, goal_board, code, websocket, "")
     lobbies[code] = lobby
     print("connecting", websocket.state)
     await manager.connect(websocket)
@@ -216,7 +213,11 @@ async def websocket_endpoint_create(websocket: WebSocket, player: str):
         await manager.broadcast(lobby)
 
 
-@app.websocket("/join")
+@app.post("/checkCode", tags=["checkCode"])
+async def checkCode(code: int):
+    return False
+
+@app.websocket("/lobbies/{code:int}")
 async def join(websocket: WebSocket, code: int, name: str):
     if lobbies.keys().__contains__(code):
         lobby = lobbies[code]
@@ -270,37 +271,6 @@ async def join(websocket: WebSocket, code: int, name: str):
                 await manager.broadcast(lobby)
     else:
         return "not found"
-
-
-@app.post("/create", tags=["create"])
-def createLobby(player: str = "Player 1"):
-    code = random.randint(0, 999999)
-    while lobbies.keys().__contains__(code):
-        code = random.randint(0, 999999)
-    socket = fastapi.WebSocket("ws://localhost:8000/ws/" + code)
-    start_board = generate_random_board(3, 2)
-
-    goal1 = generateGoalState(randomBoard, 3, 3, 12, 42, 3 * 2, False)
-    goal2 = generateGoalState(randomBoard, 3, 3, 12, 42, 3 * 2, False)
-    goal_board = merge(goal1, goal2, 3, 2)
-    lobby = Lobby(player, start_board, goal_board, code, socket)
-    lobbies[code] = lobby
-    return lobbies[code]
-
-
-# renew challenge in lobby
-@app.post("/newChallenge", tags=["newChallenge"])
-async def new_challenge(lobby_code: int):
-    lobby = lobbies[lobby_code]
-    start_board = generate_random_board(lobby.width, lobby.height)
-    goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42, lobby.width * 2,
-                              False)
-    goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42, lobby.width * 2,
-                              False)
-    goal_board = merge(goal1, goal2, lobby.width, lobby.height)
-    lobby.currentBoard = start_board
-    lobby.goalBoard = goal_board
-    return lobbies[lobby_code]
 
 
 # request new random board

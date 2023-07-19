@@ -1,6 +1,7 @@
-import { Challenge, GameEvaluation, AbstractGameMode } from "./GameModeResources";
-import { fetchChallenge } from "../../cAPICalls";
+import { Challenge, GameEvaluation, AbstractGameMode, MessageAvalanche, MessageType } from "./GameModeResources";
+import { checkCode } from "../../cAPICalls";
 import { Lobby } from "./GameModeResources";
+import EventEmitter from "phaser3-rex-plugins/plugins/utils/eventemitter/EventEmitter";
 
 export class OnlineMultiPlayer extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
@@ -8,29 +9,67 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     player1Color = 0xffa500;
     player2Color = 0x0000ff;
     mixedColor = 0x925e6d;
+    ws: WebSocket;
+    public gameOverEvent: EventEmitter;
+    public moveEvent: EventEmitter;
+
+    public constructor(){
+        super();
+        this.gameOverEvent = new EventEmitter();
+        this.moveEvent = new EventEmitter();
+    }
+
+    private generateRandomSixDigitNumber(): number {
+        const min = 100000;
+        const max = 999999;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    
+    public async create(): Promise<void>{
+        
+    }
+
+    gameOver() {
+        // Emit the custom event when the game is over
+        this.gameOverEvent.emit("");
+      }
+      updateScore(score: number) {
+        // Emit the custom event when the score is updated
+        this.moveEvent.emit(score.toString());
+      }
 
     public async initChallenge(): Promise<void> {
-        // client.ts
-        const ws = new WebSocket("ws://localhost:8000/lobbies/create/?player=shadowwizardmoneygang");
-        ws.onopen = () => {
+        var code = this.generateRandomSixDigitNumber();
+        var existing = false;
+        while(existing){
+            existing = await checkCode(code);
+            code = this.generateRandomSixDigitNumber();
+        }
+        console.log(code);
+        console.log("ws://localhost:8000/lobbies/"+ code.toString() + "/?player=shadowwizardmoneygang")
+        this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "/?player=shadowwizardmoneygang");
+        this.ws.onopen = () => {
           console.log("WebSocket is connected..");
-          ws.send("Hello, server!");
+          this.ws.send("Hello, server!");   
         };
-        ws.onmessage = (event) => {
+        this.ws.onmessage = (event) => {
           console.log("Received message from server: ", event.data);
           var receivedData = JSON.parse(event.data);
           var lobby: Lobby = JSON.parse(receivedData);
-          this.challenge = new Challenge(lobby.currentBoard, lobby.goalBoard);
+          switch(lobby.messageType){
+            case "challenge":
+              this.challenge = new Challenge(lobby.currentBoard, lobby.goalBoard);
+            case "move":
+              this.moveEvent.emit("move", lobby.recentMove);
+          }
+          
         };
-        ws.onerror = (event) => {
+        this.ws.onerror = (event) => {
           console.error("WebSocket error: ", event);
         };
-        ws.onclose = (event) => {
+        this.ws.onclose = (event) => {
           console.log("WebSocket connection closed: ", event);
         };
-        //const challengeData = await fetchChallenge("twoPlayers");
-        //console.log(challengeData.goal)
-        //this.challenge = new Challenge(challengeData.start, challengeData.goal);
     }
 
     public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {
@@ -74,6 +113,11 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         ]
     }
 
+    public async makeMove(col: number){
+        var data = {"move": col};
+        this.ws.send(JSON.stringify(new MessageAvalanche(MessageType.MOVE, data)));
+    }
+
     public interpretGameState(board: number[][]): GameEvaluation {
         let playerStatus = [
             {
@@ -115,6 +159,21 @@ export class OnlineMultiPlayer extends AbstractGameMode {
             }
         }
 
-        return new GameEvaluation(true, finished, winnerList);
+        return new GameEvaluation(finished, winnerList);
+    }
+
+    public getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string {
+        let newSpritePNG = "marble";
+
+        switch (playerTurn) {
+            case 1:
+                newSpritePNG = "marble-p1";
+                break;
+            case -1:
+                newSpritePNG = "marble-p2";
+                break;
+        }
+
+        return newSpritePNG;
     }
 }

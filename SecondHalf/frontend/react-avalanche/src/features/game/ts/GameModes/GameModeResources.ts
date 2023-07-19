@@ -111,7 +111,7 @@ export abstract class AbstractGameMode {
     public abstract interpretGameState(board: number[][]): GameEvaluation;
 }
 
-export class Message{
+export class MessageAvalanche{
     type: MessageType;
     data: {};
 
@@ -138,9 +138,10 @@ export interface Lobby {
     availableMarbles: number
     isFull: boolean
     recentMove: number
+    messageType: string
 }
 
-enum MessageType {
+export enum MessageType {
     CREATE,
     JOIN,
     MOVE,

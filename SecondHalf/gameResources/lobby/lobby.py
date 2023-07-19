@@ -47,5 +47,6 @@ class Lobby:
             "turnLimit" : self.turnLimit,
             "availableMarbles" : self.availableMarbles,
             "isFull" : self.isFull,
-            "recentMove" : self.recentMove
+            "recentMove" : self.recentMove,
+            "messageType": self.messageType
         }
