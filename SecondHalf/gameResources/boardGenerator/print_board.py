@@ -52,6 +52,4 @@ def print_board(board):
         str_board += line
     print(str_board)
 
-print_board([[0,1,0,1,0,1,0,0],[0,2,1,0,1,0,2,0],[0,0,-2,1,0,-2,0,0],[0,1,1,0,0,1,1,0]])
-
 

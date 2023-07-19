@@ -3,7 +3,7 @@ import time
 
 import sys
 sys.path.append('../../')
-from SecondHalf.gameResources.simulation.simulate import run
+from gameResources.simulation.simulate import run
 import copy
 import random
 import math

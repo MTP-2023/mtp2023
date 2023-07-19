@@ -12,16 +12,20 @@ from challengeGenerator.generateChallenges import merge
 from collections import OrderedDict
 import numpy as np
 from apply_policy import return_move, solve_challenge
+from multiplayer_utils import return_move as return_move_multi
+from multiplayer_utils import flip_board, ShallowEnv
 from ray.rllib.policy.policy import Policy
 import os
 from ray.rllib.models import ModelCatalog
+from agent.baseline.mcts import mcts
 
 # initialize agents
 agent_handles = [
     #'SimpleAgent',
     #'MCTS',
     'PPO', # checkpoint_gpu_14_675:v2
-    'AlphaZero' # curriculum2Marbles, 100 simulations, complex model
+    'AlphaZero', # curriculum2Marbles, 100 simulations, complex model
+    'MultiPlayer'
 ]
 
 # register models required for alphazero
@@ -94,6 +98,11 @@ class ChallengeDTO(BaseModel):
     current: list
     goal: list
 
+class MultiPlayerChallengeDTO(BaseModel):
+    current: list
+    goal: list
+    player: int
+
 class Mode(BaseModel):
     modeHandle: str = "singlePlayer"
 
@@ -111,7 +120,7 @@ async def staticBoard():
         [1,0,1,0,1,0,0,1]]
 
 @app.post("/challenge", tags=["challenge"])
-async def returnChallenge(mode: Mode, width: int = default_width, height: int = default_height, minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
+async def returnChallenge(mode: Mode, width: int = default_width, height: int = default_height, minMarbles: int = 1, maxMarbles: int = 1, turnLimit: int = 10, availableMarbles: int = 100, fallthrough: bool = False):
     start_board = generate_random_board(width, height)
     if mode.modeHandle == "singlePlayer":
         goal_board = generateGoalState(start_board, minMarbles, maxMarbles, turnLimit, availableMarbles, width*2, fallthrough)
@@ -161,3 +170,32 @@ async def requestSolution(challenge: ChallengeDTO, agent_handle: str, max_steps:
         #print(solution)
 
     return solution
+
+@app.post("/agent_move/{agent_handle}")
+async def agentMove(challenge: MultiPlayerChallengeDTO, agent_handle: str):
+    #print(challenge.player)
+    if agent_handle not in agent_handles:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    if agent_handle in agent_dict.keys():
+        current_board = challenge.current
+        goal_board = challenge.goal
+        if challenge.player == -1:
+            current_board = flip_board(challenge.current)
+            goal_board = flip_board(challenge.goal)
+        obs = OrderedDict()
+        obs["current"] = current_board
+        obs["goal"] = goal_board
+        paramEnv = ShallowEnv(current_board, goal_board, 1, 2, len(current_board[0]), len(current_board),
+                              challenge.player)
+        move = return_move_multi(agent, paramEnv, obs)
+        print(move)
+    return int(move)
+
+@app.post("/mcts_move/")
+async def mctsMove(challenge: MultiPlayerChallengeDTO):
+    current_board = challenge.current
+    goal_board = challenge.goal
+    player = challenge.player
+    move = mcts(current_board, 50, 1, goal_board, len(current_board[0])-2, len(current_board), 100, 1, player)
+    return int(move)

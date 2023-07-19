@@ -3,7 +3,9 @@ export function interpretBoard(board: number[][]): number[][] {
 
     const isStartBoard = (Math.max(...board.flat()) < 2);
 
-    board.forEach((row, idx) => {
+    const copy = board.map((row) => [...row]);
+
+    copy.forEach((row, idx) => {
         let currentRow = []
         if (idx % 2 == 0) {
             row.shift()
@@ -36,5 +38,36 @@ export function interpretBoard(board: number[][]): number[][] {
         interpretedBoard.push(currentRow);
     })
 
+    console.log(interpretedBoard)
     return interpretedBoard;
+}
+
+export function interpretBoardReverse(switch_orientation: String[][], holds_marble: number[][]): number[][] {
+    let current_board: number[][] = [];
+    switch_orientation.forEach((row, idx) => {
+        let currentRow = [0, 0, 0, 0, 0, 0, 0, 0];
+        let offset = 0;
+        if(idx%2 == 0){
+            offset = 1;
+        }
+        for(let i = 0; i < row.length; i+=1){
+            if(row[i] == "left"){
+                if(holds_marble[idx][i] != 0){
+                    currentRow[i*2+offset] = holds_marble[idx][i];
+                } else {
+                    currentRow[i*2+offset] = 1;
+                }
+            } else if (row[i] == "right") {
+                if (holds_marble[idx][i] != 0) {
+                    currentRow[i * 2 + offset + 1] = holds_marble[idx][i];
+                } else {
+                    currentRow[i * 2 + offset + 1] = 1;
+                }
+            }
+        }
+        current_board.push(currentRow);
+    })
+    console.log("REINTERPRETED BOARD")
+    console.log(current_board)
+    return current_board
 }

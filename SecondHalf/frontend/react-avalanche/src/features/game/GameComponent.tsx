@@ -6,8 +6,9 @@ import MainMenu from "./ts/Scenes/MainMenu";
 import SplashScreen from "./ts/Scenes/SplashScreen";
 import MainGame from "./ts/Scenes/MainGame";
 import MainSettings from "./ts/Scenes/MainSettings";
-import Victory from './ts/Scenes/GameEnd';
+import GameEnd from './ts/Scenes/GameEnd';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import AgentSelect from "./ts/Scenes/AgentSelect";
 
 const GameComponent: React.FC = () => {
   useEffect(() => {
@@ -49,7 +50,8 @@ const GameComponent: React.FC = () => {
     game.scene.add(SplashScreen.Name, SplashScreen);
     game.scene.add(MainGame.Name, MainGame);
     game.scene.add(MainSettings.Name, MainSettings);
-    game.scene.add(Victory.Name, Victory);
+    game.scene.add(GameEnd.Name, GameEnd);
+    game.scene.add(AgentSelect.Name, AgentSelect);
 
     // Start the Boot scene
     game.scene.start(Boot.Name);

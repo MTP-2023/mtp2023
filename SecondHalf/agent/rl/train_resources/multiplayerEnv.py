@@ -2,7 +2,7 @@ import random
 import sys
 sys.path.append("../../")
 sys.path.append("../")
-from rl.train_resources.avalancheEnv import GameBoardEnv, SingleChallengeTestEnv
+from agent.rl.train_resources.avalancheEnv import GameBoardEnv, SingleChallengeTestEnv
 from ray.rllib.env.env_context import EnvContext
 from gymnasium.spaces import Discrete, Box, Dict
 from gameResources.simulation.simulate import run

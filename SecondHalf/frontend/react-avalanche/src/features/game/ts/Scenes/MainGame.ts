@@ -1,8 +1,10 @@
 import Utilities from "../Utilities";
-import Victory from "./GameEnd";
+import GameEnd from "./GameEnd";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
+import { LocalVsAi} from "../GameModes/LocalVsAi";
+import { interpretBoardReverse } from "../Helper/BoardInterpreter";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -48,10 +50,7 @@ export default class MainGame extends Phaser.Scene {
 		this.marbleRadius = 13 * this.scaleFactor;
 
 		this.buttonRadius = this.scaleFactor * 10;
-		this.buttonFontSize = this.scaleFactor * 18;
-
-		this.simulationRunning = false;
-		this.counter = 0;
+		this.buttonFontSize = this.scaleFactor * 18
 
 		// set vars for buttons
 
@@ -176,8 +175,9 @@ export default class MainGame extends Phaser.Scene {
 		return switchSprite;
 	}
 
-	public async create(data: { gameModeHandle: string }): Promise<void> {
+	public async create(data: { gameModeHandle: string , agent: string}): Promise<void> {
 		Utilities.LogSceneMethodEntry("MainGame", "create");
+		console.log(data.agent)
 
 		// set matter options
 		this.matter.world.update60Hz();
@@ -191,10 +191,19 @@ export default class MainGame extends Phaser.Scene {
 			case "local1v1":
 				this.gameMode = new LocalMultiPlayer();
 				break;
+			case "localvsai":
+				this.gameMode = new LocalVsAi();
+				this.gameMode.agent = data.agent;
+				break;
 		}
+		console.log(this.gameMode.agent)
 
 		// retrieve challenge
 		await this.gameMode.initChallenge();
+		this.simulationRunning = false;
+		this.counter = 0;
+		this.boardMarbles = 0;
+		this.turn = 1;
 
 		const startBoard =  this.gameMode!.getStartBoard();
 		const goalBoard = this.gameMode!.getGoalBoard();
@@ -212,8 +221,20 @@ export default class MainGame extends Phaser.Scene {
 		const playerStatusHeight = this.imgHeight;
 		const playerStatusX = (boardX - playerStatusWidth) / 2;
 		const playerStatusY = camera.worldView.y + 30 * this.scaleFactor;
-		this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth+boardX);
 
+		if(this.gameMode.isMultiplayer) {
+			let player1Text = "Player 1";
+			let player2Text = "Player 2";
+			if(!this.gameMode.isLocal) {
+				player1Text = "You";
+				player2Text = "Enemy";
+			}
+			if(this.gameMode.isVsAi){
+				player1Text = "You";
+				player2Text = "AI";
+			}
+			this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth + boardX, player1Text, player2Text);
+		}
 		// button init
 		const buttonGroup = this.add.container();
 		buttonGroup.setName("buttons");
@@ -612,13 +633,15 @@ export default class MainGame extends Phaser.Scene {
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
-			this.toggleClickableButtons(true);
-			this.simulationRunning = false;
 			this.interpretGameState();
+			if(this.turn==1 || !this.gameMode.isVsAi) {
+				this.toggleClickableButtons(true);
+			}
+			this.simulationRunning = false;
 		}
 	}
 
-	private interpretGameState(): void {
+	private async interpretGameState(): Promise<void> {
 		// Filter the bodies based on their label property
 		const switches = this.matter.world.getAllBodies()
 		.filter((body: MatterJS.BodyType) => body.label === "switch")
@@ -638,11 +661,15 @@ export default class MainGame extends Phaser.Scene {
 			}
 		}
 
-		//console.log(switch_orientation, holds_marble);
+		console.log(switch_orientation, holds_marble);
+		if(this.gameMode.isVsAi) {
+			this.gameMode.currentBoard = interpretBoardReverse(switch_orientation, holds_marble);
+		}
 
 		// PLACEHOLDER FOR GameMode.interpretGameState(board); 
 		// precending logic potentially to be adapted
 		const evalResult = this.gameMode!.interpretGameState(holds_marble);
+		console.log("MULTIPLAYER?", this.gameMode.isMultiplayer)
 		if (evalResult.hasWinner) {
 			let gameEndText = '';
 			if (this.gameMode.isMultiplayer) {
@@ -658,9 +685,17 @@ export default class MainGame extends Phaser.Scene {
 				gameEndText = "Congratulation! You won!"
 			}
 
-			this.scene.launch(Victory.Name, { displayText: gameEndText });
+			this.scene.launch(GameEnd.Name, { displayText: gameEndText });
 		} else if (this.gameMode.isMultiplayer) {
+			console.log("SWITCH TURNS CALLED")
 			this.turn = this.gameMode.switchTurns(this.turn, this);
+			if (this.gameMode.isVsAi && this.turn == -1){
+				this.toggleClickableButtons(false);
+				this.simulationRunning = false;
+				await new Promise(f => setTimeout(f, 500));
+				let agentTurn = await this.gameMode.getAgentMove()+1;
+				this.dropMarble(agentTurn, (this.scale.width - this.boardWidth) / 2);
+			}
 		}
 	}
 
