@@ -20,16 +20,18 @@ class Lobby:
     availableMarbles = 100
     isFull = False
     recentMove = 0
+    messageType = ""
 
-    def __init__(self, creatorName, startBoard, goalBoard, code, socket):
+    def __init__(self, creatorName, startBoard, goalBoard, code, socket, type):
         self.player1_name = creatorName
         self.lobby_code = random.randint(10000, 99999)
         self.currentBoard = startBoard
         self.goalBoard = goalBoard
         self.lobby_code = code
+        self.messageType = type
 
-    def toJSON(self):
-        return json.dumps({
+    def toDict(self):
+        return {
             "player1_name" : self.player1_name,
             "player2_name" : self.player2_name,
             "player1_wins" : self.player1_wins,
@@ -46,4 +48,4 @@ class Lobby:
             "availableMarbles" : self.availableMarbles,
             "isFull" : self.isFull,
             "recentMove" : self.recentMove
-        })
+        }

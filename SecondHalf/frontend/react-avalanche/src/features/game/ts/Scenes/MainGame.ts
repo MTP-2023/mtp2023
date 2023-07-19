@@ -3,6 +3,7 @@ import Victory from "./GameEnd";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
+import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -194,6 +195,9 @@ export default class MainGame extends Phaser.Scene {
 				break;
 			case "local1v1":
 				this.gameMode = new LocalMultiPlayer();
+				break;
+			case "online1v1":
+				this.gameMode = new OnlineMultiPlayer();
 				break;
 		}
 

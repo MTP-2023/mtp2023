@@ -9,6 +9,7 @@ import sys
 
 sys.path.append('../')
 sys.path.append('../../agent/rl')
+from lobby.message import MoveMessage
 from lobby.message import Message, MessageTypes
 from uuid import UUID
 from fastapi_sessions.backends.implementations import InMemoryBackend
@@ -31,6 +32,8 @@ import os
 import json
 from simulation.simulate import run
 from ray.rllib.models import ModelCatalog
+import lobby.lobby
+from lobby.message import ChallengeMessage, CreateMessage
 
 # initialize agents
 agent_handles = [
@@ -155,13 +158,12 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.websocket("/lobbies/")
+@app.websocket("/lobbies/create/")
 async def websocket_endpoint_create(websocket: WebSocket, player: str):
-    
     code = random.randint(0, 999999)
     while lobbies.keys().__contains__(code):
         code = random.randint(0, 999999)
-    #websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
+    # websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
     start_board = generate_random_board(3, 2)
 
     goal1 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
@@ -171,7 +173,7 @@ async def websocket_endpoint_create(websocket: WebSocket, player: str):
     lobbies[code] = lobby
     print("connecting", websocket.state)
     await manager.connect(websocket)
-    await manager.broadcast(lobby.toJSON())
+    await manager.broadcast(json.dumps(lobby.toDict()))
     try:
         while True:
             message: Message = await websocket.receive_json()
@@ -179,7 +181,7 @@ async def websocket_endpoint_create(websocket: WebSocket, player: str):
                 lobby = lobbies[message.data["code"]]
                 run(message.data["move"], lobby.currentBoard, message.data["player"], False)
                 lobby.recentMove = message.data["move"]
-                await manager.broadcast(lobby)
+                await manager.broadcast(MoveMessage(lobby))
             elif message.Type == MessageTypes.NEWCHALLENGE:
                 lobby = lobbies[message.data["code"]]
                 start_board = generate_random_board(lobby.width, lobby.height)
@@ -222,7 +224,7 @@ async def join(websocket: WebSocket, code: int, name: str):
             return "full"
         else:
             lobby.player2_name = name
-            #websocket = lobby.socket
+            # websocket = lobby.socket
             await manager.connect(websocket)
             try:
                 while True:

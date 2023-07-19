@@ -1,4 +1,4 @@
-// class for object that must be returned by interpretGameState
+    // class for object that must be returned by interpretGameState
 export class GameEvaluation {
     isMultiplayer: boolean;
     hasWinner: boolean;
@@ -50,3 +50,40 @@ export abstract class AbstractGameMode {
     // function that evaluates game state after each move and decides whether the game is over
     public abstract interpretGameState(board: number[][]): GameEvaluation;
 }
+
+export class Message{
+    type: MessageType;
+    data: {};
+
+    constructor(type: MessageType, data: {}){
+        this.type = type
+        this.data = data
+    }
+}
+
+export interface Lobby {
+    player1_name: string
+    player2_name: string
+    player1_wins: number 
+    player2_wins: number
+    currentPlayer: number
+    lobby_code: number
+    currentBoard: number[][]
+    goalBoard: number[][]
+    width: number
+    height: number
+    minMarbles: number
+    maxMarbles: number
+    turnLimit: number
+    availableMarbles: number
+    isFull: boolean
+    recentMove: number
+}
+
+enum MessageType {
+    CREATE,
+    JOIN,
+    MOVE,
+    NEWCHALLENGE,
+    CHANGESETTINGS,
+  }
