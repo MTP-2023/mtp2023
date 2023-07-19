@@ -125,10 +125,10 @@ export abstract class AbstractGameMode {
     }
 
     public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number, player1Text: string, player2Text: string): void {
-        const playerNameText1 = scene.add.text(x, y, player1Text, { fontSize: 30,  color: this.convertToCSS(this.player1Color), align: "center" });
+        const playerNameText1 = scene.add.text(x, y, player1Text, { fontSize: 50,  color: this.convertToCSS(this.player1Color), align: "center" });
         playerNameText1.setData("playerText", 1);
 
-        const playerNameText2 = scene.add.text(boardEnd + x, y, player2Text, { fontSize: 30,  color: this.convertToCSS(this.player2Color), align: "center" });
+        const playerNameText2 = scene.add.text(boardEnd + x, y, player2Text, { fontSize: 50,  color: this.convertToCSS(this.player2Color), align: "center" });
         playerNameText2.setData("playerText", -1);
 
         this.indicateTurn(1, scene);
