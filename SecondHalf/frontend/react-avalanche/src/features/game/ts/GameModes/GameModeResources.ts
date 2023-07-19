@@ -129,4 +129,6 @@ export abstract class AbstractGameMode {
 
     // function that evaluates game state after each move and decides whether the game is over
     public abstract interpretGameState(board: number[][]): GameEvaluation;
+
+    public abstract getAgentMove(): Promise<number>;
 }

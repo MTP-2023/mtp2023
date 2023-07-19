@@ -111,17 +111,7 @@ export class LocalVsAi extends AbstractGameMode {
         return this.challenge.originalGoal;
     }
 
-    public switchTurns(currentPlayer: number, scene: Phaser.Scene): number {
-        console.log("SWITCH TURNS")
-        this.stopIndicator(currentPlayer, scene);
-        const nextPlayer = currentPlayer * (-1);
-        this.indicateTurn(nextPlayer, scene);
-        let agent_move = this.getAgentMove()
-        console.log("AGENT MOVE", agent_move)
-        return nextPlayer;
-    }
-
     public async getAgentMove(): Promise<number> {
-        return await agentMove(this.currentBoard, this.getOriginalGoalBoard(), this.aiPlayer)
+        return await agentMove(this.currentBoard, this.getOriginalGoalBoard(), this.aiPlayer);
     }
 }

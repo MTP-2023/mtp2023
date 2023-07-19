@@ -308,7 +308,7 @@ export default class MainGame extends Phaser.Scene {
 			if (this.simulationRunning){
 				const buggedCollisionsToHandle = this.checkIfSwitchFlipRequired();
 				if (!buggedCollisionsToHandle) this.checkForCompletedSimulation();
-			} 
+			}
 		});
 	}
 
@@ -495,13 +495,15 @@ export default class MainGame extends Phaser.Scene {
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
-			this.toggleClickableButtons(true);
-			this.simulationRunning = false;
 			this.interpretGameState();
+			if(this.turn==1) {
+				this.toggleClickableButtons(true);
+			}
+			this.simulationRunning = false;
 		}
 	}
 
-	private interpretGameState(): void {
+	private async interpretGameState(): Promise<void> {
 		// Filter the bodies based on their label property
 		const switches = this.matter.world.getAllBodies()
 		.filter((body: MatterJS.BodyType) => body.label === "switch")
@@ -548,6 +550,13 @@ export default class MainGame extends Phaser.Scene {
 		} else if (this.gameMode.isMultiplayer) {
 			console.log("BEFORE",this.turn)
 			this.turn = this.gameMode.switchTurns(this.turn, this);
+			if (this.gameMode.isVsAi && this.turn == -1){
+				this.toggleClickableButtons(false);
+				this.simulationRunning = false;
+				await new Promise(f => setTimeout(f, 500));
+				let agentTurn = await this.gameMode.getAgentMove()+1;
+				this.dropMarble(agentTurn, (this.scale.width - this.boardWidth) / 2);
+			}
 		}
 	}
 
