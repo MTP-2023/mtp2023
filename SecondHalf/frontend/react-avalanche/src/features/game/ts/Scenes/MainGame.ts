@@ -1,5 +1,5 @@
 import Utilities from "../Utilities";
-import Victory from "./GameEnd";
+import GameEnd from "./GameEnd";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
@@ -177,8 +177,9 @@ export default class MainGame extends Phaser.Scene {
 		return switchSprite;
 	}
 
-	public async create(data: { gameModeHandle: string }): Promise<void> {
+	public async create(data: { gameModeHandle: string , agent: string}): Promise<void> {
 		Utilities.LogSceneMethodEntry("MainGame", "create");
+		console.log(data.agent)
 
 		// set matter options
 		this.matter.world.update60Hz();
@@ -194,11 +195,14 @@ export default class MainGame extends Phaser.Scene {
 				break;
 			case "localvsai":
 				this.gameMode = new LocalVsAi();
+				this.gameMode.agent = data.agent;
 				break;
 		}
+		console.log(this.gameMode.agent)
 
 		// retrieve challenge
 		await this.gameMode.initChallenge();
+		this.turn = 1;
 
 		const startBoard =  this.gameMode!.getStartBoard();
 		const goalBoard = this.gameMode!.getGoalBoard();
@@ -577,7 +581,7 @@ export default class MainGame extends Phaser.Scene {
 				gameEndText = "Congratulation! You won!"
 			}
 
-			this.scene.launch(Victory.Name, { displayText: gameEndText });
+			this.scene.launch(GameEnd.Name, { displayText: gameEndText });
 		} else if (this.gameMode.isMultiplayer) {
 			this.turn = this.gameMode.switchTurns(this.turn, this);
 			if (this.gameMode.isVsAi && this.turn == -1){

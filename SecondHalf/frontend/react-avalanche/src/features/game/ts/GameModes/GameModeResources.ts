@@ -31,6 +31,7 @@ export abstract class AbstractGameMode {
     isLocal: boolean = false;
     isMultiplayer: boolean = false;
     isVsAi: boolean = false;
+    agent: string = "rl";
     currentBoard: number[][] = [];
     player1Color = 0xffa500;
     player2Color = 0x0000ff;

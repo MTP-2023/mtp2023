@@ -1,5 +1,5 @@
 import { Challenge, GameEvaluation, AbstractGameMode } from "./GameModeResources";
-import { fetchChallenge } from "../../cAPICalls";
+import {fetchChallenge, mctsMove} from "../../cAPICalls";
 import { agentMove } from "../../cAPICalls";
 
 export class LocalVsAi extends AbstractGameMode {
@@ -102,6 +102,10 @@ export class LocalVsAi extends AbstractGameMode {
     }
 
     public async getAgentMove(): Promise<number> {
-        return await agentMove(this.currentBoard, this.getOriginalGoalBoard(), this.aiPlayer);
+        if(this.agent=="rl") {
+            return await agentMove(this.currentBoard, this.getOriginalGoalBoard(), this.aiPlayer);
+        }else {
+            return await mctsMove(this.currentBoard, this.getOriginalGoalBoard(), this.aiPlayer);
+        }
     }
 }

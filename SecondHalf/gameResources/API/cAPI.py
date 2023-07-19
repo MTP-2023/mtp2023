@@ -17,6 +17,7 @@ from multiplayer_utils import flip_board, ShallowEnv
 from ray.rllib.policy.policy import Policy
 import os
 from ray.rllib.models import ModelCatalog
+from agent.baseline.mcts import mcts
 
 # initialize agents
 agent_handles = [
@@ -189,4 +190,12 @@ async def agentMove(challenge: MultiPlayerChallengeDTO, agent_handle: str):
                               challenge.player)
         move = return_move_multi(agent, paramEnv, obs)
         print(move)
+    return int(move)
+
+@app.post("/mcts_move/")
+async def mctsMove(challenge: MultiPlayerChallengeDTO):
+    current_board = challenge.current
+    goal_board = challenge.goal
+    player = challenge.player
+    move = mcts(current_board, 50, 1, goal_board, len(current_board[0])-2, len(current_board), 100, 1, player)
     return int(move)

@@ -2,7 +2,7 @@ import Utilities from "../Utilities";
 import MainGame from "./MainGame";
 import MainMenu from "./MainMenu";
 
-export default class Victory extends Phaser.Scene {
+export default class GameEnd extends Phaser.Scene {
 	/**
 	 * Unique name of the scene.
 	 */
@@ -32,7 +32,7 @@ export default class Victory extends Phaser.Scene {
 
         setTimeout(() => {
             this.scene.stop(MainGame.Name);
-            this.scene.stop(Victory.Name);
+            this.scene.stop(GameEnd.Name);
             this.scene.start(MainMenu.Name);
         }, 3000);
 	}
