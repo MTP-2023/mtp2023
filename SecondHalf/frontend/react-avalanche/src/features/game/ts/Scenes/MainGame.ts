@@ -12,33 +12,32 @@ export default class MainGame extends Phaser.Scene {
 	public static Name = "MainGame";
 
 	// global var definition
-	scaleFactor: number;
+	scaleFactor: number = 0.8;
 	switchWidth: number;
 	imgHeight: number;
 	borderWidth: number;
 	borderExtraHeight: number;
 	switchSpacingY: number;
 	boardWidth: number;
-	rowCount: Array<number>;
+	rowCount: Array<number> = [3, 4, 3, 4];
 	buttonRadius: number;
 	buttonFontSize: number;
 	simulationRunning: boolean;
 	counter: number;
 	marbleRadius: number;
-	movementThreshold: number;
-	switchRotationVelocity: number;
+	movementThreshold: number = 0.01;
+	switchRotationVelocity: number = 0.04;
 	buttonColor: number;
 	buttonOutlineColor: number;
 	buttonTextColor: string;
 	buttonTextStyle: { fontSize: string; fill: any; };
 	gameMode: AbstractGameMode;
-	turn: number = -1;
+	turn: number = 1;
 
 	constructor() {
 		super({ key: MainGame.Name });
 		// CONST VARS FOR INITIALIZATION
 		// set vars for images
-		this.scaleFactor = 0.8;
 		this.switchWidth = this.scaleFactor * 70;
 		this.imgHeight = this.scaleFactor * 104;
 		this.borderWidth = this.scaleFactor * 5;
@@ -47,15 +46,11 @@ export default class MainGame extends Phaser.Scene {
 		this.boardWidth = 4 * this.switchWidth + 5 * this.borderWidth;
 		this.marbleRadius = 13 * this.scaleFactor;
 
-		this.rowCount = [3, 4, 3, 4]; // Define the number of switches per row.
-
 		this.buttonRadius = this.scaleFactor * 10;
 		this.buttonFontSize = this.scaleFactor * 18;
 
 		this.simulationRunning = false;
 		this.counter = 0;
-		this.movementThreshold = 0.02;
-		this.switchRotationVelocity = 0.04;
 
 		// set vars for buttons
 
@@ -188,7 +183,6 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.world.setGravity(0, 0.85);
 
 		// initialize gameMode
-		console.log(data.gameModeHandle)
 		switch (data.gameModeHandle) {
 			case "singlePlayerChallenge":
 				this.gameMode = new SinglePlayerChallenge();
@@ -219,8 +213,8 @@ export default class MainGame extends Phaser.Scene {
 		const playerStatusWidth = boardX * 0.8;
 		const playerStatusHeight = this.imgHeight;
 		const playerStatusX = (boardX - playerStatusWidth) / 2;
-		const playerStatusY = boardY;
-		this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth);
+		const playerStatusY = camera.worldView.y + 30 * this.scaleFactor;
+		this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth+boardX);
 
 		// button init
 		const buttonGroup = this.add.container();
@@ -326,7 +320,7 @@ export default class MainGame extends Phaser.Scene {
 		const y = 40;
 		let marblePNG = "marble";
 		if (this.gameMode.isLocal) {
-			[ marblePNG, this.turn ] = this.gameMode.handleTurnSwitch(this.turn);
+			marblePNG = this.gameMode.getMarbleSprite(this.turn, this);
 		}
 		let marbleSprite = this.matter.add.sprite(x, y, marblePNG, undefined, { shape: switchShape });
 		marbleSprite.setMass(5);
@@ -533,7 +527,7 @@ export default class MainGame extends Phaser.Scene {
 		const evalResult = this.gameMode!.interpretGameState(holds_marble);
 		if (evalResult.hasWinner) {
 			let gameEndText = '';
-			if (evalResult.isMultiplayer) {
+			if (this.gameMode.isMultiplayer) {
 				switch (evalResult.winner.length) {
 					case 1:
 						gameEndText = "Player " + evalResult.winner[0] + " has won!";
@@ -547,6 +541,9 @@ export default class MainGame extends Phaser.Scene {
 			}
 
 			this.scene.launch(Victory.Name, { displayText: gameEndText });
+		} else if (this.gameMode.isMultiplayer) {
+			console.log("BEFORE",this.turn)
+			this.turn = this.gameMode.switchTurns(this.turn, this);
 		}
 	}
 

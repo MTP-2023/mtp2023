@@ -4,6 +4,7 @@ import { fetchChallenge } from "../../cAPICalls";
 export class SinglePlayerChallenge extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
     isLocal: boolean = true;
+    isMultiplayer: boolean = false;
     playerColor = 0xffa500;
 
     public async initChallenge(): Promise<void> {
@@ -39,19 +40,11 @@ export class SinglePlayerChallenge extends AbstractGameMode {
     }
 
     public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardWidth: number): void {
-        
-        /*
-        const playerStatusContainer = scene.add.container(x, y);
-        const playerNameText = scene.add.text(0, 0, "Player 1", { fontSize: 16,  color: this.playerColor.toString()});
-        playerStatusContainer.add(playerNameText);*/
+        // player status not required for single player challenge
     }
 
-    public handleTurnSwitch(playerTurn: number): [ marblePNG: string, turn: number ] {
-        const newSpritePNG = "marble-p1";
-        return [
-            newSpritePNG,
-            1
-        ]
+    public getMarbleSprite(playerTurn: number): string{
+        return "marble-p1";
     }
 
     public interpretGameState(board: number[][]): GameEvaluation {
@@ -67,6 +60,6 @@ export class SinglePlayerChallenge extends AbstractGameMode {
             }
         }
 
-        return new GameEvaluation(false, finished);
+        return new GameEvaluation(finished);
     }
 }
