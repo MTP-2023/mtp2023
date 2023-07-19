@@ -47,9 +47,10 @@ const TimePage = () => {
 
           return (
             <VerticalTimelineElement
-              key={"hi"}
-              date={element.date}
-              dateClassName="date"
+              className="date"
+              //key={"hi"}
+              date={element.date} // Radu fragen: wie man das separieren könnte
+              //dateClassName="date"
               icon={<SVGComponent />}
             >
               <h3 className="vertical-timeline-element-title">
@@ -58,17 +59,7 @@ const TimePage = () => {
               <h5 className="vertical-timeline-element-subtitle">
                 {element.location}
               </h5>
-              <p id="description">{element.description}</p>
-              {showButton && (
-                <a
-                  className={`button ${
-                    isWorkIcon ? "workButton" : "schoolButton"
-                  }`}
-                  href="/"
-                >
-                  {element.buttonText}
-                </a>
-              )}
+              <p id="description">{element.description} className=""</p>
             </VerticalTimelineElement>
           );
         })}
@@ -86,3 +77,16 @@ const TimePage = () => {
 
 export default TimePage;
 */
+
+/*
+              {showButton && (
+                <a
+                  className={`button ${
+                    isWorkIcon ? "workButton" : "schoolButton"
+                  }`}
+                  href="/"
+                >
+                  {element.buttonText}
+                </a>
+              )}
+              */

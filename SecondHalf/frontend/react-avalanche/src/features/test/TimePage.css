@@ -30,7 +30,7 @@ h3 {
   color: rgb(205, 52, 52);
 }
 
-#description {
+.description {
   margin: 1.5em 0 2em 0;
   color: #0f0f0f;
 }
@@ -62,7 +62,7 @@ h3 {
   .vertical-timeline-element-date {
     display: block !important;
     float: none !important;
-    color: rgb(44, 44, 44);
+    color: #abd1f3;
     margin-top: 1.5em;
   }
 }
