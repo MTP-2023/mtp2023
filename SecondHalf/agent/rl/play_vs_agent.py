@@ -49,7 +49,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumVer2Fix/checkpoint_random1marblewinrate:v99', type='model')
+artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumVer2Fix/checkpoint_doubletrain_fixed:v99', type='model')
 artifact_dir = artifact.download()
 
 agent = Policy.from_checkpoint(artifact_dir+'/policies/default_policy')
@@ -67,7 +67,6 @@ if args.challenges == "random":
     goal_board = merge(goal, goal2, width, height)
     training_levels = []
     training_levels.append({"start_board": current_board, "goal_board": goal_board, "max_turns": max_turns})
-
 else:
     challenges = json.load(open("../../gameVariants/multiplayer/training/" + args.challenges + ".json"))
     height = challenges["height"]
@@ -126,7 +125,7 @@ for leveli in range(noOfLevels):
             elif args.player1 == "mcts":
                 action = mcts(current_board, int(args.mcts_depth), math.sqrt(2), goal_board, width * 2, height, max_turns, step, player)
             elif args.player1 == "random":
-                action = random.randint(2 * width)
+                action = random.randint(0, 2 * width-1)
             elif args.player1 == "human":
                 print("      GOAL BOARD")
                 print_board(goal_board)

@@ -1,12 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+import math
 
 import sys
 sys.path.append('../')
 sys.path.append('../../agent/rl')
 from simulation.simulate import run
 from boardGenerator.generate import generate_random_board
+from boardGenerator.print_board import print_board
 from challengeGenerator.generateGoal import generateGoalState
 from challengeGenerator.generateChallenges import merge
 from collections import OrderedDict
@@ -194,8 +196,13 @@ async def agentMove(challenge: MultiPlayerChallengeDTO, agent_handle: str):
 
 @app.post("/mcts_move/")
 async def mctsMove(challenge: MultiPlayerChallengeDTO):
+    print("MCTS move")
     current_board = challenge.current
     goal_board = challenge.goal
     player = challenge.player
-    move = mcts(current_board, 50, 1, goal_board, len(current_board[0])-2, len(current_board), 100, 1, player)
+    #print(player, len(current_board[0])-2)
+    print_board(current_board)
+    print_board(goal_board)
+    move = mcts(current_board, 1000, math.sqrt(2), goal_board, len(current_board[0])-2, len(current_board), 10, 1, player)
+    print(move+1)
     return int(move)
