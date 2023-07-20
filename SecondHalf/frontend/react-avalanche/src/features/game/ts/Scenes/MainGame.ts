@@ -716,6 +716,7 @@ export default class MainGame extends Phaser.Scene {
 				gameEndText = "Congratulation! You won!"
 			}
 
+			this.scene.pause(MainGame.Name);
 			this.scene.launch(GameEnd.Name, { displayText: gameEndText });
 		} else if (this.gameMode.isMultiplayer) {
 			console.log("SWITCH TURNS CALLED")
