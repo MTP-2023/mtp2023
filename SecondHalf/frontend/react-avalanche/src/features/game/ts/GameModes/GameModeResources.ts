@@ -1,4 +1,4 @@
-// class for object that must be returned by interpretGameState
+    // class for object that must be returned by interpretGameState
 export class GameEvaluation {
     hasWinner: boolean;
     winner: number[];
@@ -71,14 +71,13 @@ export abstract class AbstractGameMode {
     public switchTurns(currentPlayer: number, scene: Phaser.Scene): number {
         console.log("SWITCHING TURNS", currentPlayer);
         this.stopIndicator(currentPlayer, scene);
-        console.log("STOPPED INDICATOR");
         const nextPlayer = currentPlayer * (-1);
         this.indicateTurn(nextPlayer, scene);
-        console.log("STARTED INDICATOR", nextPlayer);
         return nextPlayer;
     }
 
     protected indicateTurn(playerID: number, scene: Phaser.Scene): void {
+        console.log("TURN ON", playerID)
         // Find the Text object based on its custom ID
         const foundText = scene.children.getChildren().find((child) => child.getData("playerText") === playerID);
 
@@ -106,6 +105,7 @@ export abstract class AbstractGameMode {
     }
 
     protected stopIndicator(playerID: number, scene: Phaser.Scene): void {
+        console.log("TURN OFF", playerID)
         // Find the Text object based on its custom ID
         const foundText = scene.children.getChildren().find((child) => child.getData("playerText") === playerID);
         
@@ -143,3 +143,41 @@ export abstract class AbstractGameMode {
 
     public abstract getAgentMove(): Promise<number>;
 }
+
+export class MessageAvalanche{
+    type: MessageType;
+    data: {};
+
+    constructor(type: MessageType, data: {}){
+        this.type = type
+        this.data = data
+    }
+}
+
+export interface Lobby {
+    player1_name: string
+    player2_name: string
+    player1_wins: number
+    player2_wins: number
+    currentPlayer: number
+    lobby_code: number
+    currentBoard: number[][]
+    goalBoard: number[][]
+    width: number
+    height: number
+    minMarbles: number
+    maxMarbles: number
+    turnLimit: number
+    availableMarbles: number
+    isFull: boolean
+    recentMove: number
+    messageType: string
+}
+
+export enum MessageType {
+    CREATE,
+    JOIN,
+    MOVE,
+    NEWCHALLENGE,
+    CHANGESETTINGS,
+  }

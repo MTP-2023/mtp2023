@@ -10,11 +10,12 @@
   },
   "dependencies": {
     "phaser": "^3.60.0",
-    "phaser3-rex-plugins": "^1.60.2",
+    "phaser3-rex-plugins": "^1.60.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
-    "react-router-dom": "^6.10.0"
+    "react-router-dom": "^6.10.0",
+    "wait-for-event": "^2.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",

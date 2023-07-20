@@ -3,6 +3,7 @@ import MainGame from "./MainGame";
 import MainSettings from "./MainSettings";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import AgentSelect from "./AgentSelect";
+import OnlineSettings from "./OnlineSettings";
 
 
 export default class MainMenu extends Phaser.Scene {
@@ -31,14 +32,15 @@ export default class MainMenu extends Phaser.Scene {
             .setOrigin(0.5);
         newGameText.setInteractive();
         newGameText.on("pointerdown", () => {
-            this.scene.start(MainGame.Name, {gameModeHandle: this.gameMode, agent: "rl"});
+            this.scene.start(MainGame.Name, {gameModeHandle: this.gameMode, agent: "rl", gameModeObj: null});
         }, this);
 
         // first element is the default mode
         const gameModeOptions = [
             {text: "Local 1v1", value: "local1v1"},
             {text: "Single Player", value: "singlePlayerChallenge"},
-            {text: "Local vs AI", value: "localvsai"}
+            {text: "Local vs AI", value: "localvsai"},
+			{ text: "Online 1v1", value: "online1v1"}
         ];
 
         // set default game mode
@@ -87,31 +89,43 @@ export default class MainMenu extends Phaser.Scene {
                     const labelButton = button as RexUIPlugin.Label;
                     dropDownList.text = labelButton.text;
                     mainMenuScene.gameMode = gameModeOptions.find((item) => item.text === labelButton.text)!.value;
-                    console.log(mainMenuScene.gameMode)
-                    if (mainMenuScene.gameMode == "localvsai") {
-                        mainMenuScene.scene.launch(AgentSelect.Name, {mainMenuScene: this});
-                    } else {
-                        mainMenuScene.scene.stop(AgentSelect.Name);
+
+                    switch (mainMenuScene.gameMode) {
+                        case "online1v1":
+                            mainMenuScene.scene.pause(MainMenu.Name);
+							mainMenuScene.scene.stop(AgentSelect.Name);
+                            mainMenuScene.scene.launch(OnlineSettings.Name);
+							break;
+						case "localvsai":
+							mainMenuScene.scene.pause(MainMenu.Name);
+							mainMenuScene.scene.stop(OnlineSettings.Name);
+							mainMenuScene.scene.launch(AgentSelect.Name, {mainMenuScene: this});
+							break;
+						default:
+							mainMenuScene.scene.stop(AgentSelect.Name);
+							mainMenuScene.scene.stop(OnlineSettings.Name);
+							break;
                     }
-                },
-                onButtonOver: function (button: Phaser.GameObjects.GameObject) {
-                    const labelButton = button as RexUIPlugin.Label;
-                    const el = labelButton.getElement('background') as Phaser.GameObjects.Shape;
-                    el.setStrokeStyle(1, 0xffffff);
-                },
-                onButtonOut: function (button: Phaser.GameObjects.GameObject) {
-                    const labelButton = button as RexUIPlugin.Label;
-                    const el = labelButton.getElement('background') as Phaser.GameObjects.Shape;
-                    el.setStrokeStyle();
-                },
-            },
-            value: gameModeOptions[0].value
+				},
+				onButtonOver: function (button: Phaser.GameObjects.GameObject) {
+					const labelButton = button as RexUIPlugin.Label;
+					const el = labelButton.getElement('background') as Phaser.GameObjects.Shape;
+					el.setStrokeStyle(1, 0xffffff);
+				},
+				onButtonOut: function (button: Phaser.GameObjects.GameObject) {
+					const labelButton = button as RexUIPlugin.Label;
+					const el = labelButton.getElement('background') as Phaser.GameObjects.Shape;
+					el.setStrokeStyle();
+				},
+			},
+			value: gameModeOptions[0].value
+
         };
-        const dropDownList = this.rexUI.add.dropDownList(dropDownConfig).layout();
-    }
+
+		const dropDownList = this.rexUI.add.dropDownList(dropDownConfig).layout();
+	}
 
     public update(): void {
         // Update logic, as needed.
     }
 }
-

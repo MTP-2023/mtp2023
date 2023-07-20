@@ -5,6 +5,8 @@ import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
 import { LocalVsAi} from "../GameModes/LocalVsAi";
 import { interpretBoardReverse } from "../Helper/BoardInterpreter";
+import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
+import {waitFor} from 'wait-for-event';
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -50,7 +52,10 @@ export default class MainGame extends Phaser.Scene {
 		this.marbleRadius = 13 * this.scaleFactor;
 
 		this.buttonRadius = this.scaleFactor * 10;
-		this.buttonFontSize = this.scaleFactor * 18
+		this.buttonFontSize = this.scaleFactor * 18;
+
+		this.simulationRunning = false;
+		this.counter = 0;
 
 		// set vars for buttons
 
@@ -113,9 +118,16 @@ export default class MainGame extends Phaser.Scene {
 	  
 		// Add the click event listener
 		button.on('pointerdown', () => {
-		  this.dropMarble(content);
+		  if(this.gameMode.isMultiplayer && !this.gameMode.isLocal){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			onlinegame.makeMove(content);
+			this.toggleClickableButtons(false);
+		  }
+		  else {
+			this.dropMarble(content);
+		  }
 		});
-	  
+
 		// Clean up the circle graphics object
 		circle.destroy();
 
@@ -175,7 +187,7 @@ export default class MainGame extends Phaser.Scene {
 		return switchSprite;
 	}
 
-	public async create(data: { gameModeHandle: string , agent: string}): Promise<void> {
+	public async create(data: { gameModeHandle: string , agent: string, gameModeObj: AbstractGameMode}): Promise<void> {
 		Utilities.LogSceneMethodEntry("MainGame", "create");
 		console.log(data.agent)
 
@@ -184,6 +196,9 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.world.setGravity(0, 0.85);
 
 		// initialize gameMode
+		console.log(data.gameModeHandle)
+
+
 		switch (data.gameModeHandle) {
 			case "singlePlayerChallenge":
 				this.gameMode = new SinglePlayerChallenge();
@@ -195,18 +210,28 @@ export default class MainGame extends Phaser.Scene {
 				this.gameMode = new LocalVsAi();
 				this.gameMode.agent = data.agent;
 				break;
+			case "online1v1":
+				this.gameMode = data.gameModeObj;
+				break;
 		}
 		console.log(this.gameMode.agent)
 
-		// retrieve challenge
-		await this.gameMode.initChallenge();
+		if (this.gameMode.isLocal) {
+			await this.gameMode.initChallenge();
 		this.simulationRunning = false;
 		this.counter = 0;
 		this.boardMarbles = 0;
 		this.turn = 1;
+		} else {
+			onlinegame = this.gameMode as OnlineMultiPlayer;
+			//await waitFor("emit", onlinegame.boardEvent);
+		}
 
 		const startBoard =  this.gameMode!.getStartBoard();
 		const goalBoard = this.gameMode!.getGoalBoard();
+
+		console.log(startBoard)
+
 
 		// initialize vars
 		const camera = this.cameras.main;
@@ -302,6 +327,15 @@ export default class MainGame extends Phaser.Scene {
 			this.handleCollisions(bodyA, bodyB);
 		});
 
+		//Event Handler
+		if(!this.gameMode.isLocal && this.gameMode.isMultiplayer){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			onlinegame.gameOverEvent.on("gameOver", this.handleGameOver, this);
+			onlinegame.moveEvent.on("move", this.handleMove, this);
+			onlinegame.boardEvent.on("emit", this.getChallenge, this)
+
+		}
+
 		// Register the beforeupdate event
 		this.matter.world.on("beforeupdate", () => {
 			//console.log("BEFOREUPDATE")
@@ -318,7 +352,7 @@ export default class MainGame extends Phaser.Scene {
 				}*/
 
 				//this.applyRepulsiveForceOnMarbles();
-				
+
 				this.checkForMarbleDeletion();
 			}
 		});
@@ -353,8 +387,30 @@ export default class MainGame extends Phaser.Scene {
             this.dropMarble(number);
 		}
 	}
+	// Event handler for the "gameOverEvent"
+	private handleGameOver() {
+	  	console.log("Game Over!");
+	}
+
+
+
+	// Event handler for the "boardEvent"
+	private getChallenge() {
+		console.log("challenge recieved");
+    }
+
+	// Event handler for the "moveEvent"
+	private handleMove(col: number) {
+	  	// Score update logic here
+	  	const boardX = (this.scale.width - this.boardWidth) / 2;
+	  	this.dropMarble(col, boardX);
+	}
 
 	private dropMarble(col: number): void {
+		if(!this.gameMode.isLocal){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			console.log(onlinegame.me);
+		}
 		console.log("PLAYER TRHOWS MARBLE INTO", col);
 		this.boardMarbles += 1;
 		//const marbleRadius = 13*this.scaleFactor;
@@ -484,7 +540,7 @@ export default class MainGame extends Phaser.Scene {
 		// use steps as additional check to allow switch to start rotation
 	  	let steps = 0;
 		let currentAngle = flipSwitch.angle;
-		
+
 		/*
 		const updateRotation = () => {
 			if (!flipSwitch.gameObject.getData("rotating")) return;
@@ -508,26 +564,26 @@ export default class MainGame extends Phaser.Scene {
 			}
 		};*/
 
-		
+
 		const updateRotation = () => {
 			if (!flipSwitch.gameObject.getData("rotating")) return;
-		
+
 			// Calculate the new rotation angle based on the current angle and rotation speed
 			const newAngle = currentAngle + rotationSpeed;
 			this.matter.body.setAngle(flipSwitch, newAngle, true); // Set the new angle
-		
+
 			// Update the current angle with the new angle
 			currentAngle = newAngle;
-		
+
 			// Filter the bodies based on their label property
 			const borders = this.matter.world.getAllBodies().filter(
 			  (body: MatterJS.BodyType) => body.label === "border"
 			);
-		
+
 			// Check for collision with a border
 			const collidesWithBorder =
 			  this.matter.query.region(borders, flipSwitch.bounds).length > 0;
-		
+
 			if (collidesWithBorder && steps > 8) {
 			  const newTilt = sign < 0 ? "left" : "right";
 			  flipSwitch.gameObject.setData("tilt", newTilt);
@@ -664,6 +720,16 @@ export default class MainGame extends Phaser.Scene {
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
+			this.toggleInput(true);
+			this.simulationRunning = false;
+			if(this.gameMode.isLocal){
+				this.toggleInput(true);
+			} else {
+				var onlinegame = this.gameMode as OnlineMultiPlayer;
+				if(onlinegame.me = this.turn){
+					this.toggleInput(true);
+				}
+			}
 			this.interpretGameState();
 			if(this.turn==1 || !this.gameMode.isVsAi) {
 				this.toggleInput(true);
@@ -731,6 +797,14 @@ export default class MainGame extends Phaser.Scene {
 		}
 	}
 
+	public initButtonsclickable(): void{
+		if(!this.gameMode.isLocal ){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			if(onlinegame.me == -1){
+				this.toggleInput(false);
+			}
+		}
+	}
 	//public update(/*time: number, delta: number*/): void {
 		
 	//}
