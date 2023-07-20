@@ -46,7 +46,7 @@ export class SinglePlayerChallenge extends AbstractGameMode {
     public getMarbleSprite(playerTurn: number): string{
         return "marble-p1";
     }
-
+    
     public interpretGameState(board: number[][]): GameEvaluation {
         let finished = true;
         

@@ -11,6 +11,8 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     player1Color = 0xffa500;
     player2Color = 0x0000ff;
     mixedColor = 0x925e6d;
+    player1Name = "";
+    player2Name = "";
     me = 1;
     ws: WebSocket;
     public gameOverEvent: EventEmitter;
@@ -49,9 +51,9 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         //    code = this.generateRandomSixDigitNumber();
         //}
         if(create){
-            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=shadowwizardmoneygang&operation=create");
+            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=Andre&operation=create");
         } else {
-            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=cringelord&operation=join");
+            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=Thomas&operation=join");
         }
         
         this.ws.onopen = () => {
@@ -65,6 +67,8 @@ export class OnlineMultiPlayer extends AbstractGameMode {
             switch(lobby.messageType){
                 case "challenge":
                     this.challenge = new Challenge(lobby.currentBoard, lobby.goalBoard);
+                    this.player1Name = lobby.player1_name;
+                    this.player2Name = lobby.player2_name;
                     this.boardEvent.emit("emit");
                     break;
                 case "move":
@@ -98,11 +102,12 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         }
     }
 
+    
     public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number): void {
-        const playerNameText1 = scene.add.text(x, y, "Player 1", { fontSize: 30,  color: this.convertToCSS(this.player1Color), align: "center" });
+        const playerNameText1 = scene.add.text(x, y, this.player1Name, { fontSize: 30,  color: this.convertToCSS(this.player1Color), align: "center" });
         playerNameText1.setData("playerText", 1);
 
-        const playerNameText2 = scene.add.text(boardEnd + x, y, "Player 2", { fontSize: 30,  color: this.convertToCSS(this.player2Color), align: "center" });  
+        const playerNameText2 = scene.add.text(boardEnd + x, y, this.player2Name, { fontSize: 30,  color: this.convertToCSS(this.player2Color), align: "center" });  
         playerNameText2.setData("playerText", -1);
         
         this.indicateTurn(1, scene);
@@ -117,6 +122,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
                 newSpritePNG = "marble-p1";
                 break;
             case -1:
+                console.log("sprite now p2")
                 newSpritePNG = "marble-p2";
                 break;
         }

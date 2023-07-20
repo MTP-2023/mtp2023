@@ -73,6 +73,7 @@ export abstract class AbstractGameMode {
         this.stopIndicator(currentPlayer, scene);
         const nextPlayer = currentPlayer * (-1);
         this.indicateTurn(nextPlayer, scene);
+        console.log(nextPlayer);
         return nextPlayer;
     }
 

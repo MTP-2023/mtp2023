@@ -197,8 +197,8 @@ export default class MainGame extends Phaser.Scene {
 
 		// initialize gameMode
 		console.log(data.gameModeHandle)
-
-
+		
+		
 		switch (data.gameModeHandle) {
 			case "singlePlayerChallenge":
 				this.gameMode = new SinglePlayerChallenge();
@@ -218,20 +218,21 @@ export default class MainGame extends Phaser.Scene {
 
 		if (this.gameMode.isLocal) {
 			await this.gameMode.initChallenge();
+		} else {
+			onlinegame = this.gameMode as OnlineMultiPlayer;
+			this.turn = 1;
+			//await waitFor("emit", onlinegame.boardEvent);
+		}
 		this.simulationRunning = false;
 		this.counter = 0;
 		this.boardMarbles = 0;
 		this.turn = 1;
-		} else {
-			onlinegame = this.gameMode as OnlineMultiPlayer;
-			//await waitFor("emit", onlinegame.boardEvent);
-		}
-
+		
 		const startBoard =  this.gameMode!.getStartBoard();
 		const goalBoard = this.gameMode!.getGoalBoard();
 
 		console.log(startBoard)
-
+	
 
 		// initialize vars
 		const camera = this.cameras.main;
@@ -333,7 +334,6 @@ export default class MainGame extends Phaser.Scene {
 			onlinegame.gameOverEvent.on("gameOver", this.handleGameOver, this);
 			onlinegame.moveEvent.on("move", this.handleMove, this);
 			onlinegame.boardEvent.on("emit", this.getChallenge, this)
-
 		}
 
 		// Register the beforeupdate event
@@ -370,6 +370,13 @@ export default class MainGame extends Phaser.Scene {
 		if (this.input && this.input.keyboard) {
 			this.input.keyboard.on('keydown', this.keyboardListener);
 		}
+		if(!this.gameMode.isLocal){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			if(onlinegame.me == -1){
+				this.toggleInput(false);
+			}
+		}
+
 	}
 
 	private keyboardListener(event: Phaser.Input.Keyboard.Key): void {
@@ -409,7 +416,7 @@ export default class MainGame extends Phaser.Scene {
 	private dropMarble(col: number): void {
 		if(!this.gameMode.isLocal){
 			var onlinegame = this.gameMode as OnlineMultiPlayer;
-			console.log(onlinegame.me);
+			console.log("dropping as ", onlinegame.me);
 		}
 		console.log("PLAYER TRHOWS MARBLE INTO", col);
 		this.boardMarbles += 1;
@@ -419,7 +426,7 @@ export default class MainGame extends Phaser.Scene {
 		let x = boardX + this.switchWidth/2 + this.borderWidth + Math.floor((col-1) / 2) * (this.switchWidth + this.borderWidth);
 		x = (col % 2 == 0) ? x + this.switchWidth - 1.075 * this.marbleRadius: x + 1.075 * this.marbleRadius;
 		let marblePNG = "marble";
-		if (this.gameMode.isLocal) {
+		if (this.gameMode.isMultiplayer) {
 			marblePNG = this.gameMode.getMarbleSprite(this.turn, this);
 		}
 		let marbleSprite = this.matter.add.sprite(x, this.boardSpacingTop, marblePNG, undefined, { shape: switchShape });
@@ -431,8 +438,6 @@ export default class MainGame extends Phaser.Scene {
 		marbleSprite.setData("id", this.counter);
 		marbleSprite.setData("player", this.turn);
 		marbleSprite.setData("activeRow", -1);
-
-
 		this.toggleInput(false);
 		this.simulationRunning = true;
 	}
@@ -725,10 +730,8 @@ export default class MainGame extends Phaser.Scene {
 			if(this.gameMode.isLocal){
 				this.toggleInput(true);
 			} else {
-				var onlinegame = this.gameMode as OnlineMultiPlayer;
-				if(onlinegame.me = this.turn){
-					this.toggleInput(true);
-				}
+				console.log("blocking for " + this.turn)
+				this.initButtonsclickable(this.turn);
 			}
 			this.interpretGameState();
 			if(this.turn==1 || !this.gameMode.isVsAi) {
@@ -797,11 +800,15 @@ export default class MainGame extends Phaser.Scene {
 		}
 	}
 
-	public initButtonsclickable(): void{
+	public initButtonsclickable(turn: number): void{
 		if(!this.gameMode.isLocal ){
 			var onlinegame = this.gameMode as OnlineMultiPlayer;
-			if(onlinegame.me == -1){
+			if(onlinegame.me == turn){
+				console.log("blocking", onlinegame.me, "on turn", turn);
 				this.toggleInput(false);
+			} else {
+				console.log("enabling", onlinegame.me, "on turn", turn);
+				this.toggleInput(true);
 			}
 		}
 	}
