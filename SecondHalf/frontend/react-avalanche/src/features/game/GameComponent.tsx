@@ -33,11 +33,13 @@ const GameComponent: React.FC = () => {
         }
       },
       plugins: {
-        scene: [{
+        scene: [
+          {
             key: 'rexUI',
             plugin: RexUIPlugin,
             mapping: 'rexUI'
-        }]
+          }
+        ]
       }
     };
     

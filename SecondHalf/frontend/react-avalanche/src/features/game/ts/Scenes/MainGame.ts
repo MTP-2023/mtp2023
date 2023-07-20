@@ -35,7 +35,7 @@ export default class MainGame extends Phaser.Scene {
 	gameMode: AbstractGameMode;
 	turn: number = 1;
 	boardMarbles: number = 0;
-	//activeAttractors: Map;
+	boardSpacingTop: number = 90;
 
 	constructor() {
 		super({ key: MainGame.Name });
@@ -91,7 +91,7 @@ export default class MainGame extends Phaser.Scene {
 		return borderVisuals;
 	}
 
-	private addButton(x: number, y: number, content: number, boardX: number): Phaser.GameObjects.Sprite {
+	private addButton(x: number, y: number, content: number): Phaser.GameObjects.Sprite {
 		// Create a circle graphics object
 		const circle = this.add.graphics();
 		circle.lineStyle(2, this.buttonOutlineColor, 1);
@@ -113,7 +113,7 @@ export default class MainGame extends Phaser.Scene {
 	  
 		// Add the click event listener
 		button.on('pointerdown', () => {
-		  this.dropMarble(content, boardX);
+		  this.dropMarble(content);
 		});
 	  
 		// Clean up the circle graphics object
@@ -181,7 +181,7 @@ export default class MainGame extends Phaser.Scene {
 
 		// set matter options
 		this.matter.world.update60Hz();
-		this.matter.world.setGravity(0, 0.9);
+		this.matter.world.setGravity(0, 0.85);
 
 		// initialize gameMode
 		switch (data.gameModeHandle) {
@@ -243,7 +243,7 @@ export default class MainGame extends Phaser.Scene {
 		for (let i = 1; i < 7; i++) {
 			const buttonX = boardX + (this.boardWidth / 8) * i + (i % 2 + 2) * this.borderWidth;
 			//console.log(i, buttonX-boardX, this.boardWidth)
-			const button = this.addButton(buttonX, buttonStartY, i, boardX);
+			const button = this.addButton(buttonX, buttonStartY, i);
 			buttonGroup.add(button);
 		}
 
@@ -331,38 +331,58 @@ export default class MainGame extends Phaser.Scene {
 			} 
 		});
 
-		//this.activeAttractors = new Map();
+		this.keyboardListener = this.keyboardListener.bind(this);
+		// Enable keyboard input
+		if (this.input && this.input.keyboard) {
+			this.input.keyboard.on('keydown', this.keyboardListener);
+		}
 	}
 
-	private dropMarble(col: number, boardX: number): void {
+	private keyboardListener(event: Phaser.Input.Keyboard.Key): void {
+		const code = event.keyCode;
+		// Check if the key is a number
+        if (code >= Phaser.Input.Keyboard.KeyCodes.ONE && code <= Phaser.Input.Keyboard.KeyCodes.SIX) {
+            // The key is a number
+            console.log('A number key was pressed');
+
+            // Get the number from the keyCode (assuming it's a number key)
+            const number = code - Phaser.Input.Keyboard.KeyCodes.ONE + 1;
+            console.log('Number:', number);
+
+            // Now you can use the number in your logic
+            this.dropMarble(number);
+		}
+	}
+
+	private dropMarble(col: number): void {
 		console.log("PLAYER TRHOWS MARBLE INTO", col);
 		this.boardMarbles += 1;
 		//const marbleRadius = 13*this.scaleFactor;
 		const switchShape = this.cache.json.get("marble-shape");
+		const boardX = (this.scale.width - this.boardWidth) / 2;
 		let x = boardX + this.switchWidth/2 + this.borderWidth + Math.floor((col-1) / 2) * (this.switchWidth + this.borderWidth);
-		x = (col % 2 == 0) ? x + this.switchWidth - this.marbleRadius : x + this.marbleRadius;
-		const y = 80;
+		x = (col % 2 == 0) ? x + this.switchWidth - 1.075 * this.marbleRadius: x + 1.075 * this.marbleRadius;
 		let marblePNG = "marble";
 		if (this.gameMode.isLocal) {
 			marblePNG = this.gameMode.getMarbleSprite(this.turn, this);
 		}
-		let marbleSprite = this.matter.add.sprite(x, y, marblePNG, undefined, { shape: switchShape });
-		marbleSprite.setMass(5);
+		let marbleSprite = this.matter.add.sprite(x, this.boardSpacingTop, marblePNG, undefined, { shape: switchShape });
+		//marbleSprite.setMass(5);
 		let a = 0.98;
 		marbleSprite.setDisplaySize(2*this.marbleRadius*a, 2*this.marbleRadius*a);
-		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, y, Phaser.Display.Align.CENTER);
+		this.matter.alignBody(marbleSprite.body as MatterJS.BodyType, x, this.boardSpacingTop, Phaser.Display.Align.CENTER);
 		this.counter = this.counter + 1;
 		marbleSprite.setData("id", this.counter);
 		marbleSprite.setData("player", this.turn);
 		marbleSprite.setData("activeRow", -1);
 
 
-		this.toggleClickableButtons(false);
+		this.toggleInput(false);
 		this.simulationRunning = true;
 	}
 
 	// enable/disable all marble buttons during simulation
-	private toggleClickableButtons(clickable: boolean): void {
+	private toggleInput(clickable: boolean): void {
 		const buttonGroup = this.children.getByName("buttons") as Phaser.GameObjects.Container;
 		buttonGroup.getAll().forEach((child: Phaser.GameObjects.GameObject) => {
 			if (child instanceof Phaser.GameObjects.Sprite) {
@@ -370,6 +390,16 @@ export default class MainGame extends Phaser.Scene {
 			  button.input!.enabled = clickable;
 			}
 		});
+
+		if (this.input.keyboard) {
+			if (clickable) {
+				// Enable the keyboard listener
+				this.input.keyboard.on('keydown', this.keyboardListener);
+			} else {
+				// Remove the keyboard listener
+				this.input.keyboard.off('keydown', this.keyboardListener);
+			}
+		}
 	}
 
 	// determine type of collision and call respective function
@@ -498,13 +528,14 @@ export default class MainGame extends Phaser.Scene {
 			const collidesWithBorder =
 			  this.matter.query.region(borders, flipSwitch.bounds).length > 0;
 		
-			if (collidesWithBorder) {
+			if (collidesWithBorder && steps > 8) {
 			  const newTilt = sign < 0 ? "left" : "right";
 			  flipSwitch.gameObject.setData("tilt", newTilt);
 			  flipSwitch.gameObject.setData("rotating", false);
 			  this.matter.body.setStatic(flipSwitch, true);
 			  console.log("Rotation complete", flipSwitch.gameObject.getData("id"));
 			} else {
+				steps += 1;
 			  requestAnimationFrame(updateRotation);
 			}
 		};
@@ -635,7 +666,7 @@ export default class MainGame extends Phaser.Scene {
 			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
 			this.interpretGameState();
 			if(this.turn==1 || !this.gameMode.isVsAi) {
-				this.toggleClickableButtons(true);
+				this.toggleInput(true);
 			}
 			this.simulationRunning = false;
 		}
@@ -690,11 +721,11 @@ export default class MainGame extends Phaser.Scene {
 			console.log("SWITCH TURNS CALLED")
 			this.turn = this.gameMode.switchTurns(this.turn, this);
 			if (this.gameMode.isVsAi && this.turn == -1){
-				this.toggleClickableButtons(false);
+				this.toggleInput(false);
 				this.simulationRunning = false;
 				await new Promise(f => setTimeout(f, 500));
 				let agentTurn = await this.gameMode.getAgentMove()+1;
-				this.dropMarble(agentTurn, (this.scale.width - this.boardWidth) / 2);
+				this.dropMarble(agentTurn);
 			}
 		}
 	}
