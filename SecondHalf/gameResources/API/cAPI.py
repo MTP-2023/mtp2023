@@ -158,17 +158,16 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.websocket("/lobbies/{code:int}")
+@app.websocket("/lobbies/{code}")
 async def websocket_endpoint_create(code: int, websocket: WebSocket, player: str):
     # websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
     start_board = generate_random_board(3, 2)
-
     goal1 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
     goal2 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
     goal_board = merge(goal1, goal2, 3, 2)
     lobby = Lobby(player, start_board, goal_board, code, websocket, "")
     lobbies[code] = lobby
-    print("connecting", websocket.state)
+    lobby.messageType = "challenge"
     await manager.connect(websocket)
     await manager.broadcast(json.dumps(lobby.toDict()))
     try:
