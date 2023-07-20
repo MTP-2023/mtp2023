@@ -716,6 +716,11 @@ vite@^4.1.0-beta.0, vite@^4.2.0:
   optionalDependencies:
     fsevents "~2.3.2"
 
+wait-for-event@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/wait-for-event/-/wait-for-event-2.0.1.tgz"
+  integrity sha512-CuUBvs/TnLfmgJvCVTXDU8yl3DyTilEzMYUe7mlGWtiQU1gndKT/lvdaUatG4AVwq+3heXugYTILZDOm4etc2Q==
+
 webfontloader@^1.6.28:
   version "1.6.28"
   resolved "https://registry.npmjs.org/webfontloader/-/webfontloader-1.6.28.tgz"

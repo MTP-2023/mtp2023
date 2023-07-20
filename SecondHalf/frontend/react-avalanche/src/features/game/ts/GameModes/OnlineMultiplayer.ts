@@ -2,21 +2,25 @@ import { Challenge, GameEvaluation, AbstractGameMode, MessageAvalanche, MessageT
 import { checkCode } from "../../cAPICalls";
 import { Lobby } from "./GameModeResources";
 import EventEmitter from "phaser3-rex-plugins/plugins/utils/eventemitter/EventEmitter";
+import { waitFor } from "wait-for-event";
 
 export class OnlineMultiPlayer extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
-    isLocal: boolean = true;
+    isLocal: boolean = false;
+    isMultiplayer: boolean = true;
     player1Color = 0xffa500;
     player2Color = 0x0000ff;
     mixedColor = 0x925e6d;
     ws: WebSocket;
     public gameOverEvent: EventEmitter;
     public moveEvent: EventEmitter;
+    public boardEvent: EventEmitter;
 
     public constructor(){
         super();
         this.gameOverEvent = new EventEmitter();
         this.moveEvent = new EventEmitter();
+        this.boardEvent = new EventEmitter();
     }
 
     private generateRandomSixDigitNumber(): number {
@@ -24,20 +28,16 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         const max = 999999;
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    
-    public async create(): Promise<void>{
-        
-    }
 
     gameOver() {
         // Emit the custom event when the game is over
         this.gameOverEvent.emit("");
-      }
-      updateScore(score: number) {
+    }
+    updateScore(score: number) {
         // Emit the custom event when the score is updated
         this.moveEvent.emit(score.toString());
-      }
-
+    }
+      
     public async initChallenge(): Promise<void> {
         var code = this.generateRandomSixDigitNumber();
         var existing = false;
@@ -45,30 +45,30 @@ export class OnlineMultiPlayer extends AbstractGameMode {
             existing = await checkCode(code);
             code = this.generateRandomSixDigitNumber();
         }
-        console.log(code);
-        console.log("ws://localhost:8000/lobbies/"+ code.toString() + "/?player=shadowwizardmoneygang")
-        this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "/?player=shadowwizardmoneygang");
+        this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=shadowwizardmoneygang&operation=create");
         this.ws.onopen = () => {
-          console.log("WebSocket is connected..");
-          this.ws.send("Hello, server!");   
+            console.log("WebSocket is connected..");
         };
         this.ws.onmessage = (event) => {
-          console.log("Received message from server: ", event.data);
-          var receivedData = JSON.parse(event.data);
-          var lobby: Lobby = JSON.parse(receivedData);
-          switch(lobby.messageType){
-            case "challenge":
-              this.challenge = new Challenge(lobby.currentBoard, lobby.goalBoard);
-            case "move":
-              this.moveEvent.emit("move", lobby.recentMove);
-          }
-          
+            console.log("Received message from server: ", event.data);
+            var receivedData = JSON.parse(event.data);
+            var lobby: Lobby = JSON.parse(receivedData);
+            console.log(lobby.goalBoard);
+            switch(lobby.messageType){
+                case "challenge":
+                    this.challenge = new Challenge(lobby.currentBoard, lobby.goalBoard);
+                    this.boardEvent.emit("emit");
+                    break;
+                case "move":
+                    this.moveEvent.emit("move", lobby.recentMove);
+                    break;
+            }
         };
         this.ws.onerror = (event) => {
-          console.error("WebSocket error: ", event);
+            console.error("WebSocket error: ", event);
         };
         this.ws.onclose = (event) => {
-          console.log("WebSocket connection closed: ", event);
+            console.log("WebSocket connection closed: ", event);
         };
     }
 
@@ -114,8 +114,11 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     }
 
     public async makeMove(col: number){
-        var data = {"move": col};
+        var data = {
+            "move": col
+        };
         this.ws.send(JSON.stringify(new MessageAvalanche(MessageType.MOVE, data)));
+        await waitFor("emit", this.moveEvent);
     }
 
     public interpretGameState(board: number[][]): GameEvaluation {

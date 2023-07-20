@@ -4,6 +4,7 @@ import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
 import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
+import {waitFor} from 'wait-for-event';
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -118,7 +119,13 @@ export default class MainGame extends Phaser.Scene {
 	  
 		// Add the click event listener
 		button.on('pointerdown', () => {
-		  this.dropMarble(content, boardX);
+		  if(this.gameMode.isMultiplayer && !this.gameMode.isLocal){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			onlinegame.makeMove(content);
+		  }
+		  else { 
+			this.dropMarble(content, boardX);
+		  }
 		});
 	    
 		// Clean up the circle graphics object
@@ -200,12 +207,16 @@ export default class MainGame extends Phaser.Scene {
 				this.gameMode = new OnlineMultiPlayer();
 				break;
 		}
-
+		
 		// retrieve challenge
+		onlinegame = this.gameMode as OnlineMultiPlayer;
 		await this.gameMode.initChallenge();
-
+		await waitFor("emit", onlinegame.boardEvent);
 		const startBoard =  this.gameMode!.getStartBoard();
 		const goalBoard = this.gameMode!.getGoalBoard();
+
+		console.log(startBoard)
+	
 
 		// initialize vars
 		const camera = this.cameras.main;
@@ -294,8 +305,8 @@ export default class MainGame extends Phaser.Scene {
 			var onlinegame = this.gameMode as OnlineMultiPlayer;
 			onlinegame.gameOverEvent.on("gameOver", this.handleGameOver, this);
 			onlinegame.moveEvent.on("move", this.handleMove, this);
+			onlinegame.boardEvent.on("emit", this.getChallenge, this)
 		}
-		
 
 		// Register the beforeupdate event
 		this.matter.world.on("beforeupdate", () => {
@@ -325,18 +336,22 @@ export default class MainGame extends Phaser.Scene {
 		});
 	}
 
-	 // Event handler for the "gameOverEvent"
-	 private handleGameOver() {
-		// Game over logic here
-		console.log("Game Over!");
-	  }
-	  // Event handler for the "scoreUpdateEvent"
-	  private handleMove(col: number) {
-		// Score update logic here
-		const boardX = (this.scale.width - this.boardWidth) / 2;
-		this.dropMarble(col, boardX);
-	  }
-	
+	// Event handler for the "gameOverEvent"
+	private handleGameOver() {
+	  	console.log("Game Over!");
+	}
+
+	// Event handler for the "boardEvent"
+	private getChallenge() {
+		console.log("challenge recieved");
+    }
+
+	// Event handler for the "moveEvent"
+	private handleMove(col: number) {
+	  	// Score update logic here
+	  	const boardX = (this.scale.width - this.boardWidth) / 2;
+	  	this.dropMarble(col, boardX);
+	}
 
 	private dropMarble(col: number, boardX: number): void {
 		console.log("PLAYER TRHOWS MARBLE INTO", col);
