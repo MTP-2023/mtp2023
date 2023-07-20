@@ -2,7 +2,7 @@
   "data": [
     {
       "text": "Description of image is here image1",
-      "link": "./../assets/Timeline_background.jpg"
+      "link": "/assets/Timeline_background.jpg"
     },
     {
       "text": "Description of image is here image2",
