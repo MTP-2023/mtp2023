@@ -2,6 +2,7 @@ import { Challenge, GameEvaluation, AbstractGameMode, MessageAvalanche, MessageT
 import { checkCode } from "../../cAPICalls";
 import { Lobby } from "./GameModeResources";
 import EventEmitter from "phaser3-rex-plugins/plugins/utils/eventemitter/EventEmitter";
+import { waitFor } from "wait-for-event";
 
 export class OnlineMultiPlayer extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
@@ -27,18 +28,14 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         const max = 999999;
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    
-    public async create(): Promise<void>{
-        
-    }
 
     gameOver() {
-      // Emit the custom event when the game is over
-      this.gameOverEvent.emit("");
+        // Emit the custom event when the game is over
+        this.gameOverEvent.emit("");
     }
     updateScore(score: number) {
-      // Emit the custom event when the score is updated
-      this.moveEvent.emit(score.toString());
+        // Emit the custom event when the score is updated
+        this.moveEvent.emit(score.toString());
     }
       
     public async initChallenge(): Promise<void> {
@@ -50,29 +47,28 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         }
         this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=shadowwizardmoneygang");
         this.ws.onopen = () => {
-          console.log("WebSocket is connected..");
+            console.log("WebSocket is connected..");
         };
         this.ws.onmessage = (event) => {
-          console.log("Received message from server: ", event.data);
-          var receivedData = JSON.parse(event.data);
-          var lobby: Lobby = JSON.parse(receivedData);
-          console.log(lobby.goalBoard);
-          switch(lobby.messageType){
-            case "challenge":
-              this.challenge = new Challenge(lobby.currentBoard, lobby.goalBoard);
-              this.boardEvent.emit("emit");
-              break;
-            case "move":
-              this.moveEvent.emit("move", lobby.recentMove);
-              break;
-          }
-          
+            console.log("Received message from server: ", event.data);
+            var receivedData = JSON.parse(event.data);
+            var lobby: Lobby = JSON.parse(receivedData);
+            console.log(lobby.goalBoard);
+            switch(lobby.messageType){
+                case "challenge":
+                    this.challenge = new Challenge(lobby.currentBoard, lobby.goalBoard);
+                    this.boardEvent.emit("emit");
+                    break;
+                case "move":
+                    this.moveEvent.emit("move", lobby.recentMove);
+                    break;
+            }
         };
         this.ws.onerror = (event) => {
-          console.error("WebSocket error: ", event);
+            console.error("WebSocket error: ", event);
         };
         this.ws.onclose = (event) => {
-          console.log("WebSocket connection closed: ", event);
+            console.log("WebSocket connection closed: ", event);
         };
     }
 
@@ -118,8 +114,11 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     }
 
     public async makeMove(col: number){
-        var data = {"move": col};
+        var data = {
+            "move": col
+        };
         this.ws.send(JSON.stringify(new MessageAvalanche(MessageType.MOVE, data)));
+        await waitFor("emit", this.moveEvent);
     }
 
     public interpretGameState(board: number[][]): GameEvaluation {

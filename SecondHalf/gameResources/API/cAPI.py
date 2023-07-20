@@ -173,11 +173,13 @@ async def websocket_endpoint_create(code: int, websocket: WebSocket, player: str
     try:
         while True:
             message: Message = await websocket.receive_json()
-            if message.type == MessageTypes.MOVE:
-                lobby = lobbies[message.data["code"]]
-                run(message.data["move"], lobby.currentBoard, message.data["player"], False)
-                lobby.recentMove = message.data["move"]
-                await manager.broadcast(MoveMessage(lobby))
+            print(message)
+            if message["type"] == 2:
+                #lobby = lobbies[message.data["code"]]
+                #run(message.data["move"], lobby.currentBoard, message.data["player"], False)
+                lobby.recentMove = message["data"]["move"]
+                lobby.messageType = "move"
+                await manager.broadcast(json.dumps(lobby.toDict()))
             elif message.Type == MessageTypes.NEWCHALLENGE:
                 lobby = lobbies[message.data["code"]]
                 start_board = generate_random_board(lobby.width, lobby.height)
@@ -230,8 +232,8 @@ async def join(websocket: WebSocket, code: int, name: str):
                 while True:
                     message: Message = await websocket.receive_json()
                     if message.type == MessageTypes.MOVE:
-                        lobby = lobbies[message.data["code"]]
-                        run(message.data["move"], lobby.currentBoard, message.data["player"], False)
+                        #lobby = lobbies[message.data["code"]]
+                        #run(message.data["move"], lobby.currentBoard, message.data["player"], False)
                         lobby.recentMove = message.data["move"]
                         await manager.broadcast(lobby)
                     elif message.Type == MessageTypes.NEWCHALLENGE:
