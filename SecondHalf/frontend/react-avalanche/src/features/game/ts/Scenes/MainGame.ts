@@ -121,7 +121,7 @@ export default class MainGame extends Phaser.Scene {
 		  if(this.gameMode.isMultiplayer && !this.gameMode.isLocal){
 			var onlinegame = this.gameMode as OnlineMultiPlayer;
 			onlinegame.makeMove(content);
-			this.toggleClickableButtons(false);
+			this.toggleInput(false);
 		  }
 		  else {
 			this.dropMarble(content);
@@ -403,7 +403,7 @@ export default class MainGame extends Phaser.Scene {
 	private handleMove(col: number) {
 	  	// Score update logic here
 	  	const boardX = (this.scale.width - this.boardWidth) / 2;
-	  	this.dropMarble(col, boardX);
+	  	this.dropMarble(col);
 	}
 
 	private dropMarble(col: number): void {
