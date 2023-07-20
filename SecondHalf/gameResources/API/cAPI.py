@@ -177,8 +177,8 @@ async def checkCode(code: int):
 async def create_lobby(code: int, websocket: WebSocket, player: str):
     # websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
     start_board = generate_random_board(3, 2)
-    goal1 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
-    goal2 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
+    goal1 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
+    goal2 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
     goal_board = merge(goal1, goal2, 3, 2)
     lobby = Lobby(player, start_board, goal_board, code, websocket, "")
     lobbies[code] = lobby
