@@ -22,8 +22,6 @@ from pydantic import BaseModel
 import numpy as np
 from agent.rl.apply_policy import return_move, solve_challenge
 from ray.rllib.policy.policy import Policy
-from uuid import uuid4
-from uuid import UUID
 from fastapi import FastAPI, Response
 import os
 import json
@@ -43,9 +41,6 @@ agent_handles = [
 
 class SessionData(BaseModel):
     username: str
-
-
-backend = InMemoryBackend[UUID, SessionData]()
 
 # register models required for alphazero
 from agent.rl.train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
@@ -109,19 +104,7 @@ app.add_middleware(
 default_width = 3
 default_height = 2
 
-cookie_params = CookieParameters()
-
 lobbies = {}
-
-# Uses UUID
-cookie = SessionCookie(
-    cookie_name="cookie",
-    identifier="general_verifier",
-    auto_error=True,
-    secret_key="DONOTUSE",
-    cookie_params=cookie_params,
-)
-
 
 class SimulationDTO(BaseModel):
     marble_throw: int
