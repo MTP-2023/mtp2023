@@ -158,8 +158,23 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
+
 @app.websocket("/lobbies/{code}")
-async def websocket_endpoint_create(code: int, websocket: WebSocket, player: str):
+async def websocket_endpoint_create_or_join(code: int, websocket: WebSocket, player: str, operation: str):
+    print("create or join")
+    print(operation)
+    if operation == "create":
+        await create_lobby(code, websocket, player)
+    elif operation == "join":
+        await join_lobby(code, websocket, player)
+    else:
+        raise HTTPException(status_code=404, detail="Invalid operation")
+
+@app.post("/checkCode", tags=["checkCode"])
+async def checkCode(code: int):
+    return False
+
+async def create_lobby(code: int, websocket: WebSocket, player: str):
     # websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
     start_board = generate_random_board(3, 2)
     goal1 = generateGoalState(start_board, 3, 3, 12, 42, 3 * 2, False)
@@ -213,13 +228,7 @@ async def websocket_endpoint_create(code: int, websocket: WebSocket, player: str
         lobby.goalBoard = goal_board
         await manager.broadcast(lobby)
 
-
-@app.post("/checkCode", tags=["checkCode"])
-async def checkCode(code: int):
-    return False
-
-@app.websocket("/lobbies/{code:int}")
-async def join(websocket: WebSocket, code: int, name: str):
+async def join_lobby(code: int, websocket: WebSocket, name: str):
     if lobbies.keys().__contains__(code):
         lobby = lobbies[code]
         if lobby.isFull:
@@ -228,6 +237,7 @@ async def join(websocket: WebSocket, code: int, name: str):
             lobby.player2_name = name
             # websocket = lobby.socket
             await manager.connect(websocket)
+            await manager.broadcast(json.dumps(lobby.toDict()))
             try:
                 while True:
                     message: Message = await websocket.receive_json()

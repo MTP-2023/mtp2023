@@ -45,7 +45,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
             existing = await checkCode(code);
             code = this.generateRandomSixDigitNumber();
         }
-        this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=shadowwizardmoneygang");
+        this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=shadowwizardmoneygang&operation=create");
         this.ws.onopen = () => {
             console.log("WebSocket is connected..");
         };
