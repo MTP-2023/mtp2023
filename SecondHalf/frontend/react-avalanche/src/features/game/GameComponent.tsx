@@ -7,6 +7,7 @@ import SplashScreen from "./ts/Scenes/SplashScreen";
 import MainGame from "./ts/Scenes/MainGame";
 import MainSettings from "./ts/Scenes/MainSettings";
 import Victory from './ts/Scenes/GameEnd';
+import OnlineSettings from './ts/Scenes/OnlineSettings';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 const GameComponent: React.FC = () => {
@@ -21,6 +22,9 @@ const GameComponent: React.FC = () => {
       type: Phaser.AUTO,
       parent: 'game',
       title: 'Avalanche Game',
+      dom: {
+        createContainer: true
+      },
       physics: {
         default: 'matter',
         matter: {
@@ -49,6 +53,7 @@ const GameComponent: React.FC = () => {
     game.scene.add(MainGame.Name, MainGame);
     game.scene.add(MainSettings.Name, MainSettings);
     game.scene.add(Victory.Name, Victory);
+    game.scene.add(OnlineSettings.Name, OnlineSettings);
 
     // Start the Boot scene
     game.scene.start(Boot.Name);

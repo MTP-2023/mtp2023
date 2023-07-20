@@ -2,6 +2,7 @@ import Utilities from "../Utilities";
 import MainGame from "./MainGame";
 import MainSettings from "./MainSettings";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import OnlineSettings from "./OnlineSettings";
 
 
 export default class MainMenu extends Phaser.Scene {
@@ -84,6 +85,12 @@ export default class MainMenu extends Phaser.Scene {
 					const labelButton = button as RexUIPlugin.Label;
 					dropDownList.text = labelButton.text;
                     mainMenuScene.gameMode = gameModeOptions.find((item) => item.text === labelButton.text)!.value;
+
+                    switch (mainMenuScene.gameMode) {
+                        case "online1v1":
+                            mainMenuScene.scene.pause(MainMenu.Name);
+                            mainMenuScene.scene.launch(OnlineSettings.Name);
+                    }
 				},
 				onButtonOver: function (button: Phaser.GameObjects.GameObject) {
 					const labelButton = button as RexUIPlugin.Label;
