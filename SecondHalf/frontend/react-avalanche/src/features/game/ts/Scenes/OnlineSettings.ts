@@ -1,5 +1,8 @@
+import { waitFor } from "wait-for-event";
+import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
 import Utilities from "../Utilities";
 import MainMenu from "./MainMenu";
+import MainGame from "./MainGame";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 export default class OnlineSettings extends Phaser.Scene {
@@ -70,16 +73,21 @@ export default class OnlineSettings extends Phaser.Scene {
         this.lobbyInput = null;
     }
 
-    private onCreateLobbyClicked(): void {
+    private async onCreateLobbyClicked(): Promise<void> {
         // Remove any existing lobby code text or input
         this.hideLobbyInput();
 
         // Generate random lobby code (You can replace this with your own logic)
-        const lobbyCode = "ABC123";
+        const lobbyCode = 123456;
 
         // Display the lobby code as text
-        this.showLobbyCodeText(lobbyCode);
+        this.showLobbyCodeText(lobbyCode.toString());
         this.joinLobbyButton.visible = false;
+        var gameMode: OnlineMultiPlayer = new OnlineMultiPlayer();
+        gameMode.create(true, lobbyCode);  
+        await waitFor("join", gameMode.joinEvent);
+        await waitFor("emit", gameMode.boardEvent);
+        this.startGame(gameMode);
     }
 
     private onJoinLobbyClicked(): void {
@@ -88,6 +96,8 @@ export default class OnlineSettings extends Phaser.Scene {
 
         // Create input field for entering the lobby code using the Rex UI Plugin
         this.createLobbyInput();
+
+
     }
 
     private showLobbyCodeText(lobbyCode: string): void {
@@ -100,7 +110,7 @@ export default class OnlineSettings extends Phaser.Scene {
         this.lobbyCodeText.setOrigin(0.5);
     }
 
-    private createLobbyInput(): void {
+    private async createLobbyInput(): Promise<void> {
         // Create input field for entering the lobby code using the Rex UI Plugin
         this.lobbyInput = this.rexUI.add.inputText({
             x: this.cameras.main.centerX,
@@ -124,14 +134,24 @@ export default class OnlineSettings extends Phaser.Scene {
         if (this.input.keyboard) {
             // Handle enter key press to submit the lobby code
             this.input.keyboard.on("keydown-ENTER", () => {
-                if (this.lobbyInput) {
-                    const lobbyCode = this.lobbyInput.text;
-                    console.log("Entered lobby code:", lobbyCode);
-
-                    // Call your function to perform an action with the lobby code
-                    this.onLobbyCodeEntered(lobbyCode);
-                }
+                this.finalizeJoin();
             });
+        }
+    }
+
+    private async finalizeJoin(){
+        if (this.lobbyInput) {
+            const lobbyCode = this.lobbyInput.text;
+            console.log("Entered lobby code:", lobbyCode);
+
+            var gameMode: OnlineMultiPlayer = new OnlineMultiPlayer();
+            gameMode.me = -1;
+            gameMode.create(false, lobbyCode);
+
+            // Call your function to perform an action with the lobby code
+            this.onLobbyCodeEntered(lobbyCode);
+            await waitFor("emit", gameMode.boardEvent);
+            this.startGame(gameMode);
         }
     }
 
@@ -153,5 +173,11 @@ export default class OnlineSettings extends Phaser.Scene {
             this.lobbyInput.destroy();
             this.lobbyInput = null;
         }
+    }
+
+    private startGame(gameMode: OnlineMultiPlayer): void {
+        this.scene.stop(MainMenu.Name);
+        this.scene.stop(OnlineSettings.Name);
+        this.scene.start(MainGame.Name, { gameModeHandle: "online1v1", gameModeObj: gameMode });
     }
 }

@@ -122,6 +122,7 @@ export default class MainGame extends Phaser.Scene {
 		  if(this.gameMode.isMultiplayer && !this.gameMode.isLocal){
 			var onlinegame = this.gameMode as OnlineMultiPlayer;
 			onlinegame.makeMove(content);
+			this.toggleClickableButtons(false);
 		  }
 		  else { 
 			this.dropMarble(content, boardX);
@@ -187,7 +188,7 @@ export default class MainGame extends Phaser.Scene {
 		return switchSprite;
 	}
 
-	public async create(data: { gameModeHandle: string }): Promise<void> {
+	public async create(data: { gameModeHandle: string, gameModeObj: AbstractGameMode }): Promise<void> {
 		Utilities.LogSceneMethodEntry("MainGame", "create");
 
 		// set matter options
@@ -196,6 +197,8 @@ export default class MainGame extends Phaser.Scene {
 
 		// initialize gameMode
 		console.log(data.gameModeHandle)
+		
+		
 		switch (data.gameModeHandle) {
 			case "singlePlayerChallenge":
 				this.gameMode = new SinglePlayerChallenge();
@@ -204,14 +207,19 @@ export default class MainGame extends Phaser.Scene {
 				this.gameMode = new LocalMultiPlayer();
 				break;
 			case "online1v1":
-				this.gameMode = new OnlineMultiPlayer();
+				this.gameMode = data.gameModeObj;
 				break;
 		}
 		
 		// retrieve challenge
-		onlinegame = this.gameMode as OnlineMultiPlayer;
-		await this.gameMode.initChallenge();
-		await waitFor("emit", onlinegame.boardEvent);
+		
+		if (this.gameMode.isLocal) {
+			await this.gameMode.initChallenge();	
+		} else {
+			onlinegame = this.gameMode as OnlineMultiPlayer;
+			//await waitFor("emit", onlinegame.boardEvent);
+		}
+		
 		const startBoard =  this.gameMode!.getStartBoard();
 		const goalBoard = this.gameMode!.getGoalBoard();
 
@@ -306,6 +314,7 @@ export default class MainGame extends Phaser.Scene {
 			onlinegame.gameOverEvent.on("gameOver", this.handleGameOver, this);
 			onlinegame.moveEvent.on("move", this.handleMove, this);
 			onlinegame.boardEvent.on("emit", this.getChallenge, this)
+			
 		}
 
 		// Register the beforeupdate event
@@ -341,6 +350,8 @@ export default class MainGame extends Phaser.Scene {
 	  	console.log("Game Over!");
 	}
 
+
+
 	// Event handler for the "boardEvent"
 	private getChallenge() {
 		console.log("challenge recieved");
@@ -354,6 +365,10 @@ export default class MainGame extends Phaser.Scene {
 	}
 
 	private dropMarble(col: number, boardX: number): void {
+		if(!this.gameMode.isLocal){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			console.log(onlinegame.me);
+		}
 		console.log("PLAYER TRHOWS MARBLE INTO", col);
 		//const marbleRadius = 13*this.scaleFactor;
 		const switchShape = this.cache.json.get("marble-shape");
@@ -381,8 +396,8 @@ export default class MainGame extends Phaser.Scene {
 		const buttonGroup = this.children.getByName("buttons") as Phaser.GameObjects.Container;
 		buttonGroup.getAll().forEach((child: Phaser.GameObjects.GameObject) => {
 			if (child instanceof Phaser.GameObjects.Sprite) {
-			  const button = child as Phaser.GameObjects.Sprite;
-			  button.input!.enabled = clickable;
+			  	const button = child as Phaser.GameObjects.Sprite;
+			  	button.input!.enabled = clickable;
 			}
 		});
 	}
@@ -536,7 +551,14 @@ export default class MainGame extends Phaser.Scene {
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
 			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
-			this.toggleClickableButtons(true);
+			if(this.gameMode.isLocal){
+				this.toggleClickableButtons(true);
+			} else {
+				var onlinegame = this.gameMode as OnlineMultiPlayer;
+				if(onlinegame.me = this.turn){
+					this.toggleClickableButtons(true);
+				}
+			}
 			this.simulationRunning = false;
 			this.interpretGameState();
 		}
@@ -588,6 +610,14 @@ export default class MainGame extends Phaser.Scene {
 		}
 	}
 
+	public initButtonsclickable(): void{
+		if(!this.gameMode.isLocal ){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			if(onlinegame.me == -1){
+				this.toggleClickableButtons(false);
+			}
+		}
+	}
 	//public update(/*time: number, delta: number*/): void {
 		
 	//}

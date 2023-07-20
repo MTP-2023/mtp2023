@@ -184,7 +184,7 @@ async def create_lobby(code: int, websocket: WebSocket, player: str):
     lobbies[code] = lobby
     lobby.messageType = "challenge"
     await manager.connect(websocket)
-    await manager.broadcast(json.dumps(lobby.toDict()))
+    #await manager.broadcast(json.dumps(lobby.toDict()))
     try:
         while True:
             message: Message = await websocket.receive_json()
@@ -215,6 +215,8 @@ async def create_lobby(code: int, websocket: WebSocket, player: str):
                 lobby.turnLimit = message.data["turnLimit"]
                 lobby.availableMarbles = message.data["availableMarbles"]
     except WebSocketDisconnect:
+        lobby.messageType = "dc"
+        await manager.broadcast(lobby)
         manager.disconnect(websocket)
         lobby.player2_name = ""
         lobby.player2_wins = 0
@@ -237,15 +239,19 @@ async def join_lobby(code: int, websocket: WebSocket, name: str):
             lobby.player2_name = name
             # websocket = lobby.socket
             await manager.connect(websocket)
+            lobby.messageType = "join"
+            await manager.broadcast(json.dumps(lobby.toDict()))
+            lobby.messageType = "challenge"
             await manager.broadcast(json.dumps(lobby.toDict()))
             try:
                 while True:
                     message: Message = await websocket.receive_json()
-                    if message.type == MessageTypes.MOVE:
+                    if message["type"] == 2:
                         #lobby = lobbies[message.data["code"]]
                         #run(message.data["move"], lobby.currentBoard, message.data["player"], False)
-                        lobby.recentMove = message.data["move"]
-                        await manager.broadcast(lobby)
+                        lobby.recentMove = message["data"]["move"]
+                        lobby.messageType = "move"
+                        await manager.broadcast(json.dumps(lobby.toDict()))
                     elif message.Type == MessageTypes.NEWCHALLENGE:
                         lobby = lobbies[message.data["code"]]
                         start_board = generate_random_board(lobby.width, lobby.height)

@@ -11,16 +11,19 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     player1Color = 0xffa500;
     player2Color = 0x0000ff;
     mixedColor = 0x925e6d;
+    me = 1;
     ws: WebSocket;
     public gameOverEvent: EventEmitter;
     public moveEvent: EventEmitter;
     public boardEvent: EventEmitter;
+    public joinEvent: EventEmitter;
 
     public constructor(){
         super();
         this.gameOverEvent = new EventEmitter();
         this.moveEvent = new EventEmitter();
         this.boardEvent = new EventEmitter();
+        this.joinEvent = new EventEmitter();
     }
 
     private generateRandomSixDigitNumber(): number {
@@ -38,14 +41,19 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         this.moveEvent.emit(score.toString());
     }
       
-    public async initChallenge(): Promise<void> {
-        var code = this.generateRandomSixDigitNumber();
-        var existing = false;
-        while(existing){
-            existing = await checkCode(code);
-            code = this.generateRandomSixDigitNumber();
+    public async create(create: boolean, code: number): Promise<void> {
+        //var code = this.generateRandomSixDigitNumber();
+        //var existing = false;
+        // while(existing){
+        //    existing = await checkCode(code);
+        //    code = this.generateRandomSixDigitNumber();
+        //}
+        if(create){
+            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=shadowwizardmoneygang&operation=create");
+        } else {
+            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=cringelord&operation=join");
         }
-        this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=shadowwizardmoneygang&operation=create");
+        
         this.ws.onopen = () => {
             console.log("WebSocket is connected..");
         };
@@ -61,6 +69,10 @@ export class OnlineMultiPlayer extends AbstractGameMode {
                     break;
                 case "move":
                     this.moveEvent.emit("move", lobby.recentMove);
+                    break;
+                case "join":
+                    console.log("join received")
+                    this.joinEvent.emit("join");
                     break;
             }
         };
@@ -86,12 +98,14 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         }
     }
 
-    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardWidth: number): void {
+    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number): void {
+        const playerNameText1 = scene.add.text(x, y, "Player 1", { fontSize: 30,  color: this.convertToCSS(this.player1Color), align: "center" });
+        playerNameText1.setData("playerText", 1);
 
-        /*
-        const playerStatusContainer = scene.add.container(x, y);
-        const playerNameText = scene.add.text(0, 0, "Player 1", { fontSize: 16,  color: this.playerColor.toString()});
-        playerStatusContainer.add(playerNameText);*/
+        const playerNameText2 = scene.add.text(boardEnd + x, y, "Player 2", { fontSize: 30,  color: this.convertToCSS(this.player2Color), align: "center" });  
+        playerNameText2.setData("playerText", -1);
+        
+        this.indicateTurn(1, scene);
     }
 
     public handleTurnSwitch(playerTurn: number): [ marblePNG: string, turn: number ] {

@@ -30,13 +30,13 @@ export default class MainMenu extends Phaser.Scene {
 			.setAlign("center")
 			.setOrigin(0.5);
 		newGameText.setInteractive();
-		newGameText.on("pointerdown", () => { this.scene.start(MainGame.Name, { gameModeHandle: this.gameMode }); }, this);
+		newGameText.on("pointerdown", () => { this.scene.start(MainGame.Name, { gameModeHandle: this.gameMode, gameModeObj: null }); }, this);
 
 		// first element is the default mode
 		const gameModeOptions = [
-			{ text: "Online 1v1", value: "online1v1"},
 			{ text: "Single Player", value: "singlePlayerChallenge"},
-			{ text: "Local 1v1", value: "local1v1"}
+			{ text: "Local 1v1", value: "local1v1"},
+			{ text: "Online 1v1", value: "online1v1"}		
 		];
 
 		// set default game mode
