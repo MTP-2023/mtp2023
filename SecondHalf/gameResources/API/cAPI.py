@@ -12,7 +12,6 @@ sys.path.append('../../agent/rl')
 from lobby.message import MoveMessage
 from lobby.message import Message, MessageTypes
 from uuid import UUID
-from fastapi_sessions.backends.implementations import InMemoryBackend
 from simulation.simulate import run
 from lobby.lobby import Lobby
 from boardGenerator.generate import generate_random_board
@@ -23,11 +22,7 @@ from pydantic import BaseModel
 import numpy as np
 from agent.rl.apply_policy import return_move, solve_challenge
 from ray.rllib.policy.policy import Policy
-from uuid import uuid4
-from uuid import UUID
-from fastapi_sessions.backends.implementations import InMemoryBackend
 from fastapi import FastAPI, Response
-from fastapi_sessions.frontends.implementations import SessionCookie, CookieParameters
 import os
 import json
 from simulation.simulate import run
@@ -46,9 +41,6 @@ agent_handles = [
 
 class SessionData(BaseModel):
     username: str
-
-
-backend = InMemoryBackend[UUID, SessionData]()
 
 # register models required for alphazero
 from agent.rl.train_resources.azModel import DefaultModel, SimplerModel, ComplexModel
@@ -112,19 +104,7 @@ app.add_middleware(
 default_width = 3
 default_height = 2
 
-cookie_params = CookieParameters()
-
 lobbies = {}
-
-# Uses UUID
-cookie = SessionCookie(
-    cookie_name="cookie",
-    identifier="general_verifier",
-    auto_error=True,
-    secret_key="DONOTUSE",
-    cookie_params=cookie_params,
-)
-
 
 class SimulationDTO(BaseModel):
     marble_throw: int
