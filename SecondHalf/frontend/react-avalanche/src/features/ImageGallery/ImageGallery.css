@@ -5,3 +5,25 @@
 .color-div {
   background-color: #0f0f0f;
 }
+
+.background-imagescreen {
+  background: rgba(0, 0, 0, 0.5);
+}
+.button-style {
+  background-color: black;
+
+  width: 45px;
+  border: 0;
+}
+
+.button-style2 {
+  width: 20px;
+  border: 0;
+
+  border-radius: 4px;
+  background-color: black;
+  color: #fff;
+  background-repeat: no-repeat;
+  background-position-x: 50px;
+  text-indent: -20px;
+}
