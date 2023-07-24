@@ -8,6 +8,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
     isLocal: boolean = false;
     isMultiplayer: boolean = true;
+    isVsAi: boolean = false;
     player1Color = 0xffa500;
     player2Color = 0x0000ff;
     mixedColor = 0x925e6d;
@@ -28,6 +29,10 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         this.joinEvent = new EventEmitter();
     }
 
+    public async getAgentMove(): Promise<number> {
+        return 1;
+    }
+
     private generateRandomSixDigitNumber(): number {
         const min = 100000;
         const max = 999999;
@@ -38,6 +43,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         // Emit the custom event when the game is over
         this.gameOverEvent.emit("");
     }
+    
     updateScore(score: number) {
         // Emit the custom event when the score is updated
         this.moveEvent.emit(score.toString());

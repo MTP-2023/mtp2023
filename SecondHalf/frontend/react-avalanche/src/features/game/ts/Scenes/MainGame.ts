@@ -394,12 +394,11 @@ export default class MainGame extends Phaser.Scene {
             this.dropMarble(number);
 		}
 	}
+
 	// Event handler for the "gameOverEvent"
 	private handleGameOver() {
 	  	console.log("Game Over!");
 	}
-
-
 
 	// Event handler for the "boardEvent"
 	private getChallenge() {
@@ -447,8 +446,8 @@ export default class MainGame extends Phaser.Scene {
 		const buttonGroup = this.children.getByName("buttons") as Phaser.GameObjects.Container;
 		buttonGroup.getAll().forEach((child: Phaser.GameObjects.GameObject) => {
 			if (child instanceof Phaser.GameObjects.Sprite) {
-			  const button = child as Phaser.GameObjects.Sprite;
-			  button.input!.enabled = clickable;
+			  	const button = child as Phaser.GameObjects.Sprite;
+			  	button.input!.enabled = clickable;
 			}
 		});
 
@@ -727,16 +726,18 @@ export default class MainGame extends Phaser.Scene {
 			console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
 			this.toggleInput(true);
 			this.simulationRunning = false;
+			if(this.turn==1 || !this.gameMode.isVsAi) {
+				this.toggleInput(true);
+			}
 			if(this.gameMode.isLocal){
 				this.toggleInput(true);
 			} else {
 				console.log("blocking for " + this.turn)
 				this.initButtonsclickable(this.turn);
 			}
+			
 			this.interpretGameState();
-			if(this.turn==1 || !this.gameMode.isVsAi) {
-				this.toggleInput(true);
-			}
+			
 			this.simulationRunning = false;
 		}
 	}
