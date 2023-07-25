@@ -24,6 +24,10 @@ export default class Preloader extends Phaser.Scene {
 		this.load.json("switch-left-shape");
 		this.load.json("switch-right-shape");
 		this.load.json("marble-shape");
+
+		// audio
+		this.load.path = "src/features/game/assets/audio/";
+		this.load.audio("gameBackground", "gameBackground.mp3");
 	}
 
 	public create(): void {
