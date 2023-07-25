@@ -66,4 +66,8 @@ export class SinglePlayerChallenge extends AbstractGameMode {
     public getAgentMove(): Promise<number> {
         throw new Error("Method not callable for this game mdoe.");
     }
+
+    public getPlayerNames(): string[] {
+        throw new Error("Method not callable for this game mdoe.");
+    }
 }

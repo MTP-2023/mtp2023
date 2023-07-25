@@ -108,4 +108,11 @@ export class LocalVsAi extends AbstractGameMode {
             return await mctsMove(this.currentBoard, this.getOriginalGoalBoard(), this.aiPlayer);
         }
     }
+
+    public getPlayerNames(): string[] {
+        return [
+            "You",
+            "AI Agent"
+        ]
+    }
 }
