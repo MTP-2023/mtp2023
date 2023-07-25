@@ -100,8 +100,9 @@ export default class SkinSelector extends Phaser.Scene {
             position: Phaser.Display.Align.CENTER,
         });
 
-        // Select the first option as default
-        const firstOptionContainer = gallery.getChildren()[0] as Phaser.GameObjects.Container;
+        // Select the current option
+        const selectIdx = this.skinOptions.findIndex((item) => item.imgName == this.registry.get("marbleSkin"));
+        const firstOptionContainer = gallery.getChildren()[selectIdx] as Phaser.GameObjects.Container;
         const firstOptionBackground = firstOptionContainer.getAt(0) as Phaser.GameObjects.Rectangle;
         this.handleSelection(firstOptionContainer, firstOptionBackground);
 
@@ -116,7 +117,7 @@ export default class SkinSelector extends Phaser.Scene {
         // Handle "Save" button click
         saveButton.on('pointerdown', () => {
             // saves selection into registry
-            this.registry.set("skinImg", this.selectedSkin);
+            this.registry.set("marbleSkin", this.selectedSkin);
             this.scene.stop();
             this.scene.resume(MainMenu.Name);
         });

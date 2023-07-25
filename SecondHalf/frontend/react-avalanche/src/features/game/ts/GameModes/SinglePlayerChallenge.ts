@@ -43,8 +43,8 @@ export class SinglePlayerChallenge extends AbstractGameMode {
         // player status not required for single player challenge
     }
 
-    public getMarbleSprite(playerTurn: number): string{
-        return "marble-p1";
+    public getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string{
+        return scene.registry.get("marbleSkin");
     }
 
     public interpretGameState(board: number[][]): GameEvaluation {
@@ -61,5 +61,9 @@ export class SinglePlayerChallenge extends AbstractGameMode {
         }
 
         return new GameEvaluation(finished);
+    }
+
+    public getAgentMove(): Promise<number> {
+        throw new Error("Method not callable for this game mdoe.");
     }
 }

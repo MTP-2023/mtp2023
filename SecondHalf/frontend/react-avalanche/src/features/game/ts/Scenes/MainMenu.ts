@@ -49,7 +49,7 @@ export default class MainMenu extends Phaser.Scene {
         }, this);
 
 		// set default skin
-		this.game.registry.set('skinImg', "marble");
+		this.game.registry.set('marbleSkin', "marble");
 
         // first element is the default mode
         const gameModeOptions = [

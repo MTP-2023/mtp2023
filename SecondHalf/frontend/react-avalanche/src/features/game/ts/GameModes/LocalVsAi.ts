@@ -39,7 +39,7 @@ export class LocalVsAi extends AbstractGameMode {
 
         switch (playerTurn) {
             case 1:
-                newSpritePNG = "marble-p1";
+                newSpritePNG = scene.registry.get("marbleSkin");
                 break;
             case -1:
                 newSpritePNG = "marble-p2";
