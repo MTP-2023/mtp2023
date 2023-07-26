@@ -19,6 +19,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     public moveEvent: EventEmitter;
     public boardEvent: EventEmitter;
     public joinEvent: EventEmitter;
+    public dcEvent: EventEmitter;
 
     public constructor(){
         super();
@@ -26,6 +27,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         this.moveEvent = new EventEmitter();
         this.boardEvent = new EventEmitter();
         this.joinEvent = new EventEmitter();
+        this.dcEvent = new EventEmitter();
     }
 
     private generateRandomSixDigitNumber(): number {
@@ -38,6 +40,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         // Emit the custom event when the game is over
         this.gameOverEvent.emit("");
     }
+
     updateScore(score: number) {
         // Emit the custom event when the score is updated
         this.moveEvent.emit(score.toString());
@@ -77,6 +80,10 @@ export class OnlineMultiPlayer extends AbstractGameMode {
                 case "join":
                     console.log("join received")
                     this.joinEvent.emit("join");
+                    break;
+                case "dc":
+                    console.log("he disconnected");
+                    this.dcEvent.emit("dc")
                     break;
             }
         };

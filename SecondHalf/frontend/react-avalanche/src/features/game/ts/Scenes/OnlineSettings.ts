@@ -16,7 +16,7 @@ export default class OnlineSettings extends Phaser.Scene {
     private lobbyInput: any = null; // We will set the type later
     private createLobbyButton: Phaser.GameObjects.Text;
     private joinLobbyButton: Phaser.GameObjects.Text;
-    
+
 
     public create(): void {
         Utilities.LogSceneMethodEntry("MainSettings", "create");
@@ -71,6 +71,26 @@ export default class OnlineSettings extends Phaser.Scene {
         // Initialize lobby code text and input fields
         this.lobbyCodeText = null;
         this.lobbyInput = null;
+
+
+        const closeButton = this.add.sprite(0, 0, "close-cross")
+            .setInteractive()
+            .on('pointerdown', () => {
+                this.scene.stop();
+                this.scene.resume(MainMenu.Name);
+        });
+
+        const buttonScale = 0.05;
+        closeButton.setScale(buttonScale); 
+
+        console.log( this.cameras.main.width, closeButton.width)
+        const closeButtonContainer = this.add.container(
+            this.cameras.main.width - closeButton.width * buttonScale / 2 - 10,
+            closeButton.height * buttonScale / 2 + 10,
+            closeButton
+        );
+
+        closeButtonContainer.setSize(closeButton.width, closeButton.height);
     }
 
     private async onCreateLobbyClicked(): Promise<void> {
@@ -179,5 +199,9 @@ export default class OnlineSettings extends Phaser.Scene {
         this.scene.stop(MainMenu.Name);
         this.scene.stop(OnlineSettings.Name);
         this.scene.start(MainGame.Name, { gameModeHandle: "online1v1", gameModeObj: gameMode });
+    }
+
+    public update(time: number, delta: number): void {
+        if (this.lobbyInput) this.lobbyInput.setPosition(this.cameras.main.centerX, this.cameras.main.height / 2);
     }
 }

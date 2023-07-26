@@ -3,6 +3,7 @@ import MainGame from "./MainGame";
 import MainSettings from "./MainSettings";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import OnlineSettings from "./OnlineSettings";
+import { Factory } from "react";
 
 
 export default class MainMenu extends Phaser.Scene {
@@ -12,6 +13,13 @@ export default class MainMenu extends Phaser.Scene {
 	public static Name = "MainMenu";
 	private rexUI: RexUIPlugin;
 	private gameMode: string;
+	private dropDownList: RexUIPlugin.DropDownList;
+	private gameModeOptions // first element is the default mode
+	 = [
+		{ text: "Single Player", value: "singlePlayerChallenge"},
+		{ text: "Local 1v1", value: "local1v1"},
+		{ text: "Online 1v1", value: "online1v1"}		
+	];
 
 	public preload(): void {
 		// Preload as needed.
@@ -32,15 +40,8 @@ export default class MainMenu extends Phaser.Scene {
 		newGameText.setInteractive();
 		newGameText.on("pointerdown", () => { this.scene.start(MainGame.Name, { gameModeHandle: this.gameMode, gameModeObj: null }); }, this);
 
-		// first element is the default mode
-		const gameModeOptions = [
-			{ text: "Single Player", value: "singlePlayerChallenge"},
-			{ text: "Local 1v1", value: "local1v1"},
-			{ text: "Online 1v1", value: "online1v1"}		
-		];
-
 		// set default game mode
-		this.gameMode = gameModeOptions[0].value;
+		this.gameMode = this.gameModeOptions[0].value;
 
 		const mainMenuScene = this;
 		const dropDownConfig = {
@@ -48,7 +49,7 @@ export default class MainMenu extends Phaser.Scene {
 			y: textYPosition * 2,
             background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 0, 0xffa500),
             icon: this.rexUI.add.roundRectangle(0, 0, 20, 20, 10, 0xffd580),
-            text: this.add.text(0, 0, gameModeOptions[0].text, { fontSize: 20, align: "center" }).setFixedSize(this.cameras.main.width/3, 0),
+            text: this.add.text(0, 0, this.gameModeOptions[0].text, { fontSize: 20, align: "center" }).setFixedSize(this.cameras.main.width/3, 0),
 
             space: {
                 left: 10,
@@ -58,7 +59,7 @@ export default class MainMenu extends Phaser.Scene {
                 icon: 10
             },
 
-            options: gameModeOptions,
+            options: this.gameModeOptions,
 
             list: {
 				createBackgroundCallback: () => {
@@ -83,8 +84,8 @@ export default class MainMenu extends Phaser.Scene {
 				onButtonClick: function (button: Phaser.GameObjects.GameObject) {
 					// Set label text, and value
 					const labelButton = button as RexUIPlugin.Label;
-					dropDownList.text = labelButton.text;
-                    mainMenuScene.gameMode = gameModeOptions.find((item) => item.text === labelButton.text)!.value;
+					mainMenuScene.dropDownList.text = labelButton.text;
+                    mainMenuScene.gameMode = mainMenuScene.gameModeOptions.find((item) => item.text === labelButton.text)!.value;
 
                     switch (mainMenuScene.gameMode) {
                         case "online1v1":
@@ -103,11 +104,19 @@ export default class MainMenu extends Phaser.Scene {
 					el.setStrokeStyle();
 				},
 			},
-			value: gameModeOptions[0].value
+			value: this.gameModeOptions[0].value
 			
         };
 
-		const dropDownList = this.rexUI.add.dropDownList(dropDownConfig).layout();
+		this.dropDownList = this.rexUI.add.dropDownList(dropDownConfig).layout();
+
+		this.events.on('resume', this.onOnlineCancel, this);
+	}
+
+	private onOnlineCancel(): void {
+		this.dropDownList.text = this.gameModeOptions[0].text;
+		this.dropDownList.value = this.gameModeOptions[0].value;
+		this.gameMode = this.gameModeOptions[0].value;
 	}
 
 	public update(): void {
