@@ -314,7 +314,8 @@ export default class MainGame extends Phaser.Scene {
 			var onlinegame = this.gameMode as OnlineMultiPlayer;
 			onlinegame.gameOverEvent.on("gameOver", this.handleGameOver, this);
 			onlinegame.moveEvent.on("move", this.handleMove, this);
-			onlinegame.boardEvent.on("emit", this.getChallenge, this)
+			onlinegame.boardEvent.on("emit", this.getChallenge, this);
+			onlinegame.dcEvent.on("dc", this.testdc, this)
 		}
 
 		// Register the beforeupdate event
@@ -357,12 +358,14 @@ export default class MainGame extends Phaser.Scene {
 	  	console.log("Game Over!");
 	}
 
-
-
 	// Event handler for the "boardEvent"
 	private getChallenge() {
 		console.log("challenge recieved");
     }
+
+	private testdc(){
+		console.log("dc registered in maingame")
+	}
 
 	// Event handler for the "moveEvent"
 	private handleMove(col: number) {
