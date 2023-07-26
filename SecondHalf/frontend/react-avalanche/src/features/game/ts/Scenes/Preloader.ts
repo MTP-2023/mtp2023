@@ -24,6 +24,8 @@ export default class Preloader extends Phaser.Scene {
 		this.load.json("switch-left-shape");
 		this.load.json("switch-right-shape");
 		this.load.json("marble-shape");
+		this.load.image("close-cross");
+		this.load.image("border");
 	}
 
 	public create(): void {

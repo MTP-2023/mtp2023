@@ -164,6 +164,7 @@ async def websocket_endpoint_create_or_join(code: int, websocket: WebSocket, pla
 
 @app.post("/checkCode", tags=["checkCode"])
 async def checkCode(code: int):
+    
     return False
 
 async def create_lobby(code: int, websocket: WebSocket, player: str):
@@ -208,19 +209,8 @@ async def create_lobby(code: int, websocket: WebSocket, player: str):
                 lobby.availableMarbles = message.data["availableMarbles"]
     except WebSocketDisconnect:
         lobby.messageType = "dc"
-        await manager.broadcast(lobby)
+        await manager.broadcast(json.dumps(lobby.toDict()))
         manager.disconnect(websocket)
-        lobby.player2_name = ""
-        lobby.player2_wins = 0
-        start_board = generate_random_board(lobby.width, lobby.height)
-        goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
-                                  lobby.width * 2, False)
-        goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
-                                  lobby.width * 2, False)
-        goal_board = merge(goal1, goal2, lobby.width, lobby.height)
-        lobby.currentBoard = start_board
-        lobby.goalBoard = goal_board
-        await manager.broadcast(lobby)
 
 async def join_lobby(code: int, websocket: WebSocket, name: str):
     if lobbies.keys().__contains__(code):
@@ -267,17 +257,8 @@ async def join_lobby(code: int, websocket: WebSocket, name: str):
                         lobby.availableMarbles = message.data["availableMarbles"]
             except WebSocketDisconnect:
                 manager.disconnect(websocket)
-                lobby.player1_name = ""
-                lobby.player1_wins = 0
-                start_board = generate_random_board(lobby.width, lobby.height)
-                goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
-                                          lobby.width * 2, False)
-                goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
-                                          lobby.width * 2, False)
-                goal_board = merge(goal1, goal2, lobby.width, lobby.height)
-                lobby.currentBoard = start_board
-                lobby.goalBoard = goal_board
-                await manager.broadcast(lobby)
+                lobby.messageType = "dc"
+                await manager.broadcast(json.dumps(lobby.toDict()))
     else:
         return "not found"
 

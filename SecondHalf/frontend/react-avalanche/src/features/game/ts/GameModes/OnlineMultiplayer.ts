@@ -20,6 +20,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     public moveEvent: EventEmitter;
     public boardEvent: EventEmitter;
     public joinEvent: EventEmitter;
+    public dcEvent: EventEmitter;
 
     public constructor(){
         super();
@@ -27,6 +28,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         this.moveEvent = new EventEmitter();
         this.boardEvent = new EventEmitter();
         this.joinEvent = new EventEmitter();
+        this.dcEvent = new EventEmitter();
     }
 
     public async getAgentMove(): Promise<number> {
@@ -83,6 +85,10 @@ export class OnlineMultiPlayer extends AbstractGameMode {
                 case "join":
                     console.log("join received")
                     this.joinEvent.emit("join");
+                    break;
+                case "dc":
+                    console.log("he disconnected");
+                    this.dcEvent.emit("dc")
                     break;
             }
         };
