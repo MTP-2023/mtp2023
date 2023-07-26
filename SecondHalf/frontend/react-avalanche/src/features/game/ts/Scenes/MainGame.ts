@@ -363,8 +363,10 @@ export default class MainGame extends Phaser.Scene {
 		console.log("challenge recieved");
     }
 
+	// @Michael
 	private testdc(){
 		console.log("dc registered in maingame")
+		
 	}
 
 	// Event handler for the "moveEvent"
