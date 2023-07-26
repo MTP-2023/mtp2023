@@ -1,5 +1,4 @@
 import { Challenge, GameEvaluation, AbstractGameMode, MessageAvalanche, MessageType } from "./GameModeResources";
-import { checkCode } from "../../cAPICalls";
 import { Lobby } from "./GameModeResources";
 import EventEmitter from "phaser3-rex-plugins/plugins/utils/eventemitter/EventEmitter";
 import { waitFor } from "wait-for-event";
