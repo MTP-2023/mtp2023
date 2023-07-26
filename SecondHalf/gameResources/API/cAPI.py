@@ -152,6 +152,7 @@ async def websocket_endpoint_create_or_join(code: int, websocket: WebSocket, pla
 
 @app.post("/checkCode", tags=["checkCode"])
 async def checkCode(code: int):
+    
     return False
 
 async def create_lobby(code: int, websocket: WebSocket, player: str):
