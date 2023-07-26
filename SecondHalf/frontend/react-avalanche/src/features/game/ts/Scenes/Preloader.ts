@@ -12,14 +12,20 @@ export default class Preloader extends Phaser.Scene {
 		// images
 		this.load.path = "src/features/game/assets/img/";
 		this.load.image("phaser_pixel_medium_flat");
-		this.load.image("Phaser-Logo-Small");
 		this.load.image("switch-left");
 		this.load.image("switch-right");
 		this.load.image("marble");
 		this.load.image("marble-p1");
 		this.load.image("marble-p2");
 		this.load.image("close-cross");
-		
+		this.load.image("menu-background");
+		/*
+		this.load.spritesheet("animated-background", "background-spritesheet.png", {
+			frameWidth: 1600,
+			frameHeight: 1200,
+			startFrame: 0
+		});*/
+
 		// shapes
 		this.load.path = "src/features/game/assets/shapes/";
 		this.load.json("switch-left-shape");
@@ -30,6 +36,11 @@ export default class Preloader extends Phaser.Scene {
 		this.load.path = "src/features/game/assets/audio/";
 		this.load.audio("snowStorm", "snowStorm.mp3");
 		
+		// fonts
+		this.load.path = "src/features/game/assets/fonts/";
+		const fonts = [
+			"Monoton-Regular.ttf"
+		];
 	}
 
 	public create(): void {

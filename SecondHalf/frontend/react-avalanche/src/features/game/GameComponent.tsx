@@ -23,7 +23,7 @@ const GameComponent: React.FC = () => {
       height: game_height,
       type: Phaser.AUTO,
       parent: 'game',
-      title: 'Avalanche Game',
+      title: 'SnowSlider Game',
       dom: {
         createContainer: true
       },

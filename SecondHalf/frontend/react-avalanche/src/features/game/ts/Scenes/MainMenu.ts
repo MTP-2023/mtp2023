@@ -30,6 +30,27 @@ export default class MainMenu extends Phaser.Scene {
     public create(): void {
         Utilities.LogSceneMethodEntry("MainMenu", "create");
 
+        /*
+         // Create a sprite using the loaded spritesheet as the background
+        const background = this.add.sprite(0, 0, 'animated-background').setOrigin(0, 0);
+        
+        // Set the depth of the background sprite to be behind all other elements
+        background.setDepth(-1);
+
+        // Play an animation using the frames from the spritesheet
+        this.anims.create({
+            key: 'bg-play',
+            frames: this.anims.generateFrameNumbers('animated-background'),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        background.anims.play('bg-play');*/
+
+        const backgroundImage = this.add.image(0, 0, "menu-background").setOrigin(0, 0);
+		backgroundImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+		this.children.sendToBack(backgroundImage);
+
         const textYPosition = this.cameras.main.height / 4;
 
         const newGameText = this.add.text(this.cameras.main.centerX, textYPosition, "PLAY");

@@ -14,14 +14,18 @@ export default class SplashScreen extends Phaser.Scene {
 	public create(): void {
 		Utilities.LogSceneMethodEntry("SplashScreen", "create");
 
+		const backgroundImage = this.add.image(0, 0, "menu-background").setOrigin(0, 0);
+		backgroundImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+		this.children.sendToBack(backgroundImage);
+
 		const titleText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY * 0.5, "SnowSlider")
 			.setOrigin(0.5, 0)
-			.setFontFamily("monospace").setFontSize(52).setFill("#fff");
+			.setFontFamily("monoton").setFontSize(80).setFill("#000");
 
-		const poweredByText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 25, "Powered By");
+		const poweredByText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 120, "Powered By");
 		poweredByText.setOrigin(0.5, 1);
-		poweredByText.setFontFamily("monospace").setFontSize(36).setFill("#fff");
-		this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, "phaser_pixel_medium_flat").setScale(2);
+		poweredByText.setFontFamily("monoton").setFontSize(36).setFill("#000");
+		this.add.image(this.cameras.main.centerX, this.cameras.main.centerY + 160, "phaser_pixel_medium_flat").setScale(2);
 
 		this.input.setDefaultCursor("pointer");
 		this.input.on("pointerdown", this.loadMainMenu, this);
