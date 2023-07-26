@@ -378,13 +378,22 @@ export default class MainGame extends Phaser.Scene {
 
 	private onKeyPress(event: Phaser.Input.Keyboard.Key): void {
 		const code = event.keyCode;
-		// Check if the key is a number
         if (code >= Phaser.Input.Keyboard.KeyCodes.ONE && code <= Phaser.Input.Keyboard.KeyCodes.SIX) {
-            // Get the number from the keyCode (assuming it's a number key)
-            const number = code - Phaser.Input.Keyboard.KeyCodes.ONE + 1;
+			if (!this.simulationRunning) {
+				// Get the number from the keyCode (assuming it's a number key)
+				const number = code - Phaser.Input.Keyboard.KeyCodes.ONE + 1;
 
-            // Now you can use the number in your logic
-            this.dropMarble(number);
+				if(this.gameMode.isMultiplayer && !this.gameMode.isLocal) {
+					console.log("multi")
+					var onlinegame = this.gameMode as OnlineMultiPlayer;
+					onlinegame.makeMove(number);
+					this.toggleInput(false);
+				  }
+				  else {
+					console.log("single")
+					this.dropMarble(number);
+				  }
+			}
 		}
 	}
 
@@ -406,8 +415,6 @@ export default class MainGame extends Phaser.Scene {
 
 	// Event handler for the "moveEvent"
 	private handleMove(col: number) {
-	  	// Score update logic here
-	  	const boardX = (this.scale.width - this.boardWidth) / 2;
 	  	this.dropMarble(col);
 	}
 

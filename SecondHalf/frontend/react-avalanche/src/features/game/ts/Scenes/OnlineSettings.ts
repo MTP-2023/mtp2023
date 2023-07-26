@@ -21,7 +21,7 @@ export default class OnlineSettings extends Phaser.Scene {
     public create(): void {
         Utilities.LogSceneMethodEntry("MainSettings", "create");
         const startYPosition = this.cameras.main.height / 4;
-        const fontSize = 25;
+        const fontSize = 48;
 
         const graphics = this.add.graphics();
 
@@ -125,7 +125,7 @@ export default class OnlineSettings extends Phaser.Scene {
             this.cameras.main.centerX,
             this.cameras.main.height / 2.5,
             "Lobby Code: " + lobbyCode,
-            { fontSize: 20, color: "#ffffff" }
+            { fontSize: 40, color: "#ffffff" }
         );
         this.lobbyCodeText.setOrigin(0.5);
     }
