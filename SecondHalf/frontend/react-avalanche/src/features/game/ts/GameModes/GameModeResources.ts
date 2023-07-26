@@ -69,11 +69,12 @@ export abstract class AbstractGameMode {
     }
 
     public switchTurns(currentPlayer: number, scene: Phaser.Scene): number {
-        console.log("SWITCHING TURNS", currentPlayer);
+        //console.log("SWITCHING TURNS", currentPlayer);
         this.stopIndicator(currentPlayer, scene);
+        //console.log("STOPPED INDICATOR");
         const nextPlayer = currentPlayer * (-1);
         this.indicateTurn(nextPlayer, scene);
-        console.log(nextPlayer);
+        //console.log("STARTED INDICATOR", nextPlayer);
         return nextPlayer;
     }
 
@@ -125,6 +126,25 @@ export abstract class AbstractGameMode {
         }
     }
 
+    public stopIndicators(scene: Phaser.Scene): void {
+        const foundTexts = scene.children.getChildren();
+        for (const foundText of foundTexts) {
+            if (foundText instanceof Phaser.GameObjects.Text) {
+                // Retrieve the interval ID and rectangle from the Text object's data
+                const blinkInterval = foundText.getData("blinkInterval");
+                const rectangle = foundText.getData("blinkRectangle");
+            
+                if (blinkInterval && rectangle) {
+                    // Stop the blinking and remove the rectangle graphics
+                    clearInterval(blinkInterval);
+                    foundText.data.remove("blinkInterval");
+                    foundText.data.remove("blinkRectangle");
+                    rectangle.destroy();
+                }
+            }
+        }
+    }
+
     public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number, player1Text: string, player2Text: string): void {
         const playerNameText1 = scene.add.text(x, y, player1Text, { fontSize: 50,  color: this.convertToCSS(this.player1Color), align: "center" });
         playerNameText1.setData("playerText", 1);
@@ -143,6 +163,8 @@ export abstract class AbstractGameMode {
     public abstract interpretGameState(board: number[][]): GameEvaluation;
 
     public abstract getAgentMove(): Promise<number>;
+
+    public abstract getPlayerNames(): string[];
 }
 
 export class MessageAvalanche{

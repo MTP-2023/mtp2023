@@ -4,7 +4,7 @@ import MainSettings from "./MainSettings";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import AgentSelect from "./AgentSelect";
 import OnlineSettings from "./OnlineSettings";
-import { Factory } from "react";
+import SkinSelector from "./SkinSelector";
 
 
 export default class MainMenu extends Phaser.Scene {
@@ -30,7 +30,7 @@ export default class MainMenu extends Phaser.Scene {
     public create(): void {
         Utilities.LogSceneMethodEntry("MainMenu", "create");
 
-        const textYPosition = this.cameras.main.height / 3;
+        const textYPosition = this.cameras.main.height / 4;
 
         const newGameText = this.add.text(this.cameras.main.centerX, textYPosition, "PLAY");
         newGameText
@@ -44,6 +44,25 @@ export default class MainMenu extends Phaser.Scene {
             this.scene.start(MainGame.Name, {gameModeHandle: this.gameMode, agent: "rl", gameModeObj: null});
         }, this);
 
+		const selectSkinText = this.add.text(this.cameras.main.centerX, textYPosition * 2, "Select Marble Skin");
+        selectSkinText
+            .setFontFamily("monospace")
+            .setFontSize(60)
+            .setFill("#fff")
+            .setAlign("center")
+            .setOrigin(0.5);
+        selectSkinText.setInteractive();
+        selectSkinText.on("pointerdown", () => {
+            this.scene.pause();
+			this.scene.launch(SkinSelector.Name);
+        }, this);
+
+		// set default skin
+		this.game.registry.set('marbleSkin', "marble");
+
+		// set default skin
+		this.game.registry.set('marbleSkin', "marble");
+
         
 
         // set default game mode
@@ -52,7 +71,7 @@ export default class MainMenu extends Phaser.Scene {
         const mainMenuScene = this;
         const dropDownConfig = {
             x: this.cameras.main.centerX,
-            y: textYPosition * 2,
+            y: textYPosition * 3,
             background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 0, 0xffa500),
             icon: this.rexUI.add.roundRectangle(0, 0, 20, 20, 10, 0xffd580),
             text: this.add.text(0, 0, this.gameModeOptions[0].text, {

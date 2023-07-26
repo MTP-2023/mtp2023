@@ -39,7 +39,7 @@ export class LocalVsAi extends AbstractGameMode {
 
         switch (playerTurn) {
             case 1:
-                newSpritePNG = "marble-p1";
+                newSpritePNG = scene.registry.get("marbleSkin");
                 break;
             case -1:
                 newSpritePNG = "marble-p2";
@@ -107,5 +107,12 @@ export class LocalVsAi extends AbstractGameMode {
         }else {
             return await mctsMove(this.currentBoard, this.getOriginalGoalBoard(), this.aiPlayer);
         }
+    }
+
+    public getPlayerNames(): string[] {
+        return [
+            "You",
+            "AI Agent"
+        ]
     }
 }

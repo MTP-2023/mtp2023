@@ -10,6 +10,7 @@ import GameEnd from './ts/Scenes/GameEnd';
 import OnlineSettings from './ts/Scenes/OnlineSettings';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import AgentSelect from "./ts/Scenes/AgentSelect";
+import SkinSelector from './ts/Scenes/SkinSelector';
 
 const GameComponent: React.FC = () => {
   useEffect(() => {
@@ -59,6 +60,7 @@ const GameComponent: React.FC = () => {
     game.scene.add(GameEnd.Name, GameEnd);
     game.scene.add(AgentSelect.Name, AgentSelect);
     game.scene.add(OnlineSettings.Name, OnlineSettings);
+    game.scene.add(SkinSelector.Name, SkinSelector);
 
     // Start the Boot scene
     game.scene.start(Boot.Name);

@@ -18,14 +18,18 @@ export default class Preloader extends Phaser.Scene {
 		this.load.image("marble");
 		this.load.image("marble-p1");
 		this.load.image("marble-p2");
-
+		this.load.image("close-cross");
+		
 		// shapes
 		this.load.path = "src/features/game/assets/shapes/";
 		this.load.json("switch-left-shape");
 		this.load.json("switch-right-shape");
 		this.load.json("marble-shape");
-		this.load.image("close-cross");
-		this.load.image("border");
+
+		// audio
+		this.load.path = "src/features/game/assets/audio/";
+		this.load.audio("snowStorm", "snowStorm.mp3");
+		
 	}
 
 	public create(): void {

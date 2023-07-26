@@ -35,10 +35,8 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         return 1;
     }
 
-    private generateRandomSixDigitNumber(): number {
-        const min = 100000;
-        const max = 999999;
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+    public getPlayerNames(): string[] {
+        return [this.player1Name, this.player2Name];
     }
 
     gameOver() {
