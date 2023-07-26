@@ -162,9 +162,14 @@ async def websocket_endpoint_create_or_join(code: int, websocket: WebSocket, pla
     else:
         raise HTTPException(status_code=404, detail="Invalid operation")
 
-@app.post("/checkCode", tags=["checkCode"])
-async def checkCode(code: int):
-    
+@app.get("/getCode", tags=["getCode"])
+async def getCode():
+    while True:
+        six_figure_number = random.randint(100000, 999999)
+        if six_figure_number not in lobbies:
+            return {
+                "code": six_figure_number
+            }
     return False
 
 async def create_lobby(code: int, websocket: WebSocket, player: str):
