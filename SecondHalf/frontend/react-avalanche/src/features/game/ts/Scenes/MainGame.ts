@@ -188,7 +188,8 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.world.setGravity(0, 0.85);
 
 		// start playing audio
-		const backgroundSound = this.sound.add('gameBackground', { loop: true });
+		const backgroundSound = this.sound.add('snowStorm', { loop: true });
+		backgroundSound.volume = 0.2;
     	backgroundSound.play();
 
 		// initialize gameMode
