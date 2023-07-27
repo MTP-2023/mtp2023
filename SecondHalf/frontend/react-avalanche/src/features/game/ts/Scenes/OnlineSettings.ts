@@ -13,14 +13,17 @@ export default class OnlineSettings extends Phaser.Scene {
     private rexUI: RexUIPlugin;
 
     private lobbyCodeText: Phaser.GameObjects.Text | null = null;
-    private lobbyInput: any = null; // We will set the type later
-    private createLobbyButton: Phaser.GameObjects.Text;
-    private joinLobbyButton: Phaser.GameObjects.Text;
+    private instructionText: Phaser.GameObjects.Text | null = null;
+
+    private inputField: any = null;
+    private createLobbyButton: Phaser.GameObjects.Image;
+    private joinLobbyButton: Phaser.GameObjects.Image;
 
 
     public create(): void {
         Utilities.LogSceneMethodEntry("MainSettings", "create");
-        const startYPosition = this.cameras.main.height / 4;
+        const textYPosition = this.cameras.main.height/4;
+        const textXPosition = this.cameras.main.centerX;
         const fontSize = 48;
 
         const graphics = this.add.graphics();
@@ -35,67 +38,187 @@ export default class OnlineSettings extends Phaser.Scene {
         const sceneHeight = this.cameras.main.height;
         graphics.fillRect(0, 0, sceneWidth, sceneHeight);
 
-        // Create "Create Lobby" button
-        this.createLobbyButton = this.add.text(
-            this.cameras.main.centerX,
-            startYPosition,
-            "Create Lobby",
-            { fontSize }
-        );
-        this.createLobbyButton.setOrigin(0.5);
-        this.createLobbyButton.setInteractive({ useHandCursor: true });
+        const selectBg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, "wood-label");
+        selectBg.setScale(0.6);
+
+        // Create Lobby button
+        this.createLobbyButton = this.add.image(textXPosition/3*2, this.cameras.main.centerY - selectBg.height/3, "wood-hexagon");
+        this.createLobbyButton.setScale(0.25);
+
+        const createText = this.add.text(textXPosition/3*2, this.cameras.main.centerY - selectBg.height/3, "Create Lobby");
+        createText
+            .setFontFamily("monospace")
+            .setFontSize(40)
+            .setFill("#fff")
+            .setAlign("center")
+            .setOrigin(0.5);
+
+        this.createLobbyButton.on("pointerover", () => {
+            this.toggleTextShadow(createText, true);
+        });
+
+        this.createLobbyButton.on("pointerout", () => {
+            this.toggleTextShadow(createText, false);
+        });
+
         this.createLobbyButton.on("pointerdown", () => this.onCreateLobbyClicked());
 
-        // Create "Join Lobby" button
-        this.joinLobbyButton = this.add.text(
-            this.cameras.main.centerX,
-            startYPosition * 2,
-            "Join Lobby",
-            { fontSize }
+        // Join Lobby button
+        this.joinLobbyButton = this.add.image(textXPosition/3*4, this.cameras.main.centerY - selectBg.height/3, "wood-hexagon");
+        this.joinLobbyButton.setScale(0.25);
+ 
+        const joinText = this.add.text(textXPosition/3*4, this.cameras.main.centerY - selectBg.height/3, "Join Lobby");
+        joinText
+            .setFontFamily("monospace")
+            .setFontSize(40)
+            .setFill("#fff")
+            .setAlign("center")
+            .setOrigin(0.5);
+ 
+        this.joinLobbyButton.on("pointerover", () => {
+             this.toggleTextShadow(joinText, true);
+         });
+ 
+         this.joinLobbyButton.on("pointerout", () => {
+             this.toggleTextShadow(joinText, false);
+         });
+ 
+         this.joinLobbyButton.on("pointerdown", () => this.onJoinLobbyClicked());
+
+        const closeCircle = this.add.sprite(0, 0, "wood-circle");
+        closeCircle.setScale(0.1);
+
+        const closeCross = this.add.sprite(0, 0, "close-cross");
+        closeCross.setScale(0.05); 
+        closeCross.setDepth(1);
+
+        const closeButton = this.add.container(
+            textXPosition + this.cameras.main.width/4.2,
+            textYPosition * 1.5
         );
-        this.joinLobbyButton.setOrigin(0.5);
-        this.joinLobbyButton.setInteractive({ useHandCursor: true });
-        this.joinLobbyButton.on("pointerdown", () => this.onJoinLobbyClicked());
 
-        // Create "Join Lobby" button
-        this.joinLobbyButton = this.add.text(
-            this.cameras.main.centerX,
-            startYPosition * 2,
-            "Join Lobby",
-            { fontSize }
-        );
-        this.joinLobbyButton.setOrigin(0.5);
-        this.joinLobbyButton.setInteractive({ useHandCursor: true });
-        this.joinLobbyButton.on("pointerdown", () => this.onJoinLobbyClicked());
-
-        // Initialize lobby code text and input fields
-        this.lobbyCodeText = null;
-        this.lobbyInput = null;
-
-
-        const closeButton = this.add.sprite(0, 0, "close-cross")
+        closeButton.add(closeCircle);
+        closeButton.add(closeCross);
+        closeCircle
             .setInteractive()
             .on('pointerdown', () => {
                 this.scene.stop();
                 this.scene.resume(MainMenu.Name);
+            });
+
+
+        // Name input
+        this.instructionText = this.add.text(textXPosition, textYPosition * 1.75, "Press ENTER to submit the name");
+        this.instructionText
+            .setFontFamily("monospace")
+            .setFontSize(40)
+            .setFill("#fff")
+            .setAlign("center")
+            .setOrigin(0.5)
+            .setWordWrapWidth(this.cameras.main.width/2);
+
+        this.inputField = this.createInputField("username");
+    }
+
+    private createInputField(type: string, maxChars: number = 20): Phaser.GameObjects.Text {
+        let labelText = "Press to edit";
+        const labelStyle = {
+            fontSize: "36px",
+            fontFamily: "monospace",
+            fill: "#000000", // Text color
+            backgroundColor: "#ffffff", // Background color
+            padding: {
+                left: 10,
+                right: 10,
+                top: 5,
+                bottom: 5,
+            },
+        };
+        
+        let isEditing = false;
+        
+        const inputField = this.add.text(
+          this.cameras.main.centerX,
+          this.cameras.main.centerY,
+          labelText,
+          labelStyle
+        ).setOrigin(0.5);
+        
+        inputField.setInteractive();
+
+        // Function to start editing the label text
+        function startEditing() {
+            isEditing = true;
+            inputField.setAlpha(1); // Restore full opacity
+            inputField.setText(""); // Clear the text to allow user input
+            labelText = "";
+        }
+
+        const onlineSettings = this;
+        // Function to stop editing the label text and apply changes
+        function handleInputConfirmation(): void {
+            if (type == "username") {
+                if (inputField.text.length > 0 && inputField.text != "Press to edit") {
+                    isEditing = false;
+                    onlineSettings.registry.set("playerName", inputField.text);
+                    onlineSettings.enableButtons();
+                    onlineSettings.instructionText!.text = "Create or join lobby";
+                    inputField.destroy();
+                }
+            } else if (type == "lobbycode") {
+                onlineSettings.finalizeJoin();
+            }
+            
+        }
+
+        // Event listener for pointerdown event
+        inputField.on("pointerdown", () => {
+            if (!isEditing) {
+                startEditing();
+            }
         });
 
-        const buttonScale = 0.05;
-        closeButton.setScale(buttonScale); 
+        // Add keyboard input handling for editing the label
+        if (this.input.keyboard) {
+            this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
+                if (isEditing) {
+                    if (event.key === "Enter") {
+                        // Stop editing when Enter key is pressed
+                        handleInputConfirmation();
+                    } else if (event.key === "Backspace") {
+                        // Remove the last character when Backspace key is pressed
+                        labelText = labelText.slice(0, -1);
+                        inputField.setText(labelText);
+                    } else if (event.key.length === 1 && inputField.text.length < maxChars) {
+                        // Add the pressed character to the label text
+                        labelText += event.key;
+                        inputField.setText(labelText);
+                    }
+                }
+            });
+        }
 
-        console.log( this.cameras.main.width, closeButton.width)
-        const closeButtonContainer = this.add.container(
-            this.cameras.main.width - closeButton.width * buttonScale / 2 - 10,
-            closeButton.height * buttonScale / 2 + 10,
-            closeButton
-        );
+        return inputField;
+    }
 
-        closeButtonContainer.setSize(closeButton.width, closeButton.height);
+    private toggleTextShadow(text: Phaser.GameObjects.Text, toggleOn: boolean) {
+        if (toggleOn) {
+            text.setShadow(5, 5, 'rgba(0,0,0,0.5)', 4);
+        } else {
+            text.setShadow(0, 0, undefined);
+        }
+    }
+
+    private enableButtons(): void {
+        this.createLobbyButton.setInteractive();
+        this.joinLobbyButton.setInteractive();
     }
 
     private async onCreateLobbyClicked(): Promise<void> {
+        this.instructionText!.text = "Share the lobby code with your opponent. Waiting for join..."
+
         // Remove any existing lobby code text or input
-        this.hideLobbyInput();
+        this.removePrevPageContent();
 
         // Generate random lobby code (You can replace this with your own logic)
         const lobbyCode = 123456;
@@ -112,86 +235,49 @@ export default class OnlineSettings extends Phaser.Scene {
 
     private onJoinLobbyClicked(): void {
         // Remove any existing lobby code text or input
-        this.hideLobbyInput();
+        this.removePrevPageContent();
 
         // Create input field for entering the lobby code using the Rex UI Plugin
         this.createLobbyInput();
-
-
     }
 
     private showLobbyCodeText(lobbyCode: string): void {
         this.lobbyCodeText = this.add.text(
             this.cameras.main.centerX,
-            this.cameras.main.height / 2.5,
+            this.cameras.main.centerY * 1.1,
             "Lobby Code: " + lobbyCode,
-            { fontSize: 40, color: "#ffffff" }
+            { fontSize: 40, fontFamily: "monospace", color: "#ffffff" }
         );
         this.lobbyCodeText.setOrigin(0.5);
     }
 
     private async createLobbyInput(): Promise<void> {
-        // Create input field for entering the lobby code using the Rex UI Plugin
-        this.lobbyInput = this.rexUI.add.inputText({
-            x: this.cameras.main.centerX,
-            y: this.cameras.main.height / 2,
-            width: 200,
-            height: 40,
-            fontSize: "24px",
-            backgroundColor: "#ffffff",
-            color: "#000000",
-            maxLength: 6, // Limit the lobby code to 6 characters
-            type: "text",
-            placeholder: "Enter lobby code",
-        }).setOrigin(0.5);
-
-        // Handle enter key press to submit the lobby code
-        this.lobbyInput.on("textchange", () => {
-            const lobbyCode = this.lobbyInput.text;
-            console.log("Entered lobby code:", lobbyCode);
-        });
-
-        if (this.input.keyboard) {
-            // Handle enter key press to submit the lobby code
-            this.input.keyboard.on("keydown-ENTER", () => {
-                this.finalizeJoin();
-            });
-        }
+        this.inputField = this.createInputField("lobbycode", 6);
     }
 
     private async finalizeJoin(){
-        if (this.lobbyInput) {
-            const lobbyCode = this.lobbyInput.text;
+        if (this.inputField) {
+            const lobbyCode = this.inputField.text;
             console.log("Entered lobby code:", lobbyCode);
 
             var gameMode: OnlineMultiPlayer = new OnlineMultiPlayer();
             gameMode.me = -1;
             gameMode.create(false, lobbyCode);
 
-            // Call your function to perform an action with the lobby code
-            this.onLobbyCodeEntered(lobbyCode);
             await waitFor("emit", gameMode.boardEvent);
             this.startGame(gameMode);
         }
     }
 
-    private onLobbyCodeEntered(lobbyCode: string): void {
-        // Here, you can perform the desired action with the lobby code
-        // For example, joining the lobby with the entered code
-        console.log("Performing action with lobby code:", lobbyCode);
-    }
-
-
-    private hideLobbyInput(): void {
-        this.joinLobbyButton.visible = false;
+    private removePrevPageContent(): void {
         // Remove any existing lobby code text or input
         if (this.lobbyCodeText) {
             this.lobbyCodeText.destroy();
             this.lobbyCodeText = null;
         }
-        if (this.lobbyInput) {
-            this.lobbyInput.destroy();
-            this.lobbyInput = null;
+        if (this.inputField) {
+            this.inputField.destroy();
+            this.inputField = null;
         }
     }
 
@@ -199,9 +285,5 @@ export default class OnlineSettings extends Phaser.Scene {
         this.scene.stop(MainMenu.Name);
         this.scene.stop(OnlineSettings.Name);
         this.scene.start(MainGame.Name, { gameModeHandle: "online1v1", gameModeObj: gameMode });
-    }
-
-    public update(time: number, delta: number): void {
-        if (this.lobbyInput) this.lobbyInput.setPosition(this.cameras.main.centerX, this.cameras.main.height / 2);
     }
 }

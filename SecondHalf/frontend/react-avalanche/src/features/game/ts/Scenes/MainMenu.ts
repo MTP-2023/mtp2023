@@ -18,8 +18,8 @@ export default class MainMenu extends Phaser.Scene {
     // first element is the default mode
     private gameModeOptions = [
         {text: "Local 1v1", value: "local1v1"},
-        {text: "Single Player", value: "singlePlayerChallenge"},
-        {text: "Local vs AI", value: "localvsai"},
+        {text: "Challenge", value: "singlePlayerChallenge"},
+        {text: "vs AI", value: "localvsai"},
         { text: "Online 1v1", value: "online1v1"}
     ];
 
@@ -47,33 +47,62 @@ export default class MainMenu extends Phaser.Scene {
 
         background.anims.play('bg-play');*/
 
+        // background
         const backgroundImage = this.add.image(0, 0, "menu-background").setOrigin(0, 0);
 		backgroundImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 		this.children.sendToBack(backgroundImage);
 
-        const textYPosition = this.cameras.main.height / 4;
+        const textYPosition = this.cameras.main.height / 5;
 
-        const newGameText = this.add.text(this.cameras.main.centerX, textYPosition, "PLAY");
-        newGameText
+        // PLAY button
+        const playButton = this.add.image(this.cameras.main.centerX, textYPosition, "wood-rounded-rectangle");
+        playButton.setScale(0.4);
+
+        const playText = this.add.text(this.cameras.main.centerX, textYPosition + playButton.height * 0.02, "PLAY");
+        playText
             .setFontFamily("monospace")
             .setFontSize(70)
             .setFill("#fff")
             .setAlign("center")
             .setOrigin(0.5);
-        newGameText.setInteractive();
-        newGameText.on("pointerdown", () => {
+
+        playButton.setInteractive();
+
+        playButton.on("pointerover", () => {
+            this.toggleTextShadow(playText, true);
+        });
+
+        playButton.on("pointerout", () => {
+            this.toggleTextShadow(playText, false);
+        });
+
+        playButton.on("pointerdown", () => {
             this.scene.start(MainGame.Name, {gameModeHandle: this.gameMode, agent: "rl", gameModeObj: null});
         }, this);
 
-		const selectSkinText = this.add.text(this.cameras.main.centerX, textYPosition * 2, "Select Marble Skin");
+        // SELECT SKIN button
+        const selectSkinButton = this.add.image(this.cameras.main.centerX, textYPosition * 2, "wood-rounded-rectangle");
+        selectSkinButton.setScale(0.4);
+
+		const selectSkinText = this.add.text(this.cameras.main.centerX, textYPosition * 2 + selectSkinButton.height * 0.02, "Skin Selection");
         selectSkinText
             .setFontFamily("monospace")
-            .setFontSize(60)
+            .setFontSize(54)
             .setFill("#fff")
             .setAlign("center")
             .setOrigin(0.5);
-        selectSkinText.setInteractive();
-        selectSkinText.on("pointerdown", () => {
+
+        selectSkinButton.setInteractive();
+
+        selectSkinButton.on("pointerover", () => {
+            this.toggleTextShadow(selectSkinText, true);
+        });
+
+        selectSkinButton.on("pointerout", () => {
+            this.toggleTextShadow(selectSkinText, false);
+        });
+
+        selectSkinButton.on("pointerdown", () => {
             this.scene.pause();
 			this.scene.launch(SkinSelector.Name);
         }, this);
@@ -81,22 +110,19 @@ export default class MainMenu extends Phaser.Scene {
 		// set default skin
 		this.game.registry.set('marbleSkin', "marble");
 
-		// set default skin
-		this.game.registry.set('marbleSkin', "marble");
-
-        
-
         // set default game mode
         this.gameMode = this.gameModeOptions[0].value;
 
+        // drop down list for mode selection
         const mainMenuScene = this;
         const dropDownConfig = {
             x: this.cameras.main.centerX,
             y: textYPosition * 3,
-            background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 0, 0xffa500),
-            icon: this.rexUI.add.roundRectangle(0, 0, 20, 20, 10, 0xffd580),
-            text: this.add.text(0, 0, this.gameModeOptions[0].text, {
-                fontSize: 60,
+            background: this.add.image(0, textYPosition * 3 + 100, "wood-hexagon").setScale(0.33),
+            icon: this.add.image(0, 0, "game-mode-icon").setScale(0.15),
+            text: this.add.text(0, 20, this.gameModeOptions[0].text, {
+                fontSize: 50,
+                fontFamily: "monospace",
                 align: "center"
             }).setFixedSize(this.cameras.main.width / 3, 0),
             space: {
@@ -104,27 +130,31 @@ export default class MainMenu extends Phaser.Scene {
                 right: 10,
                 top: 10,
                 bottom: 10,
-                icon: 10
+                icon: -100
             },
 
             options: this.gameModeOptions,
 
-            list: {
-                createBackgroundCallback: () => {
-                    return this.rexUI.add.roundRectangle(0, 0, 2, 2, 0, 0x8b4000);
+            alignTargetY: 200,
+
+            list: {/*
+                space: {
+                   top: 200
                 },
+                createBackgroundCallback: () => {
+                    return this.add.image(0, 200, "wood-rectangle").setScale(0.5);
+                },*/
                 createButtonCallback: function (scene: Phaser.Scene, option: { text: string, value: string }, index: number, options: Array<{ text: string, value: string }>) {
                     const text = option.text;
                     const button = mainMenuScene.rexUI.add.label({
-                        background: mainMenuScene.rexUI.add.roundRectangle(0, 0, 2, 2, 0),
-                        text: scene.add.text(0, 0, text, {fontSize: 50}),
+                        background: mainMenuScene.add.image(0, 0, "wood-hexagon").setScale(0.225),
+                        text: scene.add.text(0, 0, text, {fontSize: 45, fontFamily: "monospace"}),
                         align: "center",
                         space: {
-                            left: 10,
-                            right: 10,
-                            top: 10,
-                            bottom: 10,
-                            icon: 10
+                            left: 5,
+                            right: 5,
+                            top: 20,
+                            bottom: 20
                         }
                     });
                     return button;
@@ -154,13 +184,14 @@ export default class MainMenu extends Phaser.Scene {
 				},
 				onButtonOver: function (button: Phaser.GameObjects.GameObject) {
 					const labelButton = button as RexUIPlugin.Label;
-					const el = labelButton.getElement('background') as Phaser.GameObjects.Shape;
-					el.setStrokeStyle(1, 0xffffff);
+                    // Apply shadow effect to the text element
+                    const textElement = labelButton.getElement('text') as Phaser.GameObjects.Text;
+                    mainMenuScene.toggleTextShadow(textElement, true);
 				},
 				onButtonOut: function (button: Phaser.GameObjects.GameObject) {
 					const labelButton = button as RexUIPlugin.Label;
-					const el = labelButton.getElement('background') as Phaser.GameObjects.Shape;
-					el.setStrokeStyle();
+                    const textElement = labelButton.getElement('text') as Phaser.GameObjects.Text;
+                    mainMenuScene.toggleTextShadow(textElement, false);
 				},
 			},
 			value: this.gameModeOptions[0].value
@@ -168,6 +199,14 @@ export default class MainMenu extends Phaser.Scene {
         };
 
 		this.dropDownList = this.rexUI.add.dropDownList(dropDownConfig).layout();
+
+        this.dropDownList.on("pointerover", () => {
+            this.toggleTextShadow(this.dropDownList.getElement("text") as Phaser.GameObjects.Text, true);
+        });
+
+        this.dropDownList.on("pointerout", () => {
+            this.toggleTextShadow(this.dropDownList.getElement("text") as Phaser.GameObjects.Text, false);
+        });
 
 		this.events.on('resume', this.onOnlineCancel, this);
 	}
@@ -177,6 +216,14 @@ export default class MainMenu extends Phaser.Scene {
 		this.dropDownList.value = this.gameModeOptions[0].value;
 		this.gameMode = this.gameModeOptions[0].value;
 	}
+
+    private toggleTextShadow(text: Phaser.GameObjects.Text, toggleOn: boolean) {
+        if (toggleOn) {
+            text.setShadow(5, 5, 'rgba(0,0,0,0.5)', 4);
+        } else {
+            text.setShadow(0, 0, undefined);
+        }
+    }
 
     public update(): void {
         // Update logic, as needed.
