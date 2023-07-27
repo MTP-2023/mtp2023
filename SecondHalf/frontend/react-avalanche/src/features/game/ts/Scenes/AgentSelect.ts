@@ -7,13 +7,17 @@ export default class AgentSelect extends Phaser.Scene {
      * Unique name of the scene.
      */
     public static Name = "AgentSelect";
+    private clickAudio: any;
 
     public preload(): void {
         // Preload as needed.
     }
 
     public create(mainMenuScene: MainMenu): void {
-        Utilities.LogSceneMethodEntry("GameEnd", "create");
+        Utilities.LogSceneMethodEntry("AgentSelect", "create");
+
+        this.clickAudio = this.sound.add("woodenClick");
+
         const textYPosition = this.cameras.main.height/8;
         const textXPosition = this.cameras.main.centerX;
         
@@ -62,6 +66,7 @@ export default class AgentSelect extends Phaser.Scene {
         });
 
         rlButton.on("pointerdown", () => {
+            this.clickAudio.play();
             this.scene.stop(AgentSelect.Name);
             this.scene.stop(MainMenu.Name);
             this.scene.start(MainGame.Name, {gameModeHandle: "localvsai", agent: "rl"});
@@ -91,9 +96,10 @@ export default class AgentSelect extends Phaser.Scene {
         });
 
         mctsButton.on("pointerdown", () => {
-        this.scene.stop(MainMenu.Name);
-        this.scene.stop(AgentSelect.Name);
-        this.scene.start(MainGame.Name, {gameModeHandle: "localvsai", agent: "mcts"});
+            this.clickAudio.play();
+            this.scene.stop(MainMenu.Name);
+            this.scene.stop(AgentSelect.Name);
+            this.scene.start(MainGame.Name, {gameModeHandle: "localvsai", agent: "mcts"});
         }, this);
 
 
@@ -113,9 +119,10 @@ export default class AgentSelect extends Phaser.Scene {
         closeButton.add(closeCross);
 
         closeButton.setSize(closeCross.width, closeCross.height);
-        closeButton
+        closeCircle
             .setInteractive()
             .on('pointerdown', () => {
+                this.clickAudio.play();
                 this.scene.stop();
                 this.scene.resume(MainMenu.Name);
             });

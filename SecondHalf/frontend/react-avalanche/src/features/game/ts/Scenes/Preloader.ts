@@ -45,6 +45,7 @@ export default class Preloader extends Phaser.Scene {
 		// audio
 		this.load.path = "src/features/game/assets/audio/";
 		this.load.audio("snowStorm", "snowStorm.mp3");
+		this.load.audio("woodenClick", "woodenClick.wav");
 		
 		// fonts
 		this.load.path = "src/features/game/assets/fonts/";

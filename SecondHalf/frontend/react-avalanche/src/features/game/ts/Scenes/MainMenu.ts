@@ -22,6 +22,7 @@ export default class MainMenu extends Phaser.Scene {
         {text: "vs AI", value: "localvsai"},
         { text: "Online 1v1", value: "online1v1"}
     ];
+    private clickAudio: any;
 
     public preload(): void {
         // Preload as needed.
@@ -30,6 +31,7 @@ export default class MainMenu extends Phaser.Scene {
     public create(): void {
         Utilities.LogSceneMethodEntry("MainMenu", "create");
 
+        this.clickAudio = this.sound.add("woodenClick");
         /*
          // Create a sprite using the loaded spritesheet as the background
         const background = this.add.sprite(0, 0, 'animated-background').setOrigin(0, 0);
@@ -77,6 +79,7 @@ export default class MainMenu extends Phaser.Scene {
         });
 
         playButton.on("pointerdown", () => {
+            this.clickAudio.play();
             this.scene.start(MainGame.Name, {gameModeHandle: this.gameMode, agent: "rl", gameModeObj: null});
         }, this);
 
@@ -103,6 +106,7 @@ export default class MainMenu extends Phaser.Scene {
         });
 
         selectSkinButton.on("pointerdown", () => {
+            this.clickAudio.play();
             this.scene.pause();
 			this.scene.launch(SkinSelector.Name);
         }, this);
@@ -160,6 +164,7 @@ export default class MainMenu extends Phaser.Scene {
                     return button;
                 },
 				onButtonClick: function (button: Phaser.GameObjects.GameObject) {
+                    mainMenuScene.clickAudio.play();
 					// Set label text, and value
 					const labelButton = button as RexUIPlugin.Label;
 					mainMenuScene.dropDownList.text = labelButton.text;
@@ -199,6 +204,10 @@ export default class MainMenu extends Phaser.Scene {
         };
 
 		this.dropDownList = this.rexUI.add.dropDownList(dropDownConfig).layout();
+
+        this.dropDownList.on("pointerdown", () => {
+           this.clickAudio.play();
+        });
 
         this.dropDownList.on("pointerover", () => {
             this.toggleTextShadow(this.dropDownList.getElement("text") as Phaser.GameObjects.Text, true);

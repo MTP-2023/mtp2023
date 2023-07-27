@@ -19,12 +19,16 @@ export default class OnlineSettings extends Phaser.Scene {
     private createLobbyButton: Phaser.GameObjects.Image;
     private joinLobbyButton: Phaser.GameObjects.Image;
 
+    private clickAudio: any;
+
 
     public create(): void {
-        Utilities.LogSceneMethodEntry("MainSettings", "create");
+        Utilities.LogSceneMethodEntry("OnlineSettings", "create");
+
+        this.clickAudio = this.sound.add("woodenClick");
+
         const textYPosition = this.cameras.main.height/4;
         const textXPosition = this.cameras.main.centerX;
-        const fontSize = 48;
 
         const graphics = this.add.graphics();
 
@@ -61,7 +65,10 @@ export default class OnlineSettings extends Phaser.Scene {
             this.toggleTextShadow(createText, false);
         });
 
-        this.createLobbyButton.on("pointerdown", () => this.onCreateLobbyClicked());
+        this.createLobbyButton.on("pointerdown", () => {
+            this.clickAudio.play();
+            this.onCreateLobbyClicked();
+        });
 
         // Join Lobby button
         this.joinLobbyButton = this.add.image(textXPosition/3*4, this.cameras.main.centerY - selectBg.height/3, "wood-hexagon");
@@ -83,7 +90,10 @@ export default class OnlineSettings extends Phaser.Scene {
              this.toggleTextShadow(joinText, false);
          });
  
-         this.joinLobbyButton.on("pointerdown", () => this.onJoinLobbyClicked());
+         this.joinLobbyButton.on("pointerdown", () => {
+            this.clickAudio.play();
+            this.onJoinLobbyClicked();
+         });
 
         const closeCircle = this.add.sprite(0, 0, "wood-circle");
         closeCircle.setScale(0.1);
@@ -102,6 +112,7 @@ export default class OnlineSettings extends Phaser.Scene {
         closeCircle
             .setInteractive()
             .on('pointerdown', () => {
+                this.clickAudio.play();
                 this.scene.stop();
                 this.scene.resume(MainMenu.Name);
             });
@@ -225,7 +236,6 @@ export default class OnlineSettings extends Phaser.Scene {
 
         // Display the lobby code as text
         this.showLobbyCodeText(lobbyCode.toString());
-        this.joinLobbyButton.visible = false;
         var gameMode: OnlineMultiPlayer = new OnlineMultiPlayer();
         gameMode.create(true, lobbyCode);  
         await waitFor("join", gameMode.joinEvent);
