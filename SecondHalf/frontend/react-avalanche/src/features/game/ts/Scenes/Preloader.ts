@@ -24,6 +24,8 @@ export default class Preloader extends Phaser.Scene {
 		// board elements
 		this.load.image("switch-left");
 		this.load.image("switch-right");
+		this.load.image("wood-board");
+		this.load.image("wood-nametag");
 		// marble skins
 		this.load.image("marble");
 		this.load.image("marble-p1");

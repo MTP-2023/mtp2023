@@ -35,6 +35,8 @@ export abstract class AbstractGameMode {
     currentBoard: number[][] = [];
     player1Color = 0xffa500;
     player2Color = 0x0000ff;
+    private player1NameText: Phaser.GameObjects.Text;
+    private player2NameText: Phaser.GameObjects.Text;
 
     // function that obtains the challenge data, i.e. requests a start and goal board from the server, and initializes the class variable 'challenge'
     public initChallenge(): void {
@@ -69,6 +71,7 @@ export abstract class AbstractGameMode {
     }
 
     public switchTurns(currentPlayer: number, scene: Phaser.Scene): number {
+        console.log("CALLED SWITCH");
         //console.log("SWITCHING TURNS", currentPlayer);
         this.stopIndicator(currentPlayer, scene);
         //console.log("STOPPED INDICATOR");
@@ -79,78 +82,95 @@ export abstract class AbstractGameMode {
     }
 
     protected indicateTurn(playerID: number, scene: Phaser.Scene): void {
-        console.log("TURN ON", playerID)
+        console.log("TURN ON", playerID);
         // Find the Text object based on its custom ID
-        const foundText = scene.children.getChildren().find((child) => child.getData("playerText") === playerID);
-
-        if (foundText instanceof Phaser.GameObjects.Text) {
-            const textBounds = foundText.getBounds();
-            const x = textBounds.x;
-            const y = textBounds.y;
-            const width = textBounds.width;
-            const height = textBounds.height;
-
-            // Create the rectangle graphics
-            const rectangle = scene.add.graphics();
-            rectangle.lineStyle(2, 0xffffff, 1);
-            rectangle.strokeRect(x, y, width, height);
-
-            // Start blinking the rectangle
-            const blinkInterval = setInterval(() => {
-                rectangle.visible = !rectangle.visible;
-            }, 500); // Change blinking speed here (e.g., 500ms for half-second interval)
-
-            // Save the interval ID and rectangle as properties of the Text object
-            foundText.setData("blinkInterval", blinkInterval);
-            foundText.setData("blinkRectangle", rectangle);
+        const highlightText = playerID === 1 ? this.player1NameText : this.player2NameText;
+        if (highlightText instanceof Phaser.GameObjects.Text) {
+            console.log(highlightText.text);
+            // Create a timer that repeatedly calls the blinkText function every 500ms
+            const blinkTimer = scene.time.addEvent({
+                delay: 500,
+                callback: this.blinkText,
+                args: [highlightText],
+                callbackScope: this,
+                loop: true,
+            });
+    
+            // Save the timer as a property of the Text object
+            highlightText.setData("blinkTimer", blinkTimer);
         }
+    }
+    
+    
+    protected blinkText(text: Phaser.GameObjects.Text): void {
+        // Toggle the text visibility by setting alpha to 0 (invisible) or 1 (visible)
+        text.alpha = text.alpha === 0.3 ? 1 : 0.3;
     }
 
     protected stopIndicator(playerID: number, scene: Phaser.Scene): void {
-        console.log("TURN OFF", playerID)
+        console.log("TURN OFF", playerID);
         // Find the Text object based on its custom ID
-        const foundText = scene.children.getChildren().find((child) => child.getData("playerText") === playerID);
-        
-        if (foundText instanceof Phaser.GameObjects.Text) {
-            // Retrieve the interval ID and rectangle from the Text object's data
-            const blinkInterval = foundText.getData("blinkInterval");
-            const rectangle = foundText.getData("blinkRectangle");
-        
-            if (blinkInterval && rectangle) {
-                // Stop the blinking and remove the rectangle graphics
-                clearInterval(blinkInterval);
-                foundText.data.remove("blinkInterval");
-                foundText.data.remove("blinkRectangle");
-                rectangle.destroy();
+        const highlightText = playerID === 1 ? this.player1NameText : this.player2NameText;
+    
+        if (highlightText instanceof Phaser.GameObjects.Text) {
+            // Retrieve the timer from the Text object's data
+            const blinkTimer = highlightText.getData("blinkTimer");
+    
+            if (blinkTimer) {
+                // Stop and remove the timer, and make the text fully visible
+                blinkTimer.remove();
+                highlightText.setData("blinkTimer", null);
+                highlightText.alpha = 1;
             }
         }
     }
-
+    
     public stopIndicators(scene: Phaser.Scene): void {
         const foundTexts = scene.children.getChildren();
         for (const foundText of foundTexts) {
             if (foundText instanceof Phaser.GameObjects.Text) {
-                // Retrieve the interval ID and rectangle from the Text object's data
-                const blinkInterval = foundText.getData("blinkInterval");
-                const rectangle = foundText.getData("blinkRectangle");
-            
-                if (blinkInterval && rectangle) {
-                    // Stop the blinking and remove the rectangle graphics
-                    clearInterval(blinkInterval);
-                    foundText.data.remove("blinkInterval");
-                    foundText.data.remove("blinkRectangle");
-                    rectangle.destroy();
+                // Retrieve the timer from the Text object's data
+                const blinkTimer = foundText.getData("blinkTimer");
+    
+                if (blinkTimer) {
+                    // Stop and remove the timer, and make the text fully visible
+                    blinkTimer.remove();
+                    foundText.setData("blinkTimer", null);
+                    foundText.alpha = 1;
                 }
             }
         }
     }
+    
+    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number, player1Text: string, player2Text: string, imgLabel: string, imgScale: number): void {
+        // Create a container to hold the image and text
+        const container1 = scene.add.container(x, y);
+        container1.setSize(width, height);
 
-    public createPlayerStatus(scene: Phaser.Scene, x: number, y: number, width: number, height: number, boardEnd: number, player1Text: string, player2Text: string): void {
-        const playerNameText1 = scene.add.text(x, y, player1Text, { fontSize: 50,  color: this.convertToCSS(this.player1Color), align: "center" });
-        playerNameText1.setData("playerText", 1);
+        // Add the image to the container
+        const image1 = scene.add.image(0, 0, imgLabel).setScale(imgScale);
+        container1.add(image1);
 
-        const playerNameText2 = scene.add.text(boardEnd + x, y, player2Text, { fontSize: 50,  color: this.convertToCSS(this.player2Color), align: "center" });
-        playerNameText2.setData("playerText", -1);
+        // Add the text on top of the image in the container
+        this.player1NameText = scene.add.text(0, 0, player1Text, { fontSize: 40, fontFamily: "monospace", color: this.convertToCSS(this.player1Color), align: "center" }).setOrigin(0.5);
+        container1.add(this.player1NameText);
+
+        // Set the custom data for the container and text
+        container1.setData("playerText", 1);
+        this.player1NameText.setData("playerText", 1);
+
+        // Repeat the process for player 2
+        const container2 = scene.add.container(scene.cameras.main.width - x, y);
+        container2.setSize(width, height);
+
+        const image2 = scene.add.image(0, 0, imgLabel).setScale(imgScale);
+        container2.add(image2);
+
+        this.player2NameText = scene.add.text(0, 0, player2Text, { fontSize: 40, fontFamily: "monospace", color: this.convertToCSS(this.player2Color), align: "center" }).setOrigin(0.5);
+        container2.add(this.player2NameText);
+
+        container2.setData("playerText", -1);
+        this.player2NameText.setData("playerText", -1);
 
         this.indicateTurn(1, scene);
     }

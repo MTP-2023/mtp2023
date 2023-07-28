@@ -4,7 +4,7 @@
   "density": 3,
   "restitution": 0.0001,
   "friction": 0.001,
-  "frictionAir": 0.01,
+  "frictionAir": 0.011,
   "frictionStatic": 0.3,
   "collisionFilter": { "group": 0, "category": 1, "mask": 255 },
   "label": "marble",
