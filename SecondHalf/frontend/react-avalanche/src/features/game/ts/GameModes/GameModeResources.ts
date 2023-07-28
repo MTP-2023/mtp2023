@@ -33,10 +33,10 @@ export abstract class AbstractGameMode {
     isVsAi: boolean = false;
     agent: string = "rl";
     currentBoard: number[][] = [];
-    player1Color = 0xffa500;
+    player1Color = 0x013220;
     player2Color = 0x0000ff;
-    private player1NameText: Phaser.GameObjects.Text;
-    private player2NameText: Phaser.GameObjects.Text;
+    player1NameText: Phaser.GameObjects.Text;
+    player2NameText: Phaser.GameObjects.Text;
 
     // function that obtains the challenge data, i.e. requests a start and goal board from the server, and initializes the class variable 'challenge'
     public initChallenge(): void {
