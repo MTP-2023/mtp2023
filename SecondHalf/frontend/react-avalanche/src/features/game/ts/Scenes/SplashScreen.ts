@@ -14,6 +14,9 @@ export default class SplashScreen extends Phaser.Scene {
 	public create(): void {
 		Utilities.LogSceneMethodEntry("SplashScreen", "create");
 
+		// set default skin
+		this.game.registry.set('marbleSkin', "marble");
+
 		const backgroundImage = this.add.image(0, 0, "menu-background").setOrigin(0, 0);
 		backgroundImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 		this.children.sendToBack(backgroundImage);

@@ -43,7 +43,7 @@ export class SinglePlayerChallenge extends AbstractGameMode {
         // player status not required for single player challenge
     }
 
-    public getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string{
+    public getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string {
         return scene.registry.get("marbleSkin");
     }
     

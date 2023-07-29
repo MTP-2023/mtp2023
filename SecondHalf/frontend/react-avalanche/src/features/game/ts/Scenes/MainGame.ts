@@ -443,10 +443,7 @@ export default class MainGame extends Phaser.Scene {
 		const boardX = (this.scale.width - this.boardWidth) / 2;
 		let x = boardX + this.switchWidth/2 + this.borderWidth + Math.floor((col-1) / 2) * (this.switchWidth + this.borderWidth);
 		x = (col % 2 == 0) ? x + this.switchWidth - 1.075 * this.marbleRadius: x + 1.075 * this.marbleRadius;
-		let marblePNG = "marble";
-		if (this.gameMode.isMultiplayer) {
-			marblePNG = this.gameMode.getMarbleSprite(this.turn, this);
-		}
+		const marblePNG = this.gameMode.getMarbleSprite(this.turn, this);
 		let marbleSprite = this.matter.add.sprite(x, this.boardSpacingTop, marblePNG, undefined, { shape: switchShape });
 
 		// add body/shape to marble

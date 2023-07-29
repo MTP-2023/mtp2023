@@ -22,12 +22,17 @@ export default class GameEnd extends Phaser.Scene {
         graphics.fillStyle(0x000000, 0.5);
         graphics.fillRect(0, 0, overlayWidth, overlayHeight);
 
+        // set background image
+        const textBg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY*0.8, "wood-victory");
+        textBg.setScale(0.8);
+
         const victoryText = this.add.text(
-        overlayWidth / 2,
-        overlayHeight / 2,
-        data.displayText,
-        { fontSize: '72px', color: '#ffffff' }
+            this.cameras.main.centerX, 
+            this.cameras.main.centerY*0.8,
+            data.displayText,
+            { fontSize: '60px', fontFamily: "monospace", align: "center", color: '#ffffff' },
         );
+        victoryText.setWordWrapWidth(textBg.width*0.6)
         victoryText.setOrigin(0.5);
 
         setTimeout(() => {

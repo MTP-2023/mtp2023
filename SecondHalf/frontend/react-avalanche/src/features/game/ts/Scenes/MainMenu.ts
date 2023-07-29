@@ -17,8 +17,8 @@ export default class MainMenu extends Phaser.Scene {
     private dropDownList: RexUIPlugin.DropDownList;
     // first element is the default mode
     private gameModeOptions = [
-        {text: "Local 1v1", value: "local1v1"},
         {text: "Challenge", value: "singlePlayerChallenge"},
+        {text: "Local 1v1", value: "local1v1"},
         {text: "vs AI", value: "localvsai"},
         { text: "Online 1v1", value: "online1v1"}
     ];
@@ -110,9 +110,6 @@ export default class MainMenu extends Phaser.Scene {
             this.scene.pause();
 			this.scene.launch(SkinSelector.Name);
         }, this);
-
-		// set default skin
-		this.game.registry.set('marbleSkin', "marble");
 
         // set default game mode
         this.gameMode = this.gameModeOptions[0].value;

@@ -17,7 +17,7 @@ export default class Preloader extends Phaser.Scene {
 		this.load.image("menu-background");
 		this.load.image("wood-rounded-rectangle");
 		this.load.image("wood-hexagon");
-		this.load.image("wood-rectangle");
+		this.load.image("wood-victory");
 		this.load.image("wood-label");
 		this.load.image("wood-circle");
 		this.load.image("game-mode-icon");
