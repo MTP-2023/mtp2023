@@ -107,7 +107,11 @@ export default class OnlineSettings extends Phaser.Scene {
         this.showLobbyCodeText(lobbyCode.toString());
         this.joinLobbyButton.visible = false;
         var gameMode: OnlineMultiPlayer = new OnlineMultiPlayer();
-        gameMode.create(true, lobbyCode);  
+        var skin = "marble-p1";
+        if(this.registry.get("marbleSkin") != "marble"){
+            skin = this.registry.get("marbleSkin")
+        } 
+        gameMode.create(true, lobbyCode, "creator", skin);  
         await waitFor("join", gameMode.joinEvent);
         await waitFor("emit", gameMode.boardEvent);
         this.startGame(gameMode);
@@ -169,7 +173,11 @@ export default class OnlineSettings extends Phaser.Scene {
 
             var gameMode: OnlineMultiPlayer = new OnlineMultiPlayer();
             gameMode.me = -1;
-            gameMode.create(false, lobbyCode);
+            var skin = "marble-p2"
+            if(this.registry.get("marbleSkin") != "marble"){
+                skin = this.registry.get("marbleSkin")
+            } 
+            gameMode.create(false, lobbyCode, "joiner", skin);
 
             // Call your function to perform an action with the lobby code
             this.onLobbyCodeEntered(lobbyCode);

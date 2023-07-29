@@ -69,12 +69,12 @@ export abstract class AbstractGameMode {
     }
 
     public switchTurns(currentPlayer: number, scene: Phaser.Scene): number {
-        //console.log("SWITCHING TURNS", currentPlayer);
+        console.log("SWITCHING TURNS", currentPlayer);
         this.stopIndicator(currentPlayer, scene);
-        //console.log("STOPPED INDICATOR");
+        console.log("STOPPED INDICATOR");
         const nextPlayer = currentPlayer * (-1);
         this.indicateTurn(nextPlayer, scene);
-        //console.log("STARTED INDICATOR", nextPlayer);
+        console.log("STARTED INDICATOR", nextPlayer);
         return nextPlayer;
     }
 
@@ -182,6 +182,8 @@ export interface Lobby {
     player2_name: string
     player1_wins: number
     player2_wins: number
+    player1_Skin: string
+    player2_Skin: string
     currentPlayer: number
     lobby_code: number
     currentBoard: number[][]

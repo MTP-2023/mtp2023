@@ -6,6 +6,8 @@ import json
 class Lobby:
     player1_name = ""
     player2_name = ""
+    player1_skin = "marble-p1"
+    player2_skin = "marble-p2"
     player1_wins = 0
     player2_wins = 0
     currentPlayer = 1
@@ -36,6 +38,8 @@ class Lobby:
             "player2_name" : self.player2_name,
             "player1_wins" : self.player1_wins,
             "player2_wins" : self.player2_wins,
+            "player1_Skin" : self.player1_skin,
+            "player2_Skin" : self.player2_skin,
             "currentPlayer" : self.currentPlayer,
             "lobby_code" : self.lobby_code,
             "currentBoard" : self.currentBoard,

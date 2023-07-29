@@ -152,13 +152,13 @@ manager = ConnectionManager()
 
 
 @app.websocket("/lobbies/{code}")
-async def websocket_endpoint_create_or_join(code: int, websocket: WebSocket, player: str, operation: str):
+async def websocket_endpoint_create_or_join(code: int, websocket: WebSocket, player: str, marbleSkin: str, operation: str):
     print("create or join")
     print(operation)
     if operation == "create":
-        await create_lobby(code, websocket, player)
+        await create_lobby(code, websocket, player, marbleSkin)
     elif operation == "join":
-        await join_lobby(code, websocket, player)
+        await join_lobby(code, websocket, player, marbleSkin)
     else:
         raise HTTPException(status_code=404, detail="Invalid operation")
 
@@ -172,13 +172,15 @@ async def getCode():
             }
     return False
 
-async def create_lobby(code: int, websocket: WebSocket, player: str):
+async def create_lobby(code: int, websocket: WebSocket, player: str, marbleSkin: str = "marble-p1"):
     # websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
     start_board = generate_random_board(3, 2)
     goal1 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
     goal2 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
     goal_board = merge(goal1, goal2, 3, 2)
     lobby = Lobby(player, start_board, goal_board, code, websocket, "")
+    print("setting", marbleSkin, "as skin for creator")
+    lobby.player1_skin = marbleSkin
     lobbies[code] = lobby
     lobby.messageType = "challenge"
     await manager.connect(websocket)
@@ -214,16 +216,18 @@ async def create_lobby(code: int, websocket: WebSocket, player: str):
                 lobby.availableMarbles = message.data["availableMarbles"]
     except WebSocketDisconnect:
         lobby.messageType = "dc"
-        await manager.broadcast(json.dumps(lobby.toDict()))
         manager.disconnect(websocket)
+        await manager.broadcast(json.dumps(lobby.toDict()))
+        
 
-async def join_lobby(code: int, websocket: WebSocket, name: str):
+async def join_lobby(code: int, websocket: WebSocket, name: str, marbleSkin: str = "marble-p2"):
     if lobbies.keys().__contains__(code):
         lobby = lobbies[code]
         if lobby.isFull:
             return "full"
         else:
             lobby.player2_name = name
+            lobby.player2_skin = marbleSkin
             # websocket = lobby.socket
             await manager.connect(websocket)
             lobby.messageType = "join"

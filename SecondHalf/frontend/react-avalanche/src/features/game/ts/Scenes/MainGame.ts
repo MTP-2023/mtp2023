@@ -663,7 +663,7 @@ export default class MainGame extends Phaser.Scene {
 		// If the simulation is complete, enable the button
 		if (simulationComplete && this.simulationRunning) {
 			//console.log("SIMULATION HAS FINISHED, NEW BOARD STATE:");
-			this.interpretGameState();
+			//this.interpretGameState();
 			if(this.turn==1 || !this.gameMode.isVsAi) {
 				this.toggleInput(true);
 			}

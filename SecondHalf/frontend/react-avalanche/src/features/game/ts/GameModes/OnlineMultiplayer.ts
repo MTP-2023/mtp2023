@@ -13,6 +13,8 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     mixedColor = 0x925e6d;
     player1Name = "";
     player2Name = "";
+    player1Skin = "";
+    player2Skin = "";
     me = 1;
     ws: WebSocket;
     public gameOverEvent: EventEmitter;
@@ -48,7 +50,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         this.moveEvent.emit(score.toString());
     }
       
-    public async create(create: boolean, code: number): Promise<void> {
+    public async create(create: boolean, code: number, playerName: string, marbleSkin: string): Promise<void> {
         //var code = this.generateRandomSixDigitNumber();
         //var existing = false;
         // while(existing){
@@ -56,9 +58,9 @@ export class OnlineMultiPlayer extends AbstractGameMode {
         //    code = this.generateRandomSixDigitNumber();
         //}
         if(create){
-            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=Andre&operation=create");
+            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=" + playerName + "&marbleSkin=" + marbleSkin + "&operation=create");
         } else {
-            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=Thomas&operation=join");
+            this.ws = new WebSocket("ws://localhost:8000/lobbies/"+ code.toString() + "?player=" + playerName + "&marbleSkin=" + marbleSkin + "&operation=join");
         }
         
         this.ws.onopen = () => {
@@ -80,7 +82,10 @@ export class OnlineMultiPlayer extends AbstractGameMode {
                     this.moveEvent.emit("move", lobby.recentMove);
                     break;
                 case "join":
-                    console.log("join received")
+                    console.log("join received");
+                    console.log("setting", lobby.player1_Skin, "and", lobby.player2_Skin,"as skins")
+                    this.player1Skin = lobby.player1_Skin;
+                    this.player2Skin = lobby.player2_Skin;
                     this.joinEvent.emit("join");
                     break;
                 case "dc":
@@ -199,10 +204,10 @@ export class OnlineMultiPlayer extends AbstractGameMode {
 
         switch (playerTurn) {
             case 1:
-                newSpritePNG = "marble-p1";
+                newSpritePNG = this.player1Skin;
                 break;
             case -1:
-                newSpritePNG = "marble-p2";
+                newSpritePNG = this.player2Skin;
                 break;
         }
 
