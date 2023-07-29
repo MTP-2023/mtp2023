@@ -10,6 +10,13 @@ export default class SkinSelector extends Phaser.Scene {
 
     private rexUI: RexUIPlugin;
     private skinOptions = [
+        { label: "Baseball", imgName: "baseball" },
+        { label: "Swiss", imgName: "marble" },
+        { label: "Orange", imgName: "marble-p1" },
+        { label: "Blue", imgName: "marble-p2" },
+        { label: "Joker", imgName: "joker" },
+        { label: "Capy", imgName: "capy" },
+        
         { label: "Swiss", imgName: "marble" },
         { label: "Orange", imgName: "marble-p1" },
         { label: "Blue", imgName: "marble-p2" },
@@ -39,9 +46,9 @@ export default class SkinSelector extends Phaser.Scene {
 
         // set background image
         const skinBg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY*0.8, "wood-label");
-        skinBg.setScale(0.7);
+        skinBg.setScale(0.75);
 
-        const instructionText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY*0.5, "Select your marble style:");
+        const instructionText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY*0.45, "Select your marble style:");
         instructionText
             .setFontFamily("monospace")
             .setFontSize(48)
@@ -52,11 +59,12 @@ export default class SkinSelector extends Phaser.Scene {
 
         // add selection for skins as gallery
         const gallery = this.add.group();
-        const buttonWidth = 120;
-        const buttonHeight = 120;
-        const buttonScale = 2.5;
-        const buttonSpacing = 75;
-        const maxButtonsPerRow = Math.floor(this.cameras.main.width / (buttonWidth + buttonSpacing)) > 4 ? 4 : Math.floor(this.cameras.main.width / (buttonWidth + buttonSpacing));
+        const buttonWidth = 110;
+        const buttonHeight = 110;
+        const buttonScale = 2;
+        const buttonSpacing = 60;
+        const allowButtonsPerRow = 6;
+        const maxButtonsPerRow = Math.floor(this.cameras.main.width / (buttonWidth + buttonSpacing)) > allowButtonsPerRow ? allowButtonsPerRow : Math.floor(this.cameras.main.width / (buttonWidth + buttonSpacing));
 
         const galleryWidth = maxButtonsPerRow * (buttonWidth + buttonSpacing) - buttonSpacing;
         const galleryHeight = Math.ceil(this.skinOptions.length / maxButtonsPerRow) * (buttonHeight + buttonSpacing) - buttonSpacing;
@@ -64,14 +72,14 @@ export default class SkinSelector extends Phaser.Scene {
         const offsetX = (this.cameras.main.width - galleryWidth) / 2;
         const offsetY = (this.cameras.main.height - galleryHeight) / 2.75;
 
-        let currentX = offsetX + buttonSpacing;
-        let currentY = offsetY + buttonSpacing;
+        let currentX = offsetX;
+        let currentY = offsetY;
 
         for (let i = 0; i < this.skinOptions.length; i++) {
             const option = this.skinOptions[i];
             const outline = this.add.image(0, 0, "wood-circle").setScale(0.15);
             const image = this.add.image(0, 0, option.imgName).setScale(buttonScale);
-            const label = this.add.text(0, image.height * buttonScale, option.label, { fontSize: '40px', fontFamily: "monospace", color: '#ffffff' }).setOrigin(0.5, 0.5);
+            const label = this.add.text(0, outline.height * 0.15 * 0.9, option.label, { fontSize: '36px', fontFamily: "monospace", color: '#ffffff' }).setOrigin(0.5, 1);
 
             const buttonContainer = this.add.container(0, 0, [outline, image, label]).setSize(buttonWidth, buttonHeight);
             buttonContainer.setData('index', i);
@@ -104,7 +112,7 @@ export default class SkinSelector extends Phaser.Scene {
 
             // Move to the next row if the current row is filled
             if ((i + 1) % maxButtonsPerRow === 0 || i === this.skinOptions.length - 1) {
-                currentX = buttonSpacing;
+                currentX = offsetX;
                 currentY += buttonHeight + buttonSpacing;
             }
         }
@@ -115,7 +123,7 @@ export default class SkinSelector extends Phaser.Scene {
             cellHeight: buttonHeight + buttonSpacing,
             x: offsetX,
             y: offsetY,
-            position: Phaser.Display.Align.CENTER,
+            position: Phaser.Display.Align.LEFT_TOP,
         });
 
         // Select the current option
