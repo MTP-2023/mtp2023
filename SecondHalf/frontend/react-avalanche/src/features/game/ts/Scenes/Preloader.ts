@@ -26,10 +26,15 @@ export default class Preloader extends Phaser.Scene {
 		this.load.image("switch-right");
 		this.load.image("wood-board");
 		this.load.image("wood-nametag");
+
 		// marble skins
+		this.load.path = "src/features/game/assets/img/marbleSkins/";
 		this.load.image("marble");
 		this.load.image("marble-p1");
 		this.load.image("marble-p2");
+		this.load.image("joker");
+		this.load.image("capy");
+		this.load.image("baseball");
 
 		/*
 		this.load.spritesheet("animated-background", "background-spritesheet.png", {

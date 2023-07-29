@@ -10,17 +10,20 @@ export default class SkinSelector extends Phaser.Scene {
 
     private rexUI: RexUIPlugin;
     private skinOptions = [
-        { label: "Default", imgName: "marble" },
-        { label: "P1", imgName: "marble-p1" },
-        { label: "P2", imgName: "marble-p2" }
+        { label: "Swiss", imgName: "marble" },
+        { label: "Orange", imgName: "marble-p1" },
+        { label: "Blue", imgName: "marble-p2" },
+        { label: "Joker", imgName: "joker" },
+        { label: "Capy", imgName: "capy" },
+        { label: "Baseball", imgName: "baseball" }
     ]
 
     private selectedSkin = this.skinOptions[0].imgName;
+    private clickAudio: any;
 
     public create(): void {
         Utilities.LogSceneMethodEntry("MainSettings", "create");
-        const startYPosition = this.cameras.main.height / 4;
-        const fontSize = 25;
+        this.clickAudio = this.sound.add("woodenClick");
 
         const graphics = this.add.graphics();
 
@@ -34,28 +37,43 @@ export default class SkinSelector extends Phaser.Scene {
         const sceneHeight = this.cameras.main.height;
         graphics.fillRect(0, 0, sceneWidth, sceneHeight);
 
+        // set background image
+        const skinBg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY*0.8, "wood-label");
+        skinBg.setScale(0.7);
+
+        const instructionText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY*0.5, "Select your marble style:");
+        instructionText
+            .setFontFamily("monospace")
+            .setFontSize(48)
+            .setFill("#fff")
+            .setAlign("center")
+            .setOrigin(0.5)
+            .setWordWrapWidth(this.cameras.main.width/2);
+
+        // add selection for skins as gallery
         const gallery = this.add.group();
-        const buttonWidth = 200;
-        const buttonHeight = 150;
-        const buttonScale = 3;
-        const buttonSpacing = 10;
-        const maxButtonsPerRow = Math.floor(this.cameras.main.width / (buttonWidth + buttonSpacing)) > 3 ? 3 : Math.floor(this.cameras.main.width / (buttonWidth + buttonSpacing));
+        const buttonWidth = 120;
+        const buttonHeight = 120;
+        const buttonScale = 2.5;
+        const buttonSpacing = 75;
+        const maxButtonsPerRow = Math.floor(this.cameras.main.width / (buttonWidth + buttonSpacing)) > 4 ? 4 : Math.floor(this.cameras.main.width / (buttonWidth + buttonSpacing));
 
         const galleryWidth = maxButtonsPerRow * (buttonWidth + buttonSpacing) - buttonSpacing;
         const galleryHeight = Math.ceil(this.skinOptions.length / maxButtonsPerRow) * (buttonHeight + buttonSpacing) - buttonSpacing;
 
         const offsetX = (this.cameras.main.width - galleryWidth) / 2;
-        const offsetY = (this.cameras.main.height - galleryHeight) / 2;
+        const offsetY = (this.cameras.main.height - galleryHeight) / 2.75;
 
         let currentX = offsetX + buttonSpacing;
         let currentY = offsetY + buttonSpacing;
 
         for (let i = 0; i < this.skinOptions.length; i++) {
             const option = this.skinOptions[i];
+            const outline = this.add.image(0, 0, "wood-circle").setScale(0.15);
             const image = this.add.image(0, 0, option.imgName).setScale(buttonScale);
-            const label = this.add.text(0, image.height * buttonScale, option.label, { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5, 0);
+            const label = this.add.text(0, image.height * buttonScale, option.label, { fontSize: '40px', fontFamily: "monospace", color: '#ffffff' }).setOrigin(0.5, 0.5);
 
-            const buttonContainer = this.add.container(0, 0, [image, label]).setSize(buttonWidth, buttonHeight);
+            const buttonContainer = this.add.container(0, 0, [outline, image, label]).setSize(buttonWidth, buttonHeight);
             buttonContainer.setData('index', i);
 
             const buttonGraphics = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0xffffff).setAlpha(0);
@@ -63,7 +81,7 @@ export default class SkinSelector extends Phaser.Scene {
 
             buttonContainer.setInteractive()
                 .on('pointerdown', () => {
-                    console.log(`${option.label} clicked!`);
+                    this.clickAudio.play();
                     this.handleSelection(buttonContainer, buttonGraphics);
                 });
 
@@ -106,21 +124,43 @@ export default class SkinSelector extends Phaser.Scene {
         const firstOptionBackground = firstOptionContainer.getAt(0) as Phaser.GameObjects.Rectangle;
         this.handleSelection(firstOptionContainer, firstOptionBackground);
 
-        // Add the "Save" button
-        const saveButton = this.add.text(
-            this.cameras.main.centerX,
-            this.cameras.main.height/8 *7, // Adjust the Y position as needed
-            'Save',
-            { fontSize: '48px', color: '#ffffff' }
-        ).setOrigin(0.5).setInteractive();
+        // Add "Save" button
+        const saveButton = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY*1.6, "wood-hexagon");
+        saveButton.setScale(0.3);
+        saveButton.setInteractive();
+
+        const saveText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY*1.6, "Save");
+        saveText
+            .setFontFamily("monospace")
+            .setFontSize(56)
+            .setFill("#fff")
+            .setAlign("center")
+            .setOrigin(0.5);
+
+        saveButton.on("pointerover", () => {
+            this.toggleTextShadow(saveText, true);
+        });
+
+        saveButton.on("pointerout", () => {
+            this.toggleTextShadow(saveText, false);
+        });
 
         // Handle "Save" button click
         saveButton.on('pointerdown', () => {
+            this.clickAudio.play();
             // saves selection into registry
             this.registry.set("marbleSkin", this.selectedSkin);
             this.scene.stop();
             this.scene.resume(MainMenu.Name);
         });
+    }
+
+    private toggleTextShadow(text: Phaser.GameObjects.Text, toggleOn: boolean) {
+        if (toggleOn) {
+            text.setShadow(5, 5, 'rgba(0,0,0,0.5)', 4);
+        } else {
+            text.setShadow(0, 0, undefined);
+        }
     }
 
     // Function to handle selection highlighting
