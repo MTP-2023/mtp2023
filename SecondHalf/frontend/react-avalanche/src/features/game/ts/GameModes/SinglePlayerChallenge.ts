@@ -31,7 +31,6 @@ export class SinglePlayerChallenge extends AbstractGameMode {
 
     public addChallengeIndicator(scene: Phaser.Scene, data: number, x: number, y: number, width: number, height: number, lineWidth: number): void {
         // Check if switch should hold a marble to fulfill the winning requirements
-        console.log("HERE")
         if (data == 2) {
             // add indicator, here a semi-transparent, orange rectangle
             const indicatorRectangle = scene.add.rectangle(x, y, width, height, this.playerColor, 0.5);

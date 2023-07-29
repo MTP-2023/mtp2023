@@ -1,10 +1,9 @@
 import Utilities from "../Utilities";
 import MainGame from "./MainGame";
-import MainSettings from "./MainSettings";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-import AgentSelect from "./AgentSelect";
-import OnlineSettings from "./OnlineSettings";
-import SkinSelector from "./SkinSelector";
+import AgentSelect from "../SceneOverlays/AgentSelect";
+import OnlineSettings from "../SceneOverlays/OnlineSettings";
+import SkinSelector from "../SceneOverlays/SkinSelector";
 
 
 export default class MainMenu extends Phaser.Scene {

@@ -1,12 +1,12 @@
 import Utilities from "../Utilities";
-import GameEnd from "./GameEnd";
+import GameEnd from "../SceneOverlays/GameEnd";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
 import { LocalVsAi} from "../GameModes/LocalVsAi";
 import { interpretBoardReverse } from "../Helper/BoardInterpreter";
 import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
-import {waitFor} from 'wait-for-event';
+import QuitGame from "../SceneOverlays/QuitGame";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -144,10 +144,28 @@ export default class MainGame extends Phaser.Scene {
 			this.toggleTextShadow(text, false);
 		});
 		
-		// Add the circular image and text to a container
-		//const container = this.add.container(x, y, [circularImage, text]);
-		
 		return circularImage;
+	}
+
+	private addQuitButton(y: number): void {
+		// quit button
+        const closeCircle = this.add.sprite(0, 0, "wood-circle");
+        closeCircle.setScale(0.08);
+
+        const closeCross = this.add.sprite(0, 0, "close-cross");
+        closeCross.setScale(0.04); 
+        closeCross.setDepth(1);
+
+        const closeButton = this.add.container(this.scale.width * 0.675, y);
+
+        closeButton.add(closeCircle);
+        closeButton.add(closeCross);
+        closeCircle
+            .setInteractive()
+            .on('pointerdown', () => {
+                this.scene.pause();
+				this.scene.run(QuitGame.Name);
+            });
 	}
 
 	private toggleTextShadow(text: Phaser.GameObjects.Text, toggleOn: boolean) {
@@ -229,7 +247,6 @@ export default class MainGame extends Phaser.Scene {
 		// initialize gameMode
 		console.log(data.gameModeHandle)
 		
-		
 		switch (data.gameModeHandle) {
 			case "singlePlayerChallenge":
 				this.gameMode = new SinglePlayerChallenge();
@@ -294,6 +311,8 @@ export default class MainGame extends Phaser.Scene {
 			const button = this.addButton(buttonX, buttonStartY, i);
 			buttonGroup.add(button);
 		}
+
+		this.addQuitButton(buttonStartY,);
 
 		// SWITCHES -----------------------------------------------------------
 		// Iterate over the rows

@@ -1,6 +1,6 @@
 import Utilities from "../Utilities";
-import MainGame from "./MainGame";
-import MainMenu from "./MainMenu";
+import MainGame from "../Scenes/MainGame";
+import MainMenu from "../Scenes/MainMenu";
 
 export default class AgentSelect extends Phaser.Scene {
     /**

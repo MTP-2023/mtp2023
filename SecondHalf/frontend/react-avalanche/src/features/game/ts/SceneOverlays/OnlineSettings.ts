@@ -1,8 +1,8 @@
 import { waitFor } from "wait-for-event";
 import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
 import Utilities from "../Utilities";
-import MainMenu from "./MainMenu";
-import MainGame from "./MainGame";
+import MainMenu from "../Scenes/MainMenu";
+import MainGame from "../Scenes/MainGame";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 export default class OnlineSettings extends Phaser.Scene {
@@ -83,18 +83,19 @@ export default class OnlineSettings extends Phaser.Scene {
             .setOrigin(0.5);
  
         this.joinLobbyButton.on("pointerover", () => {
-             this.toggleTextShadow(joinText, true);
-         });
- 
-         this.joinLobbyButton.on("pointerout", () => {
-             this.toggleTextShadow(joinText, false);
-         });
- 
-         this.joinLobbyButton.on("pointerdown", () => {
-            this.clickAudio.play();
-            this.onJoinLobbyClicked();
-         });
+            this.toggleTextShadow(joinText, true);
+        });
 
+        this.joinLobbyButton.on("pointerout", () => {
+            this.toggleTextShadow(joinText, false);
+        });
+
+        this.joinLobbyButton.on("pointerdown", () => {
+        this.clickAudio.play();
+        this.onJoinLobbyClicked();
+        });
+
+        // close button
         const closeCircle = this.add.sprite(0, 0, "wood-circle");
         closeCircle.setScale(0.1);
 

@@ -1,5 +1,5 @@
 import Utilities from "../Utilities";
-import MainMenu from "./MainMenu";
+import MainMenu from "../Scenes/MainMenu";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 export default class SkinSelector extends Phaser.Scene {
