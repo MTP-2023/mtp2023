@@ -15,6 +15,8 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     player2Name = "";
     player1Skin = "";
     player2Skin = "";
+    player1Wins = 0;
+    player2Wins = 0;
     me = 1;
     ws: WebSocket;
     public gameOverEvent: EventEmitter;
@@ -91,6 +93,11 @@ export class OnlineMultiPlayer extends AbstractGameMode {
                 case "dc":
                     console.log("he disconnected");
                     this.dcEvent.emit("dc")
+                    break;
+                case "next round":
+                    this.challenge = new Challenge(lobby.currentBoard, lobby.goalBoard);
+                    this.player1Wins = lobby.player1_wins;
+                    this.player2Wins = lobby.player2_wins;
                     break;
             }
         };
@@ -193,10 +200,20 @@ export class OnlineMultiPlayer extends AbstractGameMode {
                 if (player.won) {
                     winnerList.push(player.handle)
                 }
+                if(this.me == 1){
+                    this.notifyWin(p1.won);
+                }
             }
         }
 
         return new GameEvaluation(finished, winnerList);
+    }
+
+    public async notifyWin(p1Win: boolean){
+        var data = {
+            "winner" : (p1Win ? 1 : -1)
+        }
+        this.ws.send(JSON.stringify(new MessageAvalanche(MessageType.WIN, data)));
     }
 
     public getMarbleSprite(playerTurn: number, scene: Phaser.Scene): string {

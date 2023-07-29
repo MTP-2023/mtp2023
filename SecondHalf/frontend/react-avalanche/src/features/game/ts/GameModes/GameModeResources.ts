@@ -203,6 +203,6 @@ export enum MessageType {
     CREATE,
     JOIN,
     MOVE,
-    NEWCHALLENGE,
+    WIN,
     CHANGESETTINGS,
   }

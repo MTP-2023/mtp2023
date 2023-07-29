@@ -190,12 +190,23 @@ async def create_lobby(code: int, websocket: WebSocket, player: str, marbleSkin:
             message: Message = await websocket.receive_json()
             print(message)
             if message["type"] == 2:
-                #lobby = lobbies[message.data["code"]]
-                #run(message.data["move"], lobby.currentBoard, message.data["player"], False)
                 lobby.recentMove = message["data"]["move"]
                 lobby.messageType = "move"
                 await manager.broadcast(json.dumps(lobby.toDict()))
-            elif message.Type == MessageTypes.NEWCHALLENGE:
+            elif message["type"] == 3: 
+                if message["data"]["winner"] == 1:
+                    lobby.player1_wins += 1
+                else:
+                    lobby.player2_wins += 1
+                start_board = generate_random_board(3, 2)
+                goal1 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
+                goal2 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
+                goal_board = merge(goal1, goal2, 3, 2)
+                lobby.currentBoard = start_board
+                lobby.goalBoard = goal_board
+                lobby.messageType = "next round"
+                await manager.broadcast(json.dumps(lobby.toDict()))
+            """elif message.Type == MessageTypes.NEWCHALLENGE:
                 lobby = lobbies[message.data["code"]]
                 start_board = generate_random_board(lobby.width, lobby.height)
                 goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
@@ -213,7 +224,7 @@ async def create_lobby(code: int, websocket: WebSocket, player: str, marbleSkin:
                 lobby.minMarbles = message.data["minMarbles"]
                 lobby.maxMarbles = message.data["maxMarbles"]
                 lobby.turnLimit = message.data["turnLimit"]
-                lobby.availableMarbles = message.data["availableMarbles"]
+                lobby.availableMarbles = message.data["availableMarbles"] """
     except WebSocketDisconnect:
         lobby.messageType = "dc"
         manager.disconnect(websocket)
@@ -242,6 +253,20 @@ async def join_lobby(code: int, websocket: WebSocket, name: str, marbleSkin: str
                         #run(message.data["move"], lobby.currentBoard, message.data["player"], False)
                         lobby.recentMove = message["data"]["move"]
                         lobby.messageType = "move"
+                        await manager.broadcast(json.dumps(lobby.toDict()))
+                    elif message["type"] == 3: 
+                        if message["data"]["winner"] == 1:
+                            lobby.player1_wins += 1
+                        else:
+                            lobby.player2_wins += 1
+                        start_board = generate_random_board(3, 2)
+                        goal1 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
+                        goal2 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
+                        goal_board = merge(goal1, goal2, 3, 2)
+                        lobby.currentBoard = start_board
+                        lobby.goalBoard = goal_board
+                        lobby.messageType = "next round"
+                        print("sending out new challenge")
                         await manager.broadcast(json.dumps(lobby.toDict()))
                     elif message.Type == MessageTypes.NEWCHALLENGE:
                         lobby = lobbies[message.data["code"]]

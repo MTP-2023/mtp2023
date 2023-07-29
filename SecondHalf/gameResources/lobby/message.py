@@ -5,7 +5,7 @@ class MessageTypes(Enum):
     CREATE = 1
     JOIN = 2
     MOVE = 3
-    NEWCHALLENGE = 4
+    WIN = 4
     CHANGESETTINGS = 5
 
 
