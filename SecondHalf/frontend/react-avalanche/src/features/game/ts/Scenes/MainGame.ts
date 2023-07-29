@@ -117,13 +117,12 @@ export default class MainGame extends Phaser.Scene {
 		return borderVisuals;
 	}
 
-	private addButton(x: number, y: number, content: number): Phaser.GameObjects.Container {
-
+	private addButton(x: number, y: number, content: number): Phaser.GameObjects.Image {
 		// Create a sprite for the circular image
-		const circularImage = this.add.sprite(0, 0, "wood-circle").setScale(0.06);
+		const circularImage = this.add.sprite(x, y, "wood-circle").setScale(0.06);
 		
 		// Create a text object to display the number
-		const text = this.add.text(0, 0, content.toString(), this.buttonTextStyle);
+		const text = this.add.text(x, y, content.toString(), this.buttonTextStyle);
 		text.setOrigin(0.5);
 		
 		// Add the click event listener
@@ -131,11 +130,11 @@ export default class MainGame extends Phaser.Scene {
 		circularImage.on('pointerdown', () => {
 			this.clickAudio.play();
 			if (this.gameMode.isMultiplayer && !this.gameMode.isLocal) {
-			var onlinegame = this.gameMode as OnlineMultiPlayer;
-			onlinegame.makeMove(content);
-			this.toggleInput(false);
+				var onlinegame = this.gameMode as OnlineMultiPlayer;
+				onlinegame.makeMove(content);
+				this.toggleInput(false);
 			} else {
-			this.dropMarble(content);
+				this.dropMarble(content);
 			}
 		});
 
@@ -148,9 +147,9 @@ export default class MainGame extends Phaser.Scene {
 		});
 		
 		// Add the circular image and text to a container
-		const container = this.add.container(x, y, [circularImage, text]);
+		//const container = this.add.container(x, y, [circularImage, text]);
 		
-		return container;
+		return circularImage;
 	}
 
 	private toggleTextShadow(text: Phaser.GameObjects.Text, toggleOn: boolean) {
@@ -468,7 +467,7 @@ export default class MainGame extends Phaser.Scene {
 		buttonGroup.getAll().forEach((child: Phaser.GameObjects.GameObject) => {
 			if (child instanceof Phaser.GameObjects.Sprite) {
 			  	const button = child as Phaser.GameObjects.Sprite;
-			  	button.input!.enabled = clickable;
+			  	clickable ? button.setInteractive() : button.disableInteractive();
 			}
 		});
 
