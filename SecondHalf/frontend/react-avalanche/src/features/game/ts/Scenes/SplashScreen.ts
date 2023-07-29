@@ -17,9 +17,8 @@ export default class SplashScreen extends Phaser.Scene {
 		// set default skin
 		this.game.registry.set('marbleSkin', "marble");
 
-		const backgroundImage = this.add.image(0, 0, "menu-background").setOrigin(0, 0);
-		backgroundImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
-		this.children.sendToBack(backgroundImage);
+		 // add background animation
+		 this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "frame0").play("animatedBackground");
 
 		const titleText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY * 0.5, "SnowSlider")
 			.setOrigin(0.5, 0)

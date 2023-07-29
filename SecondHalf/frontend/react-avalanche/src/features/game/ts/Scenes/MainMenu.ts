@@ -31,28 +31,9 @@ export default class MainMenu extends Phaser.Scene {
     public create(): void {
         Utilities.LogSceneMethodEntry("MainMenu", "create");
 
+        // add audio and background animation
         this.clickAudio = this.sound.add("woodenClick");
-        /*
-         // Create a sprite using the loaded spritesheet as the background
-        const background = this.add.sprite(0, 0, 'animated-background').setOrigin(0, 0);
-        
-        // Set the depth of the background sprite to be behind all other elements
-        background.setDepth(-1);
-
-        // Play an animation using the frames from the spritesheet
-        this.anims.create({
-            key: 'bg-play',
-            frames: this.anims.generateFrameNumbers('animated-background'),
-            frameRate: 10,
-            repeat: -1
-        });
-
-        background.anims.play('bg-play');*/
-
-        // background
-        const backgroundImage = this.add.image(0, 0, "menu-background").setOrigin(0, 0);
-		backgroundImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
-		this.children.sendToBack(backgroundImage);
+        this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "frame0").play("animatedBackground");
 
         const textYPosition = this.cameras.main.height / 5;
 

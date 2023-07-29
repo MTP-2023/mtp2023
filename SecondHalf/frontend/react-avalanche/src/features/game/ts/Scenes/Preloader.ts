@@ -6,6 +6,7 @@ export default class Preloader extends Phaser.Scene {
 	 * Unique name of the scene.
 	 */
 	public static Name = "Preloader";
+	private frameNames: string[] = [];
 
 	public preload(): void {
 
@@ -36,12 +37,14 @@ export default class Preloader extends Phaser.Scene {
 		this.load.image("capy");
 		this.load.image("baseball");
 
-		/*
-		this.load.spritesheet("animated-background", "background-spritesheet.png", {
-			frameWidth: 1600,
-			frameHeight: 1200,
-			startFrame: 0
-		});*/
+		// animated background frames
+		this.load.path = "src/features/game/assets/img/animatedBackgroundFrames/";
+
+		for (let i = 0; i < 30; i++) {
+			const frameName = "frame"+i.toString();
+			this.frameNames.push(frameName);
+			this.load.image(frameName);
+		}
 
 		// shapes
 		this.load.path = "src/features/game/assets/shapes/";
@@ -53,21 +56,27 @@ export default class Preloader extends Phaser.Scene {
 		this.load.path = "src/features/game/assets/audio/";
 		this.load.audio("snowStorm", "snowStorm.mp3");
 		this.load.audio("woodenClick", "woodenClick.wav");
-		
-		// fonts
-		this.load.path = "src/features/game/assets/fonts/";
-		const fonts = [
-			"Monoton-Regular.ttf"
-		];
 	}
 
 	public create(): void {
 		Utilities.LogSceneMethodEntry("Preloader", "create");
 
-		this.scene.start(SplashScreen.Name);
-	}
+		// create background animation
+		const animationKey = 'animatedBackground';
+		const frameRate = 10;
+		const repeat = -1;
 
-	public update(): void {
-		// preload handles updates to the progress bar, so nothing should be needed here.
+		const mappedAnimationFrames = this.frameNames.map((frameName) => {
+			return { key: frameName };
+		});
+
+		this.anims.create({
+			key: animationKey,
+			frames: mappedAnimationFrames,
+			frameRate: frameRate,
+			repeat: repeat,
+    	});
+
+		this.scene.start(SplashScreen.Name);
 	}
 }

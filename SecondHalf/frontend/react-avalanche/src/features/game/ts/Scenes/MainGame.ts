@@ -80,10 +80,8 @@ export default class MainGame extends Phaser.Scene {
 		this.clickAudio = this.sound.add("woodenClick");
 
 		// background
-        const backgroundImage = this.add.image(0, 0, "menu-background").setOrigin(0, 0);
-		backgroundImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
-		this.children.sendToBack(backgroundImage);
-		backgroundImage.setDepth(-5);
+		const backgroundAnimation = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "frame0").play("animatedBackground");
+		backgroundAnimation.setDepth(-5);
 
 		const woodenBoard = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, "wood-board");
         woodenBoard.setScale(0.55);
