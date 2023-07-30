@@ -19,8 +19,41 @@ import Bild5 from "../../assets/public/gallery/markus-spiske-fH5VEmsewO0-unsplas
 import Bild6 from "../../assets/public/gallery/max-lawton-ZJSe0tL8ZWk-unsplash.jpg";
 import Bild7 from "../../assets/public/gallery/philipp-kammerer-1FJZBOthB8k-unsplash.jpg";
 import Bild8 from "../../assets/public/gallery/sam-arnold-lQoC90sqn8s-unsplash.jpg";
+import Bild9 from "../../assets/public/gallery/austrian-national-library-r4v18AhK8gw-unsplash.jpg";
+import Bild10 from "../../assets/public/gallery/benjamin-szabo-QVN5ydW0k1k-unsplash.jpg";
+import Bild11 from "../../assets/public/gallery/carl-raw-8Gdayy2Lhi0-unsplash.jpg";
+import Bild12 from "../../assets/public/gallery/georgie-cobbs-SU35VU5de1o-unsplash.jpg";
+import Bild13 from "../../assets/public/gallery/ian-dooley-aaAllJ6bmac-unsplash.jpg";
+import Bild14 from "../../assets/public/gallery/johannes-waibel-WdBQHcIiSIw-unsplash.jpg";
+import Bild15 from "../../assets/public/gallery/joshua-bartell-eeX7MYk3HcY-unsplash.jpg";
+import Bild16 from "../../assets/public/gallery/mattias-olsson-nQz49efZEFs-unsplash.jpg";
+import Bild17 from "../../assets/public/gallery/oliver-schwendener-9lcWCCRXiKU-unsplash.jpg";
+import Bild18 from "../../assets/public/gallery/toby-otti-k6-usAW2aFw-unsplash.jpg";
+import Bild19 from "../../assets/public/gallery/xenia-radchenko-ezEn4jYrVYQ-unsplash.jpg";
 
-const images = [Bild1, Bild2, Bild3, Bild4, Bild5, Bild6, Bild7, Bild8];
+const images = [
+  Bild6,
+  Bild7,
+  Bild8,
+  Bild9,
+  Bild10,
+  Bild18,
+  Bild15,
+  Bild1,
+  Bild2,
+  Bild3,
+  Bild4,
+  Bild5,
+  Bild10,
+  Bild11,
+  Bild12,
+  Bild13,
+  Bild14,
+  Bild16,
+  Bild17,
+  Bild18,
+  Bild19,
+];
 const SVGComponent1 = () => {
   return (
     <img
