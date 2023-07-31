@@ -61,15 +61,24 @@ import test15 from "../../assets/public/gallery/us/FE1AB5A2-AAAA-4164-8F35-A1B67
 import test16 from "../../assets/public/gallery/us/IMG_7246.jpg";
 import test17 from "../../assets/public/gallery/us/IMG_7248.jpg";
 
+import umbennen from "../../assets/public/gallery/us/umbenennen.jpg";
+import flagge from "../../assets/public/gallery/us/Flagge.jpg";
+import closeup from "../../assets/public/gallery/us/close-up.jpg";
+import biggroup from "../../assets/public/gallery/us/big_group.jpg";
+
 //----------------------------------------------------------------------------------------------------
 const images = [
   Bilda,
+  flagge,
   Bild6,
+  biggroup,
   Bild7,
   test16,
+  umbennen,
   test17,
   Bildb,
   test1,
+  closeup,
   test2,
   test3,
   Bildc,

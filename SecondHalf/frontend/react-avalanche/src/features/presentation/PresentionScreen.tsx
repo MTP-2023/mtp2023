@@ -10,6 +10,7 @@ import aishowcase from "../../assets/aishowcase.png";
 import video from "../../assets/video/avalanche3.mp4";
 import TestComponent from "../test/TimePage";
 import backgroundImage from "../../assets/Timeline_background.jpg";
+import mountains from "../../assets/public/gallery/mattias-olsson-nQz49efZEFs-unsplash.jpg";
 
 const PresentationScreen = () => {
   return (
@@ -20,28 +21,24 @@ const PresentationScreen = () => {
             <video src={video} autoPlay loop muted></video>
           </div>
           <div className="hero__content">
-            <h1>Avalanche Masters Project</h1>
+            <h1>Master Team-Project</h1>
           </div>
         </section>
         <div className="sections">
           <section id="aboutAvalanche">
             <div className="section-content">
               <div className="column">
-                <div className="column-wrap">
-                  <h2>About the Avalanche Game</h2>
-                  <p>
-                    Avalanche is a strategic board game designed for tactical
-                    thinking and engaging gameplay. The objective is to be the
-                    last player with at least one marble remaining on the board.
-                    Players take turns sliding marbles, causing an "avalanche"
-                    effect that pushes other marbles off the edge. It requires
-                    careful planning and predicting the movement of marbles to
-                    outmaneuver opponents.
-                  </p>
-                </div>
-              </div>
-              <div className="column">
-                <img src={avalImg} alt="Avalanche Game" />
+                <h2>Orginial Avalanche Game</h2>
+                <p>
+                  Avalanche is a strategic board game designed for tactical
+                  thinking and engaging gameplay. The objective is to be the
+                  last player with at least one marble remaining on the board.
+                  Players take turns sliding marbles, causing an "avalanche"
+                  effect that pushes other marbles off the edge. It requires
+                  careful planning and predicting the movement of marbles to
+                  outmaneuver opponents.
+                </p>
+                <div className="column img"></div>
               </div>
             </div>
           </section>
@@ -61,9 +58,6 @@ const PresentationScreen = () => {
                   placerat in egestas erat imperdiet sed.",
                 </p>
               </div>
-              <div className="column">
-                <img src={present} alt="Masters Project" />
-              </div>
             </div>
           </section>
           <section id="instructions">
@@ -80,8 +74,21 @@ const PresentationScreen = () => {
                   gaming.
                 </p>
               </div>
+            </div>
+          </section>
+          <section id="instructions">
+            <div className="section-content reverse">
               <div className="column">
-                <img src={present} alt="Masters Project" />
+                <h2>The Team</h2>
+                <p>
+                  Our project focuses on developing AI agents for a modified
+                  version of the Avalanche board game. The objective is to
+                  create intelligent agents capable of strategically dropping
+                  marbles onto defined switches to solve challenges. By
+                  combining the excitement of the game with AI capabilities, we
+                  aim to push the boundaries of strategic decision-making in
+                  gaming.
+                </p>
               </div>
             </div>
           </section>
@@ -95,6 +102,22 @@ const PresentationScreen = () => {
 };
 
 export default PresentationScreen;
+
+/*
+below text
+<div className="column">
+                <img src={present} alt="Masters Project" />
+              </div>
+*/
+
+/*
+
+ <div className="column">
+                <div className="dark-overlay">
+                  <img src={mountains} alt="Avalanche Game" />
+                </div>
+              </div>
+*/
 
 /*
  <section>
