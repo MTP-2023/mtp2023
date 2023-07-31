@@ -10,7 +10,7 @@
   background: rgba(0, 0, 0, 0.5);
 }
 .button-style {
-  background-color: black;
+  background-color: #0f0f0f;
 
   width: 45px;
   border: 0;
@@ -21,7 +21,7 @@
   border: 0;
 
   border-radius: 4px;
-  background-color: black;
+  background-color: #0f0f0f;
   color: #fff;
   background-repeat: no-repeat;
   background-position-x: 50px;
