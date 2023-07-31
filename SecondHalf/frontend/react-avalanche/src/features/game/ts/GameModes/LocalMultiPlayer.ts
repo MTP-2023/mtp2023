@@ -6,7 +6,7 @@ export class LocalMultiPlayer extends AbstractGameMode {
     isLocal: boolean = true;
     isMultiplayer: boolean = true;
     isVsAi: boolean = false;
-    mixedColor = 0x925e6d;
+    mixedColor = 0x396cff;
 
     public async initChallenge(): Promise<void> {
         const challengeData = await fetchChallenge("twoPlayers");
