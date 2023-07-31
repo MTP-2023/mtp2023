@@ -17,6 +17,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     player2Skin = "";
     player1Wins = 0;
     player2Wins = 0;
+    latestWinner = 0;
     me = 1;
     ws: WebSocket;
     public gameOverEvent: EventEmitter;
@@ -189,18 +190,16 @@ export class OnlineMultiPlayer extends AbstractGameMode {
                 if (player.won) {
                     winnerList.push(player.handle)
                 }
-                if(this.me == 1){
-                    this.notifyWin(p1.won);
-                }
+                this.latestWinner = p1.won ? 1 : -1;
             }
         }
 
         return new GameEvaluation(finished, winnerList);
     }
 
-    public async notifyWin(p1Win: boolean){
+    public async notifyWin(){
         var data = {
-            "winner" : (p1Win ? 1 : -1)
+            "winner" : this.latestWinner
         }
         this.ws.send(JSON.stringify(new MessageAvalanche(MessageType.WIN, data)));
     }

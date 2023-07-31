@@ -2,6 +2,7 @@ import Utilities from "../Utilities";
 import MainGame from "../Scenes/MainGame";
 import MainMenu from "../Scenes/MainMenu";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
+import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
 
 export default class GameEnd extends Phaser.Scene {
 	/**
@@ -101,6 +102,10 @@ export default class GameEnd extends Phaser.Scene {
 
     private onReturnToMenuClicked(): void {
         this.clickAudio.play();
+        if(!this.gameMode.isLocal){
+            var onlinegame = this.gameMode as OnlineMultiPlayer;
+            onlinegame.ws.close();
+        }
         this.scene.stop(MainGame.Name);
         this.scene.stop(GameEnd.Name);
         this.scene.start(MainMenu.Name);

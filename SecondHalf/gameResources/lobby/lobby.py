@@ -23,6 +23,7 @@ class Lobby:
     isFull = False
     recentMove = 0
     messageType = ""
+    isWaitingForContinue = False
 
     def __init__(self, creatorName, startBoard, goalBoard, code, socket, type):
         self.player1_name = creatorName

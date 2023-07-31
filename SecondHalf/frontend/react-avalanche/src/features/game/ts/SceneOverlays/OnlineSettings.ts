@@ -1,5 +1,6 @@
 import { waitFor } from "wait-for-event";
 import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
+import { getCode } from "../../cAPICalls"
 import Utilities from "../Utilities";
 import MainMenu from "../Scenes/MainMenu";
 import MainGame from "../Scenes/MainGame";
@@ -233,7 +234,10 @@ export default class OnlineSettings extends Phaser.Scene {
         this.removePrevPageContent();
 
         // Generate random lobby code (You can replace this with your own logic)
-        const lobbyCode = 123456;
+        const lobbyCodeData = await getCode();
+        console.log(lobbyCodeData);
+        const lobbyCode = lobbyCodeData.code;
+        console.log("code is",lobbyCode);
 
         // Display the lobby code as text
         this.showLobbyCodeText(lobbyCode.toString());
