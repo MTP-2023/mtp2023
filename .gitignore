@@ -132,3 +132,4 @@ frontend/react-avalanche/package-lock.json
 # API key for wandb
 FirstHalf/agent/rl/wandb_api_key.txt
 .idea/workspace.xml
+*.gif

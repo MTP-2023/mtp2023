@@ -5,12 +5,12 @@ import Preloader from "./ts/Scenes/Preloader";
 import MainMenu from "./ts/Scenes/MainMenu";
 import SplashScreen from "./ts/Scenes/SplashScreen";
 import MainGame from "./ts/Scenes/MainGame";
-import MainSettings from "./ts/Scenes/MainSettings";
-import GameEnd from './ts/Scenes/GameEnd';
-import OnlineSettings from './ts/Scenes/OnlineSettings';
+import GameEnd from './ts/SceneOverlays/GameEnd';
+import OnlineSettings from './ts/SceneOverlays/OnlineSettings';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-import AgentSelect from "./ts/Scenes/AgentSelect";
-import SkinSelector from './ts/Scenes/SkinSelector';
+import AgentSelect from "./ts/SceneOverlays/AgentSelect";
+import SkinSelector from './ts/SceneOverlays/SkinSelector';
+import QuitGame from './ts/SceneOverlays/QuitGame';
 
 const GameComponent: React.FC = () => {
   useEffect(() => {
@@ -23,7 +23,7 @@ const GameComponent: React.FC = () => {
       height: game_height,
       type: Phaser.AUTO,
       parent: 'game',
-      title: 'Avalanche Game',
+      title: 'SnowSlider Game',
       dom: {
         createContainer: true
       },
@@ -56,11 +56,11 @@ const GameComponent: React.FC = () => {
     game.scene.add(MainMenu.Name, MainMenu);
     game.scene.add(SplashScreen.Name, SplashScreen);
     game.scene.add(MainGame.Name, MainGame);
-    game.scene.add(MainSettings.Name, MainSettings);
     game.scene.add(GameEnd.Name, GameEnd);
     game.scene.add(AgentSelect.Name, AgentSelect);
     game.scene.add(OnlineSettings.Name, OnlineSettings);
     game.scene.add(SkinSelector.Name, SkinSelector);
+    game.scene.add(QuitGame.Name, QuitGame);
 
     // Start the Boot scene
     game.scene.start(Boot.Name);

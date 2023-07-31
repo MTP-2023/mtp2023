@@ -1,12 +1,12 @@
 import Utilities from "../Utilities";
-import GameEnd from "./GameEnd";
+import GameEnd from "../SceneOverlays/GameEnd";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { SinglePlayerChallenge } from "../GameModes/SinglePlayerChallenge";
 import { LocalMultiPlayer } from "../GameModes/LocalMultiPlayer";
 import { LocalVsAi} from "../GameModes/LocalVsAi";
 import { interpretBoardReverse } from "../Helper/BoardInterpreter";
 import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
-import {waitFor} from 'wait-for-event';
+import QuitGame from "../SceneOverlays/QuitGame";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -15,7 +15,7 @@ export default class MainGame extends Phaser.Scene {
 	public static Name = "MainGame";
 
 	// global var definition
-	scaleFactor: number = 1.5;
+	scaleFactor: number = 1.4;
 	switchWidth: number;
 	imgHeight: number;
 	borderWidth: number;
@@ -29,7 +29,7 @@ export default class MainGame extends Phaser.Scene {
 	counter: number;
 	marbleRadius: number;
 	movementThreshold: number = 0.001;
-	switchRotationVelocity: number = 0.035;
+	switchRotationVelocity: number = 0.032;
 	buttonColor: number;
 	buttonOutlineColor: number;
 	buttonTextColor: string;
@@ -37,7 +37,8 @@ export default class MainGame extends Phaser.Scene {
 	gameMode: AbstractGameMode;
 	turn: number = 1;
 	boardMarbles: number = 0;
-	boardSpacingTop: number = 90;
+	boardSpacingTop: number = 180;
+	clickAudio: any;
 
 	constructor() {
 		super({ key: MainGame.Name });
@@ -46,13 +47,13 @@ export default class MainGame extends Phaser.Scene {
 		this.switchWidth = this.scaleFactor * 70;
 		this.imgHeight = this.scaleFactor * 104;
 		this.borderWidth = this.scaleFactor * 5;
-		this.switchSpacingY = this.scaleFactor * 60;
+		this.switchSpacingY = this.scaleFactor * 40;
 		this.borderExtraHeight = this.scaleFactor * 0.15 * this.switchSpacingY;
 		this.boardWidth = 4 * this.switchWidth + 5 * this.borderWidth;
 		this.marbleRadius = 13 * this.scaleFactor;
 
 		this.buttonRadius = this.scaleFactor * 10;
-		this.buttonFontSize = this.scaleFactor * 18;
+		this.buttonFontSize = this.scaleFactor * 20;
 
 		this.simulationRunning = false;
 		this.counter = 0;
@@ -67,6 +68,24 @@ export default class MainGame extends Phaser.Scene {
 
 	public preload(): void {
 
+	}
+
+	private createBackground(): void {
+		// start playing audio
+		/*
+		const backgroundSound = this.sound.add('snowStorm', { loop: true });
+		backgroundSound.volume = 0.2;
+    	backgroundSound.play();*/
+
+		this.clickAudio = this.sound.add("woodenClick");
+
+		// background
+		const backgroundAnimation = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "frame0").play("animatedBackground");
+		backgroundAnimation.setDepth(-5);
+
+		const woodenBoard = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, "wood-board");
+        woodenBoard.setScale(0.55);
+		woodenBoard.setDepth(-4);
 	}
 
 	private addBorder(row: number, switchIndex: number, boardX: number, boardY: number): Phaser.GameObjects.Rectangle {
@@ -96,43 +115,66 @@ export default class MainGame extends Phaser.Scene {
 		return borderVisuals;
 	}
 
-	private addButton(x: number, y: number, content: number): Phaser.GameObjects.Sprite {
-		// Create a circle graphics object
-		const circle = this.add.graphics();
-		circle.lineStyle(2, this.buttonOutlineColor, 1);
-		circle.fillStyle(this.buttonColor, 1);
-		circle.fillCircle(this.buttonRadius, this.buttonRadius, this.buttonRadius);
-		circle.strokeCircle(this.buttonRadius, this.buttonRadius, this.buttonRadius);
-	  
-		// Create a texture from the circle graphics object
-		const textureKey = `circleButtonTexture_${content}`;
-		circle.generateTexture(textureKey, this.buttonRadius * 2, this.buttonRadius * 2);
-	  
-		// Create a sprite using the circle texture
-		const button = this.add.sprite(x, y, textureKey);
-		button.setInteractive();
-	  
-		// Add the number as a text object
+	private addButton(x: number, y: number, content: number): Phaser.GameObjects.Image {
+		// Create a sprite for the circular image
+		const circularImage = this.add.sprite(x, y, "wood-circle").setScale(0.06);
+		
+		// Create a text object to display the number
 		const text = this.add.text(x, y, content.toString(), this.buttonTextStyle);
 		text.setOrigin(0.5);
-	  
+		
 		// Add the click event listener
-		button.on('pointerdown', () => {
-		  if(this.gameMode.isMultiplayer && !this.gameMode.isLocal){
-			var onlinegame = this.gameMode as OnlineMultiPlayer;
-			onlinegame.makeMove(content);
-			this.toggleInput(false);
-		  }
-		  else {
-			this.dropMarble(content);
-		  }
+		circularImage.setInteractive();
+		circularImage.on('pointerdown', () => {
+			this.clickAudio.play();
+			if (this.gameMode.isMultiplayer && !this.gameMode.isLocal) {
+				var onlinegame = this.gameMode as OnlineMultiPlayer;
+				onlinegame.makeMove(content);
+				this.toggleInput(false);
+			} else {
+				this.dropMarble(content);
+			}
 		});
 
-		// Clean up the circle graphics object
-		circle.destroy();
+		circularImage.on('pointerover', () => {
+			this.toggleTextShadow(text, true);
+		});
 
-		return button;
+		circularImage.on('pointerout', () => {
+			this.toggleTextShadow(text, false);
+		});
+		
+		return circularImage;
 	}
+
+	private addQuitButton(y: number): void {
+		// quit button
+        const closeCircle = this.add.sprite(0, 0, "wood-circle");
+        closeCircle.setScale(0.08);
+
+        const closeCross = this.add.sprite(0, 0, "close-cross");
+        closeCross.setScale(0.04); 
+        closeCross.setDepth(1);
+
+        const closeButton = this.add.container(this.scale.width * 0.675, y);
+
+        closeButton.add(closeCircle);
+        closeButton.add(closeCross);
+        closeCircle
+            .setInteractive()
+            .on('pointerdown', () => {
+                this.scene.pause();
+				this.scene.run(QuitGame.Name);
+            });
+	}
+
+	private toggleTextShadow(text: Phaser.GameObjects.Text, toggleOn: boolean) {
+        if (toggleOn) {
+            text.setShadow(5, 5, 'rgba(0,0,0,0.5)', 4);
+        } else {
+            text.setShadow(0, 0, undefined);
+        }
+    }
 
 	private addSwitch(startBoardData: number, goalBoardData: number, row: number, switchIndex: number, x: number, y: number): Phaser.GameObjects.GameObject {
 		// interpret data and set variables accordingly
@@ -159,13 +201,13 @@ export default class MainGame extends Phaser.Scene {
 		switchSprite.setDisplaySize(this.switchWidth, this.imgHeight);
 		
 		const detectorHeight = (this.imgHeight - switchShape.centerOfMass.y);
-		// add rectangle to act as a sensor to initiate switch flips (collision detection of matter appeared to be buggy sometimes)
+		// add rectangle to act as a sensor to hold marbles (collision detection of matter appeared to be buggy sometimes)
 		const holdDetectorY = y - (this.imgHeight / 2.5);
 		const holdDetector = this.matter.add.rectangle(x, holdDetectorY, this.switchWidth, detectorHeight/2.5, { label: "holdDetector", isStatic: true, isSensor: true });
 		holdDetector.gameObject = switchSprite;
 
 		// add rectangle to act as a sensor to initiate switch flips (collision detection of matter appeared to be buggy sometimes)
-		const switchDetectorY = y - (this.imgHeight / 2) + switchShape.centerOfMass.y + (detectorHeight / 1.5);
+		const switchDetectorY = y - (this.imgHeight / 2) + switchShape.centerOfMass.y + (detectorHeight / 1.65);
 		const switchDetector = this.matter.add.rectangle(x, switchDetectorY, this.switchWidth, detectorHeight/2.5, { label: "switchDetector", isStatic: true, isSensor: true });
 		switchDetector.gameObject = switchSprite;
 		
@@ -197,16 +239,13 @@ export default class MainGame extends Phaser.Scene {
 
 		// set matter options
 		this.matter.world.update60Hz();
-		this.matter.world.setGravity(0, 0.85);
+		this.matter.world.setGravity(0, 0.8);
 
-		// start playing audio
-		const backgroundSound = this.sound.add('snowStorm', { loop: true });
-		backgroundSound.volume = 0.2;
-    	backgroundSound.play();
+		// init graphics
+		this.createBackground();
 
 		// initialize gameMode
 		console.log(data.gameModeHandle)
-		
 		
 		switch (data.gameModeHandle) {
 			case "singlePlayerChallenge":
@@ -246,20 +285,20 @@ export default class MainGame extends Phaser.Scene {
 		// initialize vars
 		const camera = this.cameras.main;
 		const boardX = (this.scale.width - this.boardWidth) / 2;
-		const boardY = camera.worldView.y + 120 * this.scaleFactor;
-		const buttonStartY = camera.worldView.y + 30 * this.scaleFactor;
+		const boardY = camera.worldView.y + 180 * this.scaleFactor;
+		const buttonStartY = camera.worldView.y + 120 * this.scaleFactor;
 		const switchGroup = this.add.container();
 		switchGroup.setName("gameBoard");
 
 		// player UI
 		const playerStatusWidth = boardX * 0.8;
 		const playerStatusHeight = this.imgHeight;
-		const playerStatusX = (boardX - playerStatusWidth) / 2;
-		const playerStatusY = camera.worldView.y + 30 * this.scaleFactor;
+		const playerStatusX = (boardX - playerStatusWidth/1.2);
+		const playerStatusY = camera.worldView.y + 100 * this.scaleFactor;
 
 		if(this.gameMode.isMultiplayer) {
 			const playerNames = this.gameMode.getPlayerNames();
-			this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth + boardX, playerNames[0], playerNames[1]);
+			this.gameMode.createPlayerStatus(this, playerStatusX, playerStatusY, playerStatusWidth, playerStatusHeight, this.boardWidth + boardX, playerNames[0], playerNames[1], "wood-nametag", 0.25);
 		}
 		// button init
 		const buttonGroup = this.add.container();
@@ -272,6 +311,8 @@ export default class MainGame extends Phaser.Scene {
 			const button = this.addButton(buttonX, buttonStartY, i);
 			buttonGroup.add(button);
 		}
+
+		this.addQuitButton(buttonStartY,);
 
 		// SWITCHES -----------------------------------------------------------
 		// Iterate over the rows
@@ -336,19 +377,6 @@ export default class MainGame extends Phaser.Scene {
 		this.matter.world.on("beforeupdate", () => {
 			//console.log("BEFOREUPDATE")
 			if (this.simulationRunning) {
-				// check if impulse of marble collision event needs to be applied
-				/*
-				if (this.data.has("impulse")) {
-					console.log("APPLY IMPULSE")
-					const data = this.data.get("impulse");
-					//this.matter.body.applyForce(data.body, data.pos, data.vector);
-					//this.matter.body.setVelocity(data.body, data.vector);
-					this.matter.applyForce(data.body, data.vector);
-					this.data.remove("impulse");
-				}*/
-
-				//this.applyRepulsiveForceOnMarbles();
-
 				this.checkForMarbleDeletion();
 			}
 		});
@@ -382,7 +410,7 @@ export default class MainGame extends Phaser.Scene {
 			if (!this.simulationRunning) {
 				// Get the number from the keyCode (assuming it's a number key)
 				const number = code - Phaser.Input.Keyboard.KeyCodes.ONE + 1;
-
+				this.clickAudio.play();
 				if(this.gameMode.isMultiplayer && !this.gameMode.isLocal) {
 					console.log("multi")
 					var onlinegame = this.gameMode as OnlineMultiPlayer;
@@ -431,10 +459,7 @@ export default class MainGame extends Phaser.Scene {
 		const boardX = (this.scale.width - this.boardWidth) / 2;
 		let x = boardX + this.switchWidth/2 + this.borderWidth + Math.floor((col-1) / 2) * (this.switchWidth + this.borderWidth);
 		x = (col % 2 == 0) ? x + this.switchWidth - 1.075 * this.marbleRadius: x + 1.075 * this.marbleRadius;
-		let marblePNG = "marble";
-		if (this.gameMode.isMultiplayer) {
-			marblePNG = this.gameMode.getMarbleSprite(this.turn, this);
-		}
+		const marblePNG = this.gameMode.getMarbleSprite(this.turn, this);
 		let marbleSprite = this.matter.add.sprite(x, this.boardSpacingTop, marblePNG, undefined, { shape: switchShape });
 
 		// add body/shape to marble
@@ -459,7 +484,7 @@ export default class MainGame extends Phaser.Scene {
 		buttonGroup.getAll().forEach((child: Phaser.GameObjects.GameObject) => {
 			if (child instanceof Phaser.GameObjects.Sprite) {
 			  	const button = child as Phaser.GameObjects.Sprite;
-			  	button.input!.enabled = clickable;
+			  	clickable ? button.setInteractive() : button.disableInteractive();
 			}
 		});
 
@@ -525,7 +550,7 @@ export default class MainGame extends Phaser.Scene {
 	  	let steps = 0;
 		let currentAngle = flipSwitch.angle;
 		
-		
+		/*
 		const updateRotation = () => {
 			if (!flipSwitch.gameObject.getData("rotating")) return;
 			this.matter.body.rotate(flipSwitch, rotationSpeed); // Rotate the switch
@@ -546,9 +571,9 @@ export default class MainGame extends Phaser.Scene {
 				steps += 1;
 			  	requestAnimationFrame(updateRotation);
 			}
-		};
+		};*/
 
-		/*
+		
 		const updateRotation = () => {
 			if (!flipSwitch.gameObject.getData("rotating")) return;
 
@@ -578,7 +603,7 @@ export default class MainGame extends Phaser.Scene {
 				steps += 1;
 			  requestAnimationFrame(updateRotation);
 			}
-		};*/
+		};
 
 		updateRotation();
 	}
@@ -673,8 +698,6 @@ export default class MainGame extends Phaser.Scene {
 				console.log("blocking for " + this.turn)
 				this.initButtonsclickable(this.turn);
 			}
-			
-			this.interpretGameState();
 			
 			this.simulationRunning = false;
 		}
