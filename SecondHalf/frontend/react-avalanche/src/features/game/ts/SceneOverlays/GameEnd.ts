@@ -29,6 +29,10 @@ export default class GameEnd extends Phaser.Scene {
         const textBg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY*0.8, "wood-victory");
         textBg.setScale(0.8);
 
+        const victorySound = this.sound.add("victory");
+        victorySound.setVolume(0.1);
+        victorySound.play();
+
         const victoryText = this.add.text(
             this.cameras.main.centerX, 
             this.cameras.main.centerY*0.8,

@@ -56,6 +56,10 @@ export default class Preloader extends Phaser.Scene {
 		this.load.path = "src/features/game/assets/audio/";
 		this.load.audio("gameplaySoundtrack", "TheLongestNightOfThisWinter.mp3");
 		this.load.audio("woodenClick", "woodenClick.wav");
+		this.load.audio("marbleDropSound", "marbleDropSound.mp3");
+		this.load.audio("marbleStopSound", "marbleStopSound.mp3");
+		this.load.audio("switchRotationSound", "switchRotation.mp3");
+		this.load.audio("victory", "victory.wav");
 	}
 
 	public create(): void {
