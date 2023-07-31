@@ -271,6 +271,7 @@ export default class OnlineSettings extends Phaser.Scene {
     }
 
     private async createLobbyInput(): Promise<void> {
+        this.instructionText!.text = "Enter the lobby code:";
         this.inputField = this.createInputField("lobbycode", 6);
     }
 
