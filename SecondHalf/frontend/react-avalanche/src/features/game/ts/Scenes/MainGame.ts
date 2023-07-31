@@ -438,6 +438,10 @@ export default class MainGame extends Phaser.Scene {
 
 	// handle opponent disconnect
 	private handleDisconnect(){
+		if(!this.gameMode.isLocal){
+			var onlinegame = this.gameMode as OnlineMultiPlayer;
+			onlinegame.moveEvent.destroy();
+		}
 		this.scene.pause();
 		this.scene.run(DisconnectNotification.Name);
 	}
@@ -740,7 +744,17 @@ export default class MainGame extends Phaser.Scene {
 			if (this.gameMode.isMultiplayer) {
 				switch (evalResult.winner.length) {
 					case 1:
-						gameEndText = "Player " + evalResult.winner[0] + " has won!";
+						var winner = "Player " + evalResult.winner[0].toString();
+						if(!this.gameMode.isLocal){
+							var onlinegame = this.gameMode as OnlineMultiPlayer;
+							if(evalResult.winner[0] == 1){
+								winner = onlinegame.player1Name;
+							} else {
+								winner = onlinegame.player2Name;
+							}
+							onlinegame.moveEvent.destroy();
+						}
+						gameEndText = winner + " has won!";
 						break;
 					case 2:
 						gameEndText = "It's a draw!";
@@ -749,7 +763,10 @@ export default class MainGame extends Phaser.Scene {
 			} else {
 				gameEndText = "Congratulations! You won!"
 			}
-
+			if(!this.gameMode.isLocal){
+				var onlinegame = this.gameMode as OnlineMultiPlayer;
+				onlinegame.moveEvent.destroy();
+			}
 			this.scene.pause(MainGame.Name);
 			this.scene.launch(GameEnd.Name, { displayText: gameEndText, gameMode: this.gameMode });
 		} else if (this.gameMode.isMultiplayer) {

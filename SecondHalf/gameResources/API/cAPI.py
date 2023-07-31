@@ -204,7 +204,11 @@ async def create_lobby(code: int, websocket: WebSocket, player: str, marbleSkin:
                 goal_board = merge(goal1, goal2, 3, 2)
                 lobby.currentBoard = start_board
                 lobby.goalBoard = goal_board
-                lobby.messageType = "next round"
+                lobby.messageType = "pls confirm"
+                print("waiting for confirmation")
+                await manager.broadcast(json.dumps(lobby.toDict()))
+            elif message["type"] == 4: 
+                lobby.messageType = "confirmed"
                 await manager.broadcast(json.dumps(lobby.toDict()))
             """elif message.Type == MessageTypes.NEWCHALLENGE:
                 lobby = lobbies[message.data["code"]]
@@ -265,10 +269,13 @@ async def join_lobby(code: int, websocket: WebSocket, name: str, marbleSkin: str
                         goal_board = merge(goal1, goal2, 3, 2)
                         lobby.currentBoard = start_board
                         lobby.goalBoard = goal_board
-                        lobby.messageType = "next round"
-                        print("sending out new challenge")
+                        lobby.messageType = "pls confirm"
+                        print("waiting for confirmation")
                         await manager.broadcast(json.dumps(lobby.toDict()))
-                    elif message.Type == MessageTypes.NEWCHALLENGE:
+                    elif message["type"] == 4: 
+                        lobby.messageType = "confirmed"
+                        await manager.broadcast(json.dumps(lobby.toDict()))
+                    """elif message.Type == MessageTypes.NEWCHALLENGE:
                         lobby = lobbies[message.data["code"]]
                         start_board = generate_random_board(lobby.width, lobby.height)
                         goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
@@ -288,7 +295,7 @@ async def join_lobby(code: int, websocket: WebSocket, name: str, marbleSkin: str
                         lobby.minMarbles = message.data["minMarbles"]
                         lobby.maxMarbles = message.data["maxMarbles"]
                         lobby.turnLimit = message.data["turnLimit"]
-                        lobby.availableMarbles = message.data["availableMarbles"]
+                        lobby.availableMarbles = message.data["availableMarbles"]"""
             except WebSocketDisconnect:
                 manager.disconnect(websocket)
                 lobby.messageType = "dc"

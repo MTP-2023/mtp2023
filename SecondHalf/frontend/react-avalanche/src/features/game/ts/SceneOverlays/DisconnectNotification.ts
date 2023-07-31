@@ -1,6 +1,7 @@
 import Utilities from "../Utilities";
 import MainGame from "../Scenes/MainGame";
 import MainMenu from "../Scenes/MainMenu";
+import GameEnd from "./GameEnd";
 
 export default class DisconnectNotification extends Phaser.Scene {
 	/**
@@ -30,13 +31,14 @@ export default class DisconnectNotification extends Phaser.Scene {
             this.cameras.main.centerX, 
             this.cameras.main.centerY,
             "Your opponent disconnected. You are now returning to the main menu...",
-            { fontSize: '60px', fontFamily: "monospace", align: "center", color: '#ffffff' },
+            { fontSize: '50px', fontFamily: "monospace", align: "center", color: '#ffffff' },
         );
         dcText.setWordWrapWidth(textBg.width*0.6)
         dcText.setOrigin(0.5);
 
         setTimeout(() => {
             this.scene.stop(MainGame.Name);
+            this.scene.stop(GameEnd.Name);
             this.scene.stop(DisconnectNotification.Name);
             this.scene.start(MainMenu.Name);
         }, 3000);

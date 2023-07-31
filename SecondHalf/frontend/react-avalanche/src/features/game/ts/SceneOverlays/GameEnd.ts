@@ -3,6 +3,7 @@ import MainGame from "../Scenes/MainGame";
 import MainMenu from "../Scenes/MainMenu";
 import { AbstractGameMode } from "../GameModes/GameModeResources";
 import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
+import { waitFor } from "wait-for-event";
 
 export default class GameEnd extends Phaser.Scene {
 	/**
@@ -11,6 +12,7 @@ export default class GameEnd extends Phaser.Scene {
 	public static Name = "GameEnd";
     private clickAudio: any;
     private gameMode: AbstractGameMode;
+    private infoText: Phaser.GameObjects.Text;
 	public preload(): void {
 		// Preload as needed.
 	}
@@ -22,7 +24,7 @@ export default class GameEnd extends Phaser.Scene {
         const overlayWidth = this.cameras.main.width;
 
         this.clickAudio = this.sound.add("woodenClick");
-        this.gameMode = this.gameMode;
+        this.gameMode = data.gameMode;
 
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 0.5);
@@ -32,14 +34,14 @@ export default class GameEnd extends Phaser.Scene {
         const textBg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY*0.8, "wood-victory");
         textBg.setScale(0.8);
 
-        const victoryText = this.add.text(
+        this.infoText = this.add.text(
             this.cameras.main.centerX, 
             this.cameras.main.centerY*0.8,
             data.displayText,
             { fontSize: '60px', fontFamily: "monospace", align: "center", color: '#ffffff' },
         );
-        victoryText.setWordWrapWidth(textBg.width*0.6)
-        victoryText.setOrigin(0.5);
+        this.infoText.setWordWrapWidth(textBg.width*0.6)
+        this.infoText.setOrigin(0.5);
 
         // Play again button
         const playAgainButton = this.add.image(this.cameras.main.centerX/3*2, this.cameras.main.centerY*1.5, "wood-hexagon");
@@ -64,7 +66,7 @@ export default class GameEnd extends Phaser.Scene {
 
         playAgainButton.on("pointerdown", () => {
             this.clickAudio.play();
-            this.onPlayAgainClicked();
+            this.onPlayAgainClicked(playAgainButton);
         });
 
         // Join Lobby button
@@ -94,8 +96,20 @@ export default class GameEnd extends Phaser.Scene {
         });
 	}
 
-    private onPlayAgainClicked(): void {
+    private async onPlayAgainClicked(button: Phaser.GameObjects.Image): Promise<void> {
         this.clickAudio.play();
+        if(!this.gameMode.isLocal){
+            var onlinegame = this.gameMode as OnlineMultiPlayer;
+            if(!onlinegame.waitingForConfirmation){
+                onlinegame.notifyWin();
+                console.log("waiting for opponent");
+                this.infoText.text = "Waiting for opponent..."
+                button.disableInteractive();
+                await waitFor("confirmed", onlinegame.newGameEvent);
+            } else {
+                onlinegame.confirmNextMatch();
+            }
+        }
         this.scene.stop();
         this.scene.start(MainGame.Name);
     }

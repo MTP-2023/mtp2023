@@ -224,5 +224,5 @@ export enum MessageType {
     JOIN,
     MOVE,
     WIN,
-    CHANGESETTINGS,
+    CONFIRMPLAYAGAIN,
   }
