@@ -73,10 +73,9 @@ export default class MainGame extends Phaser.Scene {
 
 	private createBackground(): void {
 		// start playing audio
-		/*
-		const backgroundSound = this.sound.add('snowStorm', { loop: true });
+		const backgroundSound = this.sound.add("gameplaySoundtrack", { loop: true });
 		backgroundSound.volume = 0.2;
-    	backgroundSound.play();*/
+    	backgroundSound.play();
 
 		this.clickAudio = this.sound.add("woodenClick");
 
