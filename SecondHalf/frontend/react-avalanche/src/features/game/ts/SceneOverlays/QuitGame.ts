@@ -1,6 +1,8 @@
 import Utilities from "../Utilities";
 import MainGame from "../Scenes/MainGame";
 import MainMenu from "../Scenes/MainMenu";
+import { AbstractGameMode } from "../GameModes/GameModeResources";
+import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
 
 export default class QuitGame extends Phaser.Scene {
     /**
@@ -13,7 +15,7 @@ export default class QuitGame extends Phaser.Scene {
         // Preload as needed.
     }
 
-    public create(mainMenuScene: MainMenu): void {
+    public create(data: {gameMode: AbstractGameMode}): void {
         Utilities.LogSceneMethodEntry("QuitGame", "create");
 
         this.clickAudio = this.sound.add("woodenClick");
@@ -68,6 +70,10 @@ export default class QuitGame extends Phaser.Scene {
 
         yesButton.on("pointerdown", () => {
             this.clickAudio.play();
+            if(!data.gameMode.isLocal){
+                var onlinegame = data.gameMode as OnlineMultiPlayer;
+                onlinegame.ws.close();
+            }
             this.scene.stop(MainGame.Name);
             this.scene.stop(QuitGame.Name);
             this.scene.start(MainMenu.Name)

@@ -1,6 +1,7 @@
 import Utilities from "../Utilities";
 import MainGame from "../Scenes/MainGame";
 import MainMenu from "../Scenes/MainMenu";
+import { AbstractGameMode } from "../GameModes/GameModeResources";
 
 export default class GameEnd extends Phaser.Scene {
 	/**
@@ -8,18 +9,19 @@ export default class GameEnd extends Phaser.Scene {
 	 */
 	public static Name = "GameEnd";
     private clickAudio: any;
-
+    private gameMode: AbstractGameMode;
 	public preload(): void {
 		// Preload as needed.
 	}
 
-	public create(data: { displayText: string }): void {
+	public create(data: { displayText: string, gameMode: AbstractGameMode }): void {
 		Utilities.LogSceneMethodEntry("GameEnd", "create");
 		
         const overlayHeight = this.cameras.main.height;
         const overlayWidth = this.cameras.main.width;
 
         this.clickAudio = this.sound.add("woodenClick");
+        this.gameMode = this.gameMode;
 
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 0.5);

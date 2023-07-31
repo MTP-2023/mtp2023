@@ -164,7 +164,7 @@ export default class MainGame extends Phaser.Scene {
             .setInteractive()
             .on('pointerdown', () => {
                 this.scene.pause();
-				this.scene.run(QuitGame.Name);
+				this.scene.run(QuitGame.Name, { gameMode: this.gameMode });
             });
 	}
 
@@ -698,7 +698,7 @@ export default class MainGame extends Phaser.Scene {
 				console.log("blocking for " + this.turn)
 				this.initButtonsclickable(this.turn);
 			}
-			
+			this.interpretGameState();
 			this.simulationRunning = false;
 		}
 	}
@@ -750,7 +750,7 @@ export default class MainGame extends Phaser.Scene {
 			}
 
 			this.scene.pause(MainGame.Name);
-			this.scene.launch(GameEnd.Name, { displayText: gameEndText });
+			this.scene.launch(GameEnd.Name, { displayText: gameEndText, gameMode: this.gameMode });
 		} else if (this.gameMode.isMultiplayer) {
 			//console.log("SWITCH TURNS CALLED")
 			this.turn = this.gameMode.switchTurns(this.turn, this);
