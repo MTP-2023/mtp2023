@@ -17,7 +17,7 @@ export default class SkinSelector extends Phaser.Scene {
         { label: "Joker", imgName: "joker" },
         { label: "Capy", imgName: "capy" },
         
-        { label: "Swiss", imgName: "marble" },
+        { label: "Mike", imgName: "mike" },
         { label: "Orange", imgName: "marble-p1" },
         { label: "Blue", imgName: "marble-p2" },
         { label: "Joker", imgName: "joker" },

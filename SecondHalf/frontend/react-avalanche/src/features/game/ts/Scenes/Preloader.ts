@@ -36,6 +36,7 @@ export default class Preloader extends Phaser.Scene {
 		this.load.image("joker");
 		this.load.image("capy");
 		this.load.image("baseball");
+		this.load.image("mike");
 
 		// animated background frames
 		this.load.path = "src/features/game/assets/img/animatedBackgroundFrames/";
