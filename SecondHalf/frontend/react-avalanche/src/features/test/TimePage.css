@@ -4,7 +4,7 @@
 
 body {
   background: #0f0f0f;
-  font-family: "Montserrat", sans-serif;
+  font-family: "rubik";
   font-size: 16px;
   color: #0f0f0f;
 }
@@ -12,7 +12,7 @@ body {
 .title {
   font-size: 15em;
   text-align: center;
-  font-family: "Futura", sans-serif;
+  font-family: "monoton";
   color: #abd1f3;
 }
 
@@ -27,7 +27,7 @@ h3 {
 }
 
 .date {
-  color: rgb(205, 52, 52);
+  color: rgb(248, 111, 3);
 }
 
 .description {
@@ -62,7 +62,7 @@ h3 {
   .vertical-timeline-element-date {
     display: block !important;
     float: none !important;
-    color: #abd1f3;
+    color: rgb(248, 111, 3);
     margin-top: 1.5em;
   }
 }

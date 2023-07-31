@@ -1,5 +1,10 @@
 import React from "react";
 import "./PresentationScreen.css";
+import { View, Image } from "react-native";
+import ImageList from "@mui/material/ImageList";
+import ImageListItem from "@mui/material/ImageListItem";
+import ImageListItemBar from "@mui/material/ImageListItemBar";
+const Spacer = require("react-spacer");
 
 import avalImg from "../../assets/avalanche-game.jpeg";
 
@@ -11,6 +16,36 @@ import video from "../../assets/video/avalanche3.mp4";
 import TestComponent from "../test/TimePage";
 import backgroundImage from "../../assets/Timeline_background.jpg";
 import mountains from "../../assets/public/gallery/mattias-olsson-nQz49efZEFs-unsplash.jpg";
+import background2 from "../../assets/public/gallery/philipp-kammerer-1FJZBOthB8k-unsplash.jpg";
+
+// user profiles
+import andre from "../../assets/public/gallery/profiles/andre.png";
+import rot from "../../assets/public/gallery/profiles/rot.png";
+import theresa from "../../assets/public/gallery/profiles/theresa.png";
+import thomas from "../../assets/public/gallery/profiles/thomas.png";
+
+const itemData = [
+  {
+    img: andre,
+    title: "",
+    author: "Andre Scheld",
+  },
+  {
+    img: rot,
+    title: "",
+    author: "Michael Temnov",
+  },
+  {
+    img: theresa,
+    title: "",
+    author: "Theresa Hartmann",
+  },
+  {
+    img: thomas,
+    title: "",
+    author: "Thomas Nowak",
+  },
+];
 
 const PresentationScreen = () => {
   return (
@@ -90,7 +125,28 @@ const PresentationScreen = () => {
                   gaming.
                 </p>
               </div>
+              <div className="column">
+                <ImageList sx={{ width: 500, height: 450 }}>
+                  {itemData.map((item) => (
+                    <ImageListItem key={item.img}>
+                      <img
+                        src={`${item.img}?w=248&fit=crop&auto=format`}
+                        srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                        alt={item.title}
+                        loading="eager"
+                      />
+                      <ImageListItemBar
+                        title={item.title}
+                        subtitle={<span>by: {item.author}</span>}
+                        position="below"
+                        className="list-item"
+                      />
+                    </ImageListItem>
+                  ))}
+                </ImageList>
+              </div>
             </div>
+            <Spacer grow="1"></Spacer>
           </section>
         </div>
       </main>
