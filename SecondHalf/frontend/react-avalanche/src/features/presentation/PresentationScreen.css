@@ -1,5 +1,6 @@
 .presentation-container {
-  font-family: Futura, sans-serif;
+  font-family: "Monoton";
+  src: url("font/Monoton-Regular.ttf") format("truetype");
   background-color: #0f0f0f;
 }
 
@@ -16,7 +17,7 @@ h1 {
   font-size: 32px;
   color: #333;
   font-weight: bold;
-  font-family: Futura, sans-serif;
+  font-family: "";
 }
 
 h2 {
