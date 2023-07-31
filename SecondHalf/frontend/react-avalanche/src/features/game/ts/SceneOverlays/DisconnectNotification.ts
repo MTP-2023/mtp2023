@@ -30,7 +30,7 @@ export default class DisconnectNotification extends Phaser.Scene {
             this.cameras.main.centerX, 
             this.cameras.main.centerY,
             "Your opponent disconnected. You are now returning to the main menu...",
-            { fontSize: '60px', fontFamily: "monospace", align: "center", color: '#ffffff' },
+            { fontSize: '60px', fontFamily: "rubik", align: "center", color: '#ffffff' },
         );
         dcText.setWordWrapWidth(textBg.width*0.6)
         dcText.setOrigin(0.5);

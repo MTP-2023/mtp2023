@@ -50,7 +50,7 @@ export default class SkinSelector extends Phaser.Scene {
 
         const instructionText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY*0.45, "Select your marble style:");
         instructionText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(48)
             .setFill("#fff")
             .setAlign("center")
@@ -79,7 +79,7 @@ export default class SkinSelector extends Phaser.Scene {
             const option = this.skinOptions[i];
             const outline = this.add.image(0, 0, "wood-circle").setScale(0.15);
             const image = this.add.image(0, 0, option.imgName).setScale(buttonScale);
-            const label = this.add.text(0, outline.height * 0.15 * 0.9, option.label, { fontSize: '36px', fontFamily: "monospace", color: '#ffffff' }).setOrigin(0.5, 1);
+            const label = this.add.text(0, outline.height * 0.15 * 0.9, option.label, { fontSize: '36px', fontFamily: "rubik", color: '#ffffff' }).setOrigin(0.5, 1);
 
             const buttonContainer = this.add.container(0, 0, [outline, image, label]).setSize(buttonWidth, buttonHeight);
             buttonContainer.setData('index', i);
@@ -139,7 +139,7 @@ export default class SkinSelector extends Phaser.Scene {
 
         const saveText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY*1.6, "Save");
         saveText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(56)
             .setFill("#fff")
             .setAlign("center")

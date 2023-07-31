@@ -51,7 +51,7 @@ export default class OnlineSettings extends Phaser.Scene {
 
         const createText = this.add.text(textXPosition/3*2, this.cameras.main.centerY - selectBg.height/3, "Create Lobby");
         createText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(40)
             .setFill("#fff")
             .setAlign("center")
@@ -76,7 +76,7 @@ export default class OnlineSettings extends Phaser.Scene {
  
         const joinText = this.add.text(textXPosition/3*4, this.cameras.main.centerY - selectBg.height/3, "Join Lobby");
         joinText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(40)
             .setFill("#fff")
             .setAlign("center")
@@ -122,7 +122,7 @@ export default class OnlineSettings extends Phaser.Scene {
         // Name input
         this.instructionText = this.add.text(textXPosition, textYPosition * 1.75, "Press ENTER to submit the name");
         this.instructionText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(40)
             .setFill("#fff")
             .setAlign("center")
@@ -136,7 +136,7 @@ export default class OnlineSettings extends Phaser.Scene {
         let labelText = "Press to edit";
         const labelStyle = {
             fontSize: "36px",
-            fontFamily: "monospace",
+            fontFamily: "rubik",
             fill: "#000000", // Text color
             backgroundColor: "#ffffff", // Background color
             padding: {
@@ -257,7 +257,7 @@ export default class OnlineSettings extends Phaser.Scene {
             this.cameras.main.centerX,
             this.cameras.main.centerY * 1.1,
             "Lobby Code: " + lobbyCode,
-            { fontSize: 40, fontFamily: "monospace", color: "#ffffff" }
+            { fontSize: 40, fontFamily: "rubik", color: "#ffffff" }
         );
         this.lobbyCodeText.setOrigin(0.5);
     }
