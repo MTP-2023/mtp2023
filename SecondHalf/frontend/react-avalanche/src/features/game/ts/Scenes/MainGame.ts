@@ -7,6 +7,7 @@ import { LocalVsAi} from "../GameModes/LocalVsAi";
 import { interpretBoardReverse } from "../Helper/BoardInterpreter";
 import { OnlineMultiPlayer } from "../GameModes/OnlineMultiplayer";
 import QuitGame from "../SceneOverlays/QuitGame";
+import DisconnectNotification from "../SceneOverlays/DisconnectNotification";
 
 export default class MainGame extends Phaser.Scene {
 	/**
@@ -370,7 +371,7 @@ export default class MainGame extends Phaser.Scene {
 			onlinegame.gameOverEvent.on("gameOver", this.handleGameOver, this);
 			onlinegame.moveEvent.on("move", this.handleMove, this);
 			onlinegame.boardEvent.on("emit", this.getChallenge, this);
-			onlinegame.dcEvent.on("dc", this.testdc, this)
+			onlinegame.dcEvent.on("dc", this.handleDisconnect, this)
 		}
 
 		// Register the beforeupdate event
@@ -435,10 +436,10 @@ export default class MainGame extends Phaser.Scene {
 		console.log("challenge recieved");
     }
 
-	// @Michael
-	private testdc(){
-		console.log("dc registered in maingame")
-		
+	// handle opponent disconnect
+	private handleDisconnect(){
+		this.scene.pause();
+		this.scene.run(DisconnectNotification.Name);
 	}
 
 	// Event handler for the "moveEvent"

@@ -11,6 +11,7 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import AgentSelect from "./ts/SceneOverlays/AgentSelect";
 import SkinSelector from './ts/SceneOverlays/SkinSelector';
 import QuitGame from './ts/SceneOverlays/QuitGame';
+import DisconnectNotification from './ts/SceneOverlays/DisconnectNotification';
 
 const GameComponent: React.FC = () => {
   useEffect(() => {
@@ -61,6 +62,7 @@ const GameComponent: React.FC = () => {
     game.scene.add(OnlineSettings.Name, OnlineSettings);
     game.scene.add(SkinSelector.Name, SkinSelector);
     game.scene.add(QuitGame.Name, QuitGame);
+    game.scene.add(DisconnectNotification.Name, DisconnectNotification);
 
     // Start the Boot scene
     game.scene.start(Boot.Name);
