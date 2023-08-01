@@ -18,6 +18,20 @@ const Navbar = () => {
         </Link>
 
         <li className="navbar__item">
+          <Link to="/game" className="navbar__link">
+            Game
+          </Link>
+        </li>
+      </ul>
+    </nav>
+  );
+};
+
+export default Navbar;
+
+//____ DO NOT DELETE______
+/*
+  <li className="navbar__item">
           <Link to="/#aboutAvalanche" className="navbar__link">
             About Avalanche
           </Link>
@@ -32,17 +46,7 @@ const Navbar = () => {
             Instructions
           </a>
         </li>
-        <li className="navbar__item">
-          <Link to="/game" className="navbar__link">
-            Game
-          </Link>
-        </li>
-      </ul>
-    </nav>
-  );
-};
-
-export default Navbar;
+*/
 
 /*  <li className="navbar__item">
 <Link to="/sandbox" className="navbar__link">

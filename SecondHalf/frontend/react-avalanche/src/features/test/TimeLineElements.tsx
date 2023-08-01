@@ -11,8 +11,8 @@ let timelineElements = [
   },
   {
     id: 2,
-    title: "Backend Developer",
-    location: "Skystead, Craonia",
+    title: "Onbarding of Rumanian Students",
+    location: "Germany, Mannheim",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Imperdiet proin fermentum leo vel orci. Neque ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Nulla facilisi cras fermentum odio eu feugiat pretium nibh ipsum. Pellentesque habitant morbi tristique senectus et netus et. Sagittis orci a scelerisque purus semper. Sit amet est placerat in egestas erat imperdiet sed.",
     buttonText: "View Backend Projects",
@@ -20,13 +20,12 @@ let timelineElements = [
     icon: "work",
   },
   {
-    id: 3,
-    title: "Quality Assurance Engineer",
-    location: "South Warren, Geshington",
+    title: "Week in Cluj",
+    location: "Rumania, Cluj",
     description:
-      "Assessing the quality of specifications and technical design documents in order to ensure timely, relevant and meaningful feedback.",
-    buttonText: "Company Website",
-    date: "September 2011 - June 2013",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Imperdiet proin fermentum leo vel orci. Neque ornare aenean euismod elementum nisi quis eleifend quam adipiscing. Nulla facilisi cras fermentum odio eu feugiat pretium nibh ipsum. Pellentesque habitant morbi tristique senectus et netus et. Sagittis orci a scelerisque purus semper. Sit amet est placerat in egestas erat imperdiet sed.",
+    buttonText: "View Backend Projects",
+    date: "June 2013 - August 2016",
     icon: "work",
   },
   {
