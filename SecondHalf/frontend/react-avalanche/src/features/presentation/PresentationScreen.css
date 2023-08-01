@@ -53,6 +53,15 @@ p {
   padding-right: 5%;
   padding-top: 5%;
 }
+.column2 {
+  flex: 4;
+  max-width: 100%;
+  max-height: 100vh;
+  margin: 5px;
+  padding-left: 0%;
+  padding-right: 5%;
+  padding-top: 5%;
+}
 
 .column h2,
 .column p {

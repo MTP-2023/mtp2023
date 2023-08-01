@@ -84,14 +84,25 @@ const PresentationScreen = () => {
                 <h2>About the Game</h2>
                 <p>
                   {" "}
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Imperdiet proin fermentum leo vel orci. Neque ornare aenean
-                  euismod elementum nisi quis eleifend quam adipiscing. Nulla
-                  facilisi cras fermentum odio eu feugiat pretium nibh ipsum.
-                  Pellentesque habitant morbi tristique senectus et netus et.
-                  Sagittis orci a scelerisque purus semper. Sit amet est
-                  placerat in egestas erat imperdiet sed.",
+                  The protection of glaciers is essential to combat the negative
+                  impacts of global warming and climate change. Melting glaciers
+                  have an impact on sea levels, weather patterns and water
+                  availability, so urgent action is needed. Interventions
+                  include reducing greenhouse gas emissions, using clean energy
+                  sources and implementing measures to protect glacier areas.
+                  Increasing public awareness and education is crucial to
+                  promote individual responsibility. By working together
+                  globally, we can protect glaciers for future generations and
+                  preserve the Earth's delicate ecological balance.<br></br>
+                  <br></br> Our game can contribute to saving glaciers by
+                  raising awareness, encouraging behaviour change, supporting
+                  conservation efforts through donations, advocating for climate
+                  action and engaging players in positive environmental issues
+                  and challenges. Through these initiatives, the game can
+                  inspire players to take real action to protect glaciers and
+                  combat climate change. For our part, we donate 50% of every
+                  skin purchased and advertising revenue to WWF, GreenPeace and
+                  local organisations.
                 </p>
               </div>
             </div>
@@ -114,16 +125,22 @@ const PresentationScreen = () => {
           </section>
           <section id="instructions">
             <div className="section-content reverse">
-              <div className="column">
+              <div className="column2">
                 <h2>The Team</h2>
                 <p>
-                  Our project focuses on developing AI agents for a modified
-                  version of the Avalanche board game. The objective is to
-                  create intelligent agents capable of strategically dropping
-                  marbles onto defined switches to solve challenges. By
-                  combining the excitement of the game with AI capabilities, we
-                  aim to push the boundaries of strategic decision-making in
-                  gaming.
+                  Our outstanding team is characterised by clear goals,
+                  effective cooperation and open communication. What's more, our
+                  members have diverse skills, take responsibility for their
+                  tasks and are able to adapt to change. A supportive work
+                  environment, effective leadership and constructive conflict
+                  resolution contribute to the team's success and continuous
+                  improvement. Recognising success and learning from experience
+                  are also important elements of our outstanding team culture.
+                  Other characteristics are diversity, inclusion, innovation,
+                  climate protection, cosmopolitanism, creativity,
+                  individuality....( all the things that start-ups are ). We are
+                  not only colleagues, we are also a family that lives for the
+                  same goals and beliefs.
                 </p>
               </div>
               <div className="column">
