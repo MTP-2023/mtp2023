@@ -12,10 +12,16 @@ export default class SkinSelector extends Phaser.Scene {
     private skinOptions = [
         { label: "Baseball", imgName: "baseball" },
         { label: "Swiss", imgName: "marble" },
-        { label: "Orange", imgName: "marble-p1" },
-        { label: "Blue", imgName: "marble-p2" },
+        { label: "Green", imgName: "marble-p1" },
+        { label: "Purple", imgName: "marble-p2" },
         { label: "Joker", imgName: "joker" },
         { label: "Capy", imgName: "capy" },
+        { label: "Santa", imgName: "santa" },
+        { label: "Lars", imgName: "lars_fast" },
+        { label: "Lars Ski", imgName: "lars_ski" },
+        { label: "Gomme", imgName: "gomme" },
+        { label: "Amogus", imgName: "amogus" },
+        { label: "Sans", imgName: "sans" },
         
         { label: "Mike", imgName: "mike" }
     ]
