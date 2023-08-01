@@ -4,7 +4,7 @@ import { View, Image } from "react-native";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
-const Spacer = require("react-spacer");
+///const Spacer = require("react-spacer");
 
 import avalImg from "../../assets/avalanche-game.jpeg";
 
@@ -23,26 +23,27 @@ import andre from "../../assets/public/gallery/profiles/andre.png";
 import rot from "../../assets/public/gallery/profiles/rot.png";
 import theresa from "../../assets/public/gallery/profiles/theresa.png";
 import thomas from "../../assets/public/gallery/profiles/thomas.png";
+import { Padding } from "@mui/icons-material";
 
 const itemData = [
   {
     img: andre,
-    title: "",
+    title: "CFO, Senior Server Specialist",
     author: "Andre Scheld",
   },
   {
     img: rot,
-    title: "",
+    title: "Executive Game Director",
     author: "Michael Temnov",
   },
   {
     img: theresa,
-    title: "",
+    title: "Chief Creative Director, Web Design",
     author: "Theresa Hartmann",
   },
   {
     img: thomas,
-    title: "",
+    title: "AI Specialist, Senior Skin Designer",
     author: "Thomas Nowak",
   },
 ];
@@ -126,9 +127,9 @@ const PresentationScreen = () => {
                 </p>
               </div>
               <div className="column">
-                <ImageList sx={{ width: 500, height: 450 }}>
+                <ImageList sx={{ width: 700, height: 600 }}>
                   {itemData.map((item) => (
-                    <ImageListItem key={item.img}>
+                    <ImageListItem key={item.img} style={{ padding: 15 }}>
                       <img
                         src={`${item.img}?w=248&fit=crop&auto=format`}
                         srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
@@ -146,7 +147,14 @@ const PresentationScreen = () => {
                 </ImageList>
               </div>
             </div>
-            <Spacer grow="1"></Spacer>
+          </section>
+          <section id="instructions">
+            <div className="section-content reverse">
+              <div className="column">
+                <h2></h2>
+                <p></p>
+              </div>
+            </div>
           </section>
         </div>
       </main>
