@@ -34,7 +34,7 @@ export default class MainMenu extends Phaser.Scene {
         // add audio and background animation
         this.clickAudio = this.sound.add("woodenClick");
         this.backgroundTheme = this.sound.add("menuTheme", { loop: true });
-        this.backgroundTheme.setVolume(0.015);
+        this.backgroundTheme.setVolume(0.075);
         this.backgroundTheme.play();
         this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "frame0").play("animatedBackground");
 

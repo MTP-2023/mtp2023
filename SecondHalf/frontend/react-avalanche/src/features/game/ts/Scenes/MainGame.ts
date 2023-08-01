@@ -78,12 +78,15 @@ export default class MainGame extends Phaser.Scene {
 	private createBackground(): void {
 		// start playing audio
 		this.backgroundSound = this.sound.add("gameplaySoundtrack", { loop: true });
-		this.backgroundSound.volume = 0.2;
+		this.backgroundSound.setVolume(0.3);
     	this.backgroundSound.play();
 
 		this.marbleStopSound = this.sound.add("marbleStopSound");
+		this.marbleStopSound.setVolume(0.4);
 		this.marbleDropSound = this.sound.add("marbleDropSound");
+		this.marbleDropSound.setVolume(0.4);
 		this.switchRotationSound = this.sound.add("switchRotationSound");
+		this.switchRotationSound.setVolume(0.4);
 		this.clickAudio = this.sound.add("woodenClick");
 
 		// background
