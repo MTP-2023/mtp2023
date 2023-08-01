@@ -15,7 +15,7 @@ export default class QuitGame extends Phaser.Scene {
         // Preload as needed.
     }
 
-    public create(data: {gameMode: AbstractGameMode}): void {
+    public create(data: { gameMode: AbstractGameMode, gameScene: MainGame }): void {
         Utilities.LogSceneMethodEntry("QuitGame", "create");
 
         this.clickAudio = this.sound.add("woodenClick");
@@ -70,6 +70,7 @@ export default class QuitGame extends Phaser.Scene {
 
         yesButton.on("pointerdown", () => {
             this.clickAudio.play();
+            data.gameScene.backgroundSound.stop();
             if(!data.gameMode.isLocal){
                 var onlinegame = data.gameMode as OnlineMultiPlayer;
                 onlinegame.ws.close();

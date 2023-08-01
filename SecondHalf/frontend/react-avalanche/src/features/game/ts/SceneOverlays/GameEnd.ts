@@ -17,7 +17,7 @@ export default class GameEnd extends Phaser.Scene {
 		// Preload as needed.
 	}
 
-	public create(data: { displayText: string, gameMode: AbstractGameMode }): void {
+	public create(data: { displayText: string, gameMode: AbstractGameMode, gameScene: MainGame }): void {
 		Utilities.LogSceneMethodEntry("GameEnd", "create");
 		
         const overlayHeight = this.cameras.main.height;
@@ -33,6 +33,11 @@ export default class GameEnd extends Phaser.Scene {
         // set background image
         const textBg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY*0.8, "wood-victory");
         textBg.setScale(0.8);
+
+        const victorySound = this.sound.add("victory");
+        victorySound.setVolume(0.1);
+        victorySound.play();
+
 
         this.infoText = this.add.text(
             this.cameras.main.centerX, 
@@ -92,6 +97,7 @@ export default class GameEnd extends Phaser.Scene {
 
         returnToMenuButton.on("pointerdown", () => {
             this.clickAudio.play();
+            data.gameScene.backgroundSound.stop();
             this.onReturnToMenuClicked();
         });
 	}

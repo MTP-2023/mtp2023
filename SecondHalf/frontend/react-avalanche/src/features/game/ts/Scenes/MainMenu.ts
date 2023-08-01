@@ -22,6 +22,7 @@ export default class MainMenu extends Phaser.Scene {
         { text: "Online 1v1", value: "online1v1"}
     ];
     private clickAudio: any;
+    public backgroundTheme: any;
 
     public preload(): void {
         // Preload as needed.
@@ -32,6 +33,9 @@ export default class MainMenu extends Phaser.Scene {
 
         // add audio and background animation
         this.clickAudio = this.sound.add("woodenClick");
+        this.backgroundTheme = this.sound.add("menuTheme", { loop: true });
+        this.backgroundTheme.setVolume(0.015);
+        this.backgroundTheme.play();
         this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "frame0").play("animatedBackground");
 
         const textYPosition = this.cameras.main.height / 5;
@@ -60,6 +64,7 @@ export default class MainMenu extends Phaser.Scene {
 
         playButton.on("pointerdown", () => {
             this.clickAudio.play();
+            this.backgroundTheme.stop();
             this.scene.start(MainGame.Name, {gameModeHandle: this.gameMode, agent: "rl", gameModeObj: null});
         }, this);
 
@@ -149,14 +154,16 @@ export default class MainMenu extends Phaser.Scene {
 
                     switch (mainMenuScene.gameMode) {
                         case "online1v1":
+                            mainMenuScene.backgroundTheme.stop();
                             mainMenuScene.scene.pause(MainMenu.Name);
 							mainMenuScene.scene.stop(AgentSelect.Name);
-                            mainMenuScene.scene.launch(OnlineSettings.Name);
+                            mainMenuScene.scene.launch(OnlineSettings.Name, { mainMenuScene: this });
 							break;
 						case "localvsai":
+                            mainMenuScene.backgroundTheme.stop();
 							mainMenuScene.scene.pause(MainMenu.Name);
 							mainMenuScene.scene.stop(OnlineSettings.Name);
-							mainMenuScene.scene.launch(AgentSelect.Name, {mainMenuScene: this});
+							mainMenuScene.scene.launch(AgentSelect.Name, { mainMenuScene: this });
 							break;
 						default:
 							mainMenuScene.scene.stop(AgentSelect.Name);
@@ -194,13 +201,14 @@ export default class MainMenu extends Phaser.Scene {
             this.toggleTextShadow(this.dropDownList.getElement("text") as Phaser.GameObjects.Text, false);
         });
 
-		this.events.on('resume', this.onOnlineCancel, this);
+		this.events.on('resume', this.onCancel, this);
 	}
 
-	private onOnlineCancel(): void {
+	private onCancel(): void {
 		this.dropDownList.text = this.gameModeOptions[0].text;
 		this.dropDownList.value = this.gameModeOptions[0].value;
 		this.gameMode = this.gameModeOptions[0].value;
+        this.backgroundTheme.play();
 	}
 
     private toggleTextShadow(text: Phaser.GameObjects.Text, toggleOn: boolean) {

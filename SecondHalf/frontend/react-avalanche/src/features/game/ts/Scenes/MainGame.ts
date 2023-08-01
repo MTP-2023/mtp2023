@@ -40,6 +40,10 @@ export default class MainGame extends Phaser.Scene {
 	boardMarbles: number = 0;
 	boardSpacingTop: number = 180;
 	clickAudio: any;
+	marbleStopSound: any;
+	marbleDropSound: any;
+	switchRotationSound: any;
+	backgroundSound: any;
 
 	constructor() {
 		super({ key: MainGame.Name });
@@ -73,10 +77,13 @@ export default class MainGame extends Phaser.Scene {
 
 	private createBackground(): void {
 		// start playing audio
-		const backgroundSound = this.sound.add("gameplaySoundtrack", { loop: true });
-		backgroundSound.volume = 0.2;
-    	backgroundSound.play();
+		this.backgroundSound = this.sound.add("gameplaySoundtrack", { loop: true });
+		this.backgroundSound.volume = 0.2;
+    	this.backgroundSound.play();
 
+		this.marbleStopSound = this.sound.add("marbleStopSound");
+		this.marbleDropSound = this.sound.add("marbleDropSound");
+		this.switchRotationSound = this.sound.add("switchRotationSound");
 		this.clickAudio = this.sound.add("woodenClick");
 
 		// background
@@ -164,7 +171,7 @@ export default class MainGame extends Phaser.Scene {
             .setInteractive()
             .on('pointerdown', () => {
                 this.scene.pause();
-				this.scene.run(QuitGame.Name, { gameMode: this.gameMode });
+				this.scene.run(QuitGame.Name, { gameMode: this.gameMode, gameScene: this });
             });
 	}
 
@@ -402,6 +409,41 @@ export default class MainGame extends Phaser.Scene {
 			}
 		}
 
+		// use phaser's collision detection for audio playback (too inconsistent for logic/data handling)
+		// listen for collision events detected by matter
+		this.matter.world.on("collisionstart", (event: MatterJS.IEventCollision<MatterJS.BodyType>, bodyA: MatterJS.BodyType, bodyB: MatterJS.BodyType) => {
+			this.handleCollisions(bodyA, bodyB);
+		});
+	}
+
+	// determine type of collision and call respective function
+	private handleCollisions(bodyA: MatterJS.BodyType, bodyB: MatterJS.BodyType): void {
+		if (this.checkCollision(bodyA, bodyB, "marble", "head")) {
+			
+			//console.log("SWITCH SHOULD HOLD MARBLE")
+			
+			const marble = bodyA.label == "marble" ? bodyA : bodyB;
+			if (this.getVelocityMagnitude(marble) < this.movementThreshold) {
+				this.marbleStopSound.play();
+				console.log(this.getVelocityMagnitude(marble))
+			} 
+		} ///else if (this.checkCollision(bodyA, bodyB, "marble", "marble")) {
+			//this.handleMarbleCollision(bodyA, bodyB);
+		//} // original code block that used to initiate switch flips but turned out to be buggy, reason why marbles got stuck could not be found as of now
+		//else if (this.checkCollision(bodyA, bodyB, "marble", "tail")) {
+			//console.log("SWITCH SHOULD FLIP")
+			//const flipSwitch = bodyA.label == "tail" ? bodyA.gameObject : bodyB.gameObject;
+			//this.handleSwitchFlip(flipSwitch.body);}
+		
+	}
+
+	private checkCollision(bodyA: MatterJS.BodyType, bodyB: MatterJS.BodyType, type1: string, type2: string): boolean {
+		const isA1 = bodyA.label === type1;
+		const isB1 = bodyB.label === type1;
+		const isA2 = bodyA.label === type2;
+		const isB2 = bodyB.label === type2;
+
+		return (isA1 && isB2 || isA2 && isB1)? true : false;
 	}
 
 	private onKeyPress(event: Phaser.Input.Keyboard.Key): void {
@@ -609,6 +651,7 @@ export default class MainGame extends Phaser.Scene {
 			}
 		};
 
+		this.switchRotationSound.play();
 		updateRotation();
 	}
 
@@ -636,6 +679,7 @@ export default class MainGame extends Phaser.Scene {
 				marble.gameObject.destroy();
 				this.matter.world.remove(marble);
 				this.boardMarbles -= 1;
+				setTimeout(() => { this.marbleDropSound.play() }, 100);
 			}
 		}
 	}
@@ -767,7 +811,8 @@ export default class MainGame extends Phaser.Scene {
 				onlinegame.moveEvent.destroy();
 			}
 			this.scene.pause(MainGame.Name);
-			this.scene.launch(GameEnd.Name, { displayText: gameEndText, gameMode: this.gameMode });
+			this.backgroundSound.stop();
+			this.scene.launch(GameEnd.Name, { displayText: gameEndText, gameMode: this.gameMode, gameScene: this });
 		} else if (this.gameMode.isMultiplayer) {
 			//console.log("SWITCH TURNS CALLED")
 			this.turn = this.gameMode.switchTurns(this.turn, this);
