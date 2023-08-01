@@ -33,8 +33,8 @@ export abstract class AbstractGameMode {
     isVsAi: boolean = false;
     agent: string = "rl";
     currentBoard: number[][] = [];
-    player1Color = 0x013220;
-    player2Color = 0x0000ff;
+    player1Color = 0xd333ff;
+    player2Color = 0x48ff00;
     player1NameText: Phaser.GameObjects.Text;
     player2NameText: Phaser.GameObjects.Text;
 

@@ -8,9 +8,7 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     isLocal: boolean = false;
     isMultiplayer: boolean = true;
     isVsAi: boolean = false;
-    player1Color = 0xffa500;
-    player2Color = 0x0000ff;
-    mixedColor = 0x925e6d;
+    mixedColor = 0x396cff;
     player1Name = "";
     player2Name = "";
     player1Skin = "";

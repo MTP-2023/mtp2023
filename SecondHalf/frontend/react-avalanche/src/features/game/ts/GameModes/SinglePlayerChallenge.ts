@@ -5,7 +5,7 @@ export class SinglePlayerChallenge extends AbstractGameMode {
     challenge: Challenge = new Challenge([], []);
     isLocal: boolean = true;
     isMultiplayer: boolean = false;
-    playerColor = 0xffa500;
+    playerColor = 0xd333ff;
 
     public async initChallenge(): Promise<void> {
        // load game board state, to be replaced by API calls

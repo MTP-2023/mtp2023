@@ -8,9 +8,7 @@ export class LocalVsAi extends AbstractGameMode {
     isMultiplayer: boolean = true;
     isVsAi: boolean = true;
     aiPlayer: number = -1;
-    player1Color = 0xffa500;
-    player2Color = 0x0000ff;
-    mixedColor = 0x925e6d;
+    mixedColor = 0x396cff;
 
     public async initChallenge(): Promise<void> {
         console.log("here")
