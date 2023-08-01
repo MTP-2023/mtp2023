@@ -38,6 +38,7 @@ p {
   align-items: center;
   gap: 2rem;
   max-height: 100%;
+  padding-top: 5%;
 }
 
 .reverse {
@@ -169,7 +170,7 @@ p {
 
 .sections section {
   max-height: 20vh;
-
+  padding: 5%;
   margin-bottom: 2rem;
 }
 

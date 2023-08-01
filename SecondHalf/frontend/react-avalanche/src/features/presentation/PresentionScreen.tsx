@@ -4,7 +4,7 @@ import { View, Image } from "react-native";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
-///const Spacer = require("react-spacer");
+//const Spacer = require("react-spacer");
 
 import avalImg from "../../assets/avalanche-game.jpeg";
 
@@ -107,22 +107,8 @@ const PresentationScreen = () => {
               </div>
             </div>
           </section>
-          <section id="instructions">
-            <div className="section-content reverse">
-              <div className="column">
-                <h2>Instructions</h2>
-                <p>
-                  Our project focuses on developing AI agents for a modified
-                  version of the Avalanche board game. The objective is to
-                  create intelligent agents capable of strategically dropping
-                  marbles onto defined switches to solve challenges. By
-                  combining the excitement of the game with AI capabilities, we
-                  aim to push the boundaries of strategic decision-making in
-                  gaming.
-                </p>
-              </div>
-            </div>
-          </section>
+          <section />
+
           <section id="instructions">
             <div className="section-content reverse">
               <div className="column2">
@@ -144,9 +130,9 @@ const PresentationScreen = () => {
                 </p>
               </div>
               <div className="column">
-                <ImageList sx={{ width: 700, height: 600 }}>
+                <ImageList sx={{ width: 700, height: 650 }}>
                   {itemData.map((item) => (
-                    <ImageListItem key={item.img} style={{ padding: 15 }}>
+                    <ImageListItem key={item.img} style={{ padding: 0 }}>
                       <img
                         src={`${item.img}?w=248&fit=crop&auto=format`}
                         srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
@@ -166,10 +152,18 @@ const PresentationScreen = () => {
             </div>
           </section>
           <section id="instructions">
-            <div className="section-content reverse">
+            <div className="section-content">
               <div className="column">
-                <h2></h2>
-                <p></p>
+                <h2>Instructions</h2>
+                <p>
+                  Our project focuses on developing AI agents for a modified
+                  version of the Avalanche board game. The objective is to
+                  create intelligent agents capable of strategically dropping
+                  marbles onto defined switches to solve challenges. By
+                  combining the excitement of the game with AI capabilities, we
+                  aim to push the boundaries of strategic decision-making in
+                  gaming.
+                </p>
               </div>
             </div>
           </section>
