@@ -21,7 +21,7 @@ export default class SkinSelector extends Phaser.Scene {
         { label: "Gomme", imgName: "gomme" },
         { label: "Amogus", imgName: "amogus" },
         { label: "Sans", imgName: "sans" },
-        { label: "Mike", imgName: "mike" }
+        { label: "Minion", imgName: "minion" }
     ]
 
     private selectedSkin = this.skinOptions[0].imgName;

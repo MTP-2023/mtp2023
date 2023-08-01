@@ -37,7 +37,7 @@ export default class Preloader extends Phaser.Scene {
 		this.load.image("capy");
 		this.load.image("capy_red");
 		this.load.image("baseball");
-		this.load.image("mike");
+		this.load.image("minion");
 		this.load.image("santa");
 		this.load.image("gomme");
 		this.load.image("lars_fast");

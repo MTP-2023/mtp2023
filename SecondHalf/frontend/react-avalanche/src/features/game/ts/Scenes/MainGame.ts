@@ -52,7 +52,7 @@ export default class MainGame extends Phaser.Scene {
 		this.switchWidth = this.scaleFactor * 70;
 		this.imgHeight = this.scaleFactor * 104;
 		this.borderWidth = this.scaleFactor * 5;
-		this.switchSpacingY = this.scaleFactor * 40;
+		this.switchSpacingY = this.scaleFactor * 50;
 		this.borderExtraHeight = this.scaleFactor * 0.15 * this.switchSpacingY;
 		this.boardWidth = 4 * this.switchWidth + 5 * this.borderWidth;
 		this.marbleRadius = 13 * this.scaleFactor;
