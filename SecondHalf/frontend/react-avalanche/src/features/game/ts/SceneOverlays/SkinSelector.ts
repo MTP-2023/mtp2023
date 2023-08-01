@@ -10,19 +10,17 @@ export default class SkinSelector extends Phaser.Scene {
 
     private rexUI: RexUIPlugin;
     private skinOptions = [
-        { label: "Baseball", imgName: "baseball" },
         { label: "Swiss", imgName: "marble" },
-        { label: "Green", imgName: "marble-p1" },
-        { label: "Purple", imgName: "marble-p2" },
+        { label: "Baseball", imgName: "baseball" },
         { label: "Joker", imgName: "joker" },
         { label: "Capy", imgName: "capy" },
+        { label: "Capy Xmas", imgName: "capy_red" },
         { label: "Santa", imgName: "santa" },
         { label: "Lars", imgName: "lars_fast" },
         { label: "Lars Ski", imgName: "lars_ski" },
         { label: "Gomme", imgName: "gomme" },
         { label: "Amogus", imgName: "amogus" },
         { label: "Sans", imgName: "sans" },
-        
         { label: "Mike", imgName: "mike" }
     ]
 

@@ -48,9 +48,10 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
-artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumVer2Fix/checkpoint_doubletrain_fixed:v99', type='model')
-artifact_dir = artifact.download()
+#run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
+#artifact = run_wandb.use_artifact('mtp2023_avalanche/CurriculumVer2Fix/checkpoint_doubletrain_fixed:v99', type='model')
+#artifact_dir = artifact.download()
+artifact_dir = "artifacts/MultiPlayer"
 
 agent = Policy.from_checkpoint(artifact_dir+'/policies/default_policy')
 
