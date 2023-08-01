@@ -117,7 +117,7 @@ export default class GameEnd extends Phaser.Scene {
             }
         }
         this.scene.stop();
-        this.scene.start(MainGame.Name);
+        this.scene.start(MainGame.Name, { scores: [this.gameMode.player1Score, this.gameMode.player2Score] });
     }
 
     private onReturnToMenuClicked(): void {

@@ -65,7 +65,7 @@ export default class MainMenu extends Phaser.Scene {
         playButton.on("pointerdown", () => {
             this.clickAudio.play();
             this.backgroundTheme.stop();
-            this.scene.start(MainGame.Name, {gameModeHandle: this.gameMode, agent: "rl", gameModeObj: null});
+            this.scene.start(MainGame.Name, { gameModeHandle: this.gameMode, agent: "rl", gameModeObj: null, scores: [0, 0] });
         }, this);
 
         // SELECT SKIN button

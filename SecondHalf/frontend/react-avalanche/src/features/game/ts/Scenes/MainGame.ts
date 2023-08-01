@@ -240,7 +240,7 @@ export default class MainGame extends Phaser.Scene {
 		return switchSprite;
 	}
 
-	public async create(data: { gameModeHandle: string , agent: string, gameModeObj: AbstractGameMode}): Promise<void> {
+	public async create(data: { gameModeHandle: string , agent: string, gameModeObj: AbstractGameMode, scores: number[] }): Promise<void> {
 		Utilities.LogSceneMethodEntry("MainGame", "create");
 		//console.log(data.agent)
 
@@ -260,10 +260,14 @@ export default class MainGame extends Phaser.Scene {
 				break;
 			case "local1v1":
 				this.gameMode = new LocalMultiPlayer();
+				this.gameMode.player1Score = data.scores[0];
+				this.gameMode.player1Score = data.scores[1];
 				break;
 			case "localvsai":
 				this.gameMode = new LocalVsAi();
 				this.gameMode.agent = data.agent;
+				this.gameMode.player1Score = data.scores[0];
+				this.gameMode.player1Score = data.scores[1];
 				break;
 			case "online1v1":
 				this.gameMode = data.gameModeObj;
@@ -796,8 +800,14 @@ export default class MainGame extends Phaser.Scene {
 								winner = onlinegame.player2Name;
 							}
 							onlinegame.moveEvent.destroy();
+						} else if (this.gameMode.isVsAi) {
+							if(evalResult.winner[0] == 1){
+								winner = "You";
+							} else {
+								winner = "The AI agent";
+							}
 						}
-						gameEndText = winner + " has won!";
+						gameEndText = winner + " won!";
 						break;
 					case 2:
 						gameEndText = "It's a draw!";
@@ -809,6 +819,8 @@ export default class MainGame extends Phaser.Scene {
 			if(!this.gameMode.isLocal){
 				var onlinegame = this.gameMode as OnlineMultiPlayer;
 				onlinegame.moveEvent.destroy();
+			} else {
+				this.gameMode.updateScores(evalResult.winner);
 			}
 			this.scene.pause(MainGame.Name);
 			this.backgroundSound.stop();

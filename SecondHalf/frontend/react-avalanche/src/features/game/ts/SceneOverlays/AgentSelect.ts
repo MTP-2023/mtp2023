@@ -69,7 +69,7 @@ export default class AgentSelect extends Phaser.Scene {
             this.clickAudio.play();
             this.scene.stop(AgentSelect.Name);
             this.scene.stop(MainMenu.Name);
-            this.scene.start(MainGame.Name, {gameModeHandle: "localvsai", agent: "rl"});
+            this.scene.start(MainGame.Name, {gameModeHandle: "localvsai", agent: "rl", scores: [0, 0] });
         }, this);
 
         
@@ -99,7 +99,7 @@ export default class AgentSelect extends Phaser.Scene {
             this.clickAudio.play();
             this.scene.stop(MainMenu.Name);
             this.scene.stop(AgentSelect.Name);
-            this.scene.start(MainGame.Name, {gameModeHandle: "localvsai", agent: "mcts"});
+            this.scene.start(MainGame.Name, {gameModeHandle: "localvsai", agent: "mcts", scores: [0, 0] });
         }, this);
 
 
