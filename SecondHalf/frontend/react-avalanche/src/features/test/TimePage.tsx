@@ -8,6 +8,7 @@ import SkiPng from "../../assets/ski-svgrepo-com.png";
 import SchoolSvg from "../../assets/svg/school.svg";
 import backgroundImage from "../../assets/Timeline_background.jpg";
 import background2 from "../../assets/public/gallery/philipp-kammerer-1FJZBOthB8k-unsplash.jpg";
+import background3 from "../../assets/public/gallery/Mountains-clean.jpg";
 
 import {
   VerticalTimeline,
@@ -34,7 +35,7 @@ const TimePage = () => {
     <div
       className="background_timeline"
       style={{
-        backgroundImage: `url(${background2})`,
+        backgroundImage: `url(${background3})`,
         backgroundSize: "cover",
       }}
     >
