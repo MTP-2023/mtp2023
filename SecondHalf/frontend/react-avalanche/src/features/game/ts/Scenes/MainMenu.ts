@@ -42,7 +42,7 @@ export default class MainMenu extends Phaser.Scene {
 
         const playText = this.add.text(this.cameras.main.centerX, textYPosition + playButton.height * 0.02, "PLAY");
         playText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(70)
             .setFill("#fff")
             .setAlign("center")
@@ -69,7 +69,7 @@ export default class MainMenu extends Phaser.Scene {
 
 		const selectSkinText = this.add.text(this.cameras.main.centerX, textYPosition * 2 + selectSkinButton.height * 0.02, "Skin Selection");
         selectSkinText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(54)
             .setFill("#fff")
             .setAlign("center")
@@ -103,7 +103,7 @@ export default class MainMenu extends Phaser.Scene {
             icon: this.add.image(0, 0, "game-mode-icon").setScale(0.15),
             text: this.add.text(0, 20, this.gameModeOptions[0].text, {
                 fontSize: 50,
-                fontFamily: "monospace",
+                fontFamily: "rubik",
                 align: "center"
             }).setFixedSize(this.cameras.main.width / 3, 0),
             space: {
@@ -129,7 +129,7 @@ export default class MainMenu extends Phaser.Scene {
                     const text = option.text;
                     const button = mainMenuScene.rexUI.add.label({
                         background: mainMenuScene.add.image(0, 0, "wood-hexagon").setScale(0.225),
-                        text: scene.add.text(0, 0, text, {fontSize: 45, fontFamily: "monospace"}),
+                        text: scene.add.text(0, 0, text, {fontSize: 45, fontFamily: "rubik"}),
                         align: "center",
                         space: {
                             left: 5,

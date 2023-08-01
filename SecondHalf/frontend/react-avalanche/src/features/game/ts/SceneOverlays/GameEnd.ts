@@ -38,7 +38,7 @@ export default class GameEnd extends Phaser.Scene {
             this.cameras.main.centerX, 
             this.cameras.main.centerY*0.8,
             data.displayText,
-            { fontSize: '60px', fontFamily: "monospace", align: "center", color: '#ffffff' },
+            { fontSize: '60px', fontFamily: "rubik", align: "center", color: '#ffffff' },
         );
         this.infoText.setWordWrapWidth(textBg.width*0.6)
         this.infoText.setOrigin(0.5);
@@ -50,7 +50,7 @@ export default class GameEnd extends Phaser.Scene {
 
         const createText = this.add.text(this.cameras.main.centerX/3*2, this.cameras.main.centerY*1.5, "Play Again");
         createText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(40)
             .setFill("#fff")
             .setAlign("center")
@@ -76,7 +76,7 @@ export default class GameEnd extends Phaser.Scene {
 
         const joinText = this.add.text(this.cameras.main.centerX/3*4, this.cameras.main.centerY*1.5, "Return to Menu");
         joinText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(40)
             .setFill("#fff")
             .setAlign("center")

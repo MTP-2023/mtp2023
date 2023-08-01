@@ -40,7 +40,7 @@ export default class QuitGame extends Phaser.Scene {
         const instructionText = this.add.text(textXPosition, textYPosition*3.5, "Are you sure you want to quit the game?");
         instructionText.setWordWrapWidth(this.scale.width*0.5);
         instructionText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(50)
             .setFill("#fff")
             .setAlign("center")
@@ -52,7 +52,7 @@ export default class QuitGame extends Phaser.Scene {
 
         const yesText = this.add.text(this.scale.width*0.35, textYPosition*4.5, "Yes");
         yesText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(50)
             .setFill("#fff")
             .setAlign("center")
@@ -86,7 +86,7 @@ export default class QuitGame extends Phaser.Scene {
 
         const noText = this.add.text(this.scale.width*0.65, textYPosition*4.5, "No");
         noText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(50)
             .setFill("#fff")
             .setAlign("center")

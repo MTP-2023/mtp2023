@@ -31,7 +31,7 @@ export default class SplashScreen extends Phaser.Scene {
 
 		const attributionText = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 120, "UI elements by ukplyak on Freepik");
 		attributionText.setOrigin(0.5);
-		attributionText.setFontFamily("monospace").setFontSize(24).setFill("#000");
+		attributionText.setFontFamily("rubik").setFontSize(24).setFill("#000");
 
 		this.input.setDefaultCursor("pointer");
 		this.input.on("pointerdown", this.loadMainMenu, this);

@@ -152,7 +152,7 @@ export abstract class AbstractGameMode {
         container1.add(image1);
 
         // Add the text on top of the image in the container
-        this.player1NameText = scene.add.text(0, 0, player1Text, { fontSize: 40, fontFamily: "monospace", color: this.convertToCSS(this.player1Color), align: "center" }).setOrigin(0.5);
+        this.player1NameText = scene.add.text(0, 0, player1Text, { fontSize: 40, fontFamily: "rubik", color: this.convertToCSS(this.player1Color), align: "center" }).setOrigin(0.5);
         container1.add(this.player1NameText);
 
         // Set the custom data for the container and text
@@ -166,7 +166,7 @@ export abstract class AbstractGameMode {
         const image2 = scene.add.image(0, 0, imgLabel).setScale(imgScale);
         container2.add(image2);
 
-        this.player2NameText = scene.add.text(0, 0, player2Text, { fontSize: 40, fontFamily: "monospace", color: this.convertToCSS(this.player2Color), align: "center" }).setOrigin(0.5);
+        this.player2NameText = scene.add.text(0, 0, player2Text, { fontSize: 40, fontFamily: "rubik", color: this.convertToCSS(this.player2Color), align: "center" }).setOrigin(0.5);
         container2.add(this.player2NameText);
 
         container2.setData("playerText", -1);

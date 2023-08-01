@@ -37,7 +37,7 @@ export default class AgentSelect extends Phaser.Scene {
 
         const instructionText = this.add.text(textXPosition, textYPosition*3.1, "Select your opponent");
         instructionText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(50)
             .setFill("#fff")
             .setAlign("center")
@@ -49,7 +49,7 @@ export default class AgentSelect extends Phaser.Scene {
 
         const rlText = this.add.text(textXPosition, textYPosition*4, "PPO Agent");
         rlText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(50)
             .setFill("#fff")
             .setAlign("center")
@@ -79,7 +79,7 @@ export default class AgentSelect extends Phaser.Scene {
 
         const mctsText = this.add.text(textXPosition, textYPosition*5, "MCTS");
         mctsText
-            .setFontFamily("monospace")
+            .setFontFamily("rubik")
             .setFontSize(50)
             .setFill("#fff")
             .setAlign("center")
