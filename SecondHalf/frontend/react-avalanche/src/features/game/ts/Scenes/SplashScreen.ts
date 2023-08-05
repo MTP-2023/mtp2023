@@ -14,14 +14,24 @@ export default class SplashScreen extends Phaser.Scene {
 	public create(): void {
 		Utilities.LogSceneMethodEntry("SplashScreen", "create");
 
-		const titleText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY * 0.5, "Avalanche Game")
-			.setOrigin(0.5, 0)
-			.setFontFamily("monospace").setFontSize(26).setFill("#fff");
+		// set default skin
+		this.game.registry.set('marbleSkin', "marble");
 
-		const poweredByText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 25, "Powered By");
-		poweredByText.setOrigin(0.5, 0.5);
-		poweredByText.setFontFamily("monospace").setFontSize(20).setFill("#fff");
-		this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, "phaser_pixel_medium_flat");
+		 // add background animation
+		 this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "frame0").play("animatedBackground");
+
+		const titleText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY * 0.5, "SnowSlider")
+			.setOrigin(0.5, 0)
+			.setFontFamily("monoton").setFontSize(80).setFill("#000");
+
+		const poweredByText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 120, "Powered By");
+		poweredByText.setOrigin(0.5, 1);
+		poweredByText.setFontFamily("monoton").setFontSize(36).setFill("#000");
+		this.add.image(this.cameras.main.centerX, this.cameras.main.centerY + 160, "phaser_pixel_medium_flat").setScale(2);
+
+		const attributionText = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 120, "UI elements by ukplyak on Freepik");
+		attributionText.setOrigin(0.5);
+		attributionText.setFontFamily("rubik").setFontSize(24).setFill("#000");
 
 		this.input.setDefaultCursor("pointer");
 		this.input.on("pointerdown", this.loadMainMenu, this);

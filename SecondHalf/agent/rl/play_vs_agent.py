@@ -5,7 +5,7 @@ import numpy as np
 from ray.rllib.policy.policy import Policy
 import sys
 from ray.air.integrations.wandb import setup_wandb
-from ray.rllib.models import ModelCatalog
+
 sys.path.append("../../")
 from gameResources.boardGenerator.generate import generate_random_board
 from gameResources.boardGenerator.print_board import print_board
@@ -18,12 +18,13 @@ from collections import OrderedDict
 from gameResources.simulation.simulate import run
 from gameVariants.multiplayer.reward import reward
 from agent.baseline.mcts import mcts
+from agent.rl.multiplayer_utils import flip_board, ShallowEnv, return_move
 import argparse
 from copy import deepcopy
 import math
 
 class ShallowEnv:
-    def __init__(self, current_board, goal_board, n_steps, max_steps, width, height, player, agent_player=1):
+    def __init__(self, current_board, goal_board, n_steps, max_steps, width, height, player):
         self.current_board = deepcopy(current_board)
         self.goal_board = goal_board
         self.n_steps = n_steps
@@ -169,15 +170,7 @@ for leveli in range(noOfLevels):
                 break
             player = -1
             if args.player2 == "agent":
-                #obs = OrderedDict()
-                #obs["current"] = current_board
-                #obs["goal"] = goal_board
-                #paramEnv = ShallowEnv(current_board, goal_board, step, max_turns, len(current_board[0]), len(current_board), -1, -1)
-                #action = return_move(agent, paramEnv, obs)
-
                 flipped_board = flip_board(deepcopy(current_board))
-                #print("FLIPPED BOARD")
-                #print(print_board(flipped_board))
                 flipped_goal = flip_board(deepcopy(goal_board))
                 flipped_obs = OrderedDict()
                 flipped_obs["current"] = flipped_board

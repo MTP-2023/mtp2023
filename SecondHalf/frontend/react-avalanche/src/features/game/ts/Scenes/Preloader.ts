@@ -6,102 +6,90 @@ export default class Preloader extends Phaser.Scene {
 	 * Unique name of the scene.
 	 */
 	public static Name = "Preloader";
+	private frameNames: string[] = [];
 
 	public preload(): void {
-		this.addProgressBar();
 
-		this.load.path = "src/features/game/assets/";
+		// images
+		this.load.path = "src/features/game/assets/img/";
 		this.load.image("phaser_pixel_medium_flat");
-		//this.load.image("Phaser-Logo-Small");
+		// menu elements
+		this.load.image("close-cross");
+		this.load.image("menu-background");
+		this.load.image("wood-rounded-rectangle");
+		this.load.image("wood-hexagon");
+		this.load.image("wood-victory");
+		this.load.image("wood-label");
+		this.load.image("wood-circle");
+		this.load.image("game-mode-icon");
+		// board elements
 		this.load.image("switch-left");
 		this.load.image("switch-right");
+		this.load.image("wood-board");
+		this.load.image("wood-nametag");
+
+		// marble skins
+		this.load.path = "src/features/game/assets/img/marbleSkins/";
 		this.load.image("marble");
+		this.load.image("marble-p1");
+		this.load.image("marble-p2");
+		this.load.image("joker");
+		this.load.image("capy");
+		this.load.image("capy_red");
+		this.load.image("baseball");
+		this.load.image("minion");
+		this.load.image("santa");
+		this.load.image("gomme");
+		this.load.image("lars_fast");
+		this.load.image("lars_ski");
+		this.load.image("amogus");
+		this.load.image("sans");
+
+		// animated background frames
+		this.load.path = "src/features/game/assets/img/animatedBackgroundFrames/";
+
+		for (let i = 0; i < 30; i++) {
+			const frameName = "frame"+i.toString();
+			this.frameNames.push(frameName);
+			this.load.image(frameName);
+		}
+
+		// shapes
+		this.load.path = "src/features/game/assets/shapes/";
 		this.load.json("switch-left-shape");
 		this.load.json("switch-right-shape");
 		this.load.json("marble-shape");
-		this.load.image("border");
 
-		// You should remove this logic; this is only included here to show off the progress bar.
-		for (let i = 0; i < 100; i++) {
-			this.load.image("Phaser-Logo-Small" + i, "Phaser-Logo-Small.png");
-		}
+		// audio
+		this.load.path = "src/features/game/assets/audio/";
+		this.load.audio("gameplaySoundtrack", "TheLongestNightOfThisWinter.mp3");
+		this.load.audio("woodenClick", "woodenClick.wav");
+		this.load.audio("marbleDropSound", "marbleDropSound.mp3");
+		this.load.audio("marbleStopSound", "marbleStopSound.mp3");
+		this.load.audio("switchRotationSound", "switchRotation.mp3");
+		this.load.audio("victory", "victory.wav");
+		this.load.audio("menuTheme", "menuTheme.wav");
 	}
 
 	public create(): void {
 		Utilities.LogSceneMethodEntry("Preloader", "create");
 
+		// create background animation
+		const animationKey = 'animatedBackground';
+		const frameRate = 10;
+		const repeat = -1;
+
+		const mappedAnimationFrames = this.frameNames.map((frameName) => {
+			return { key: frameName };
+		});
+
+		this.anims.create({
+			key: animationKey,
+			frames: mappedAnimationFrames,
+			frameRate: frameRate,
+			repeat: repeat,
+    	});
+
 		this.scene.start(SplashScreen.Name);
-	}
-
-	public update(): void {
-		// preload handles updates to the progress bar, so nothing should be needed here.
-	}
-
-	/**
-	 * Adds a progress bar to the display, showing the percentage of assets loaded and their name.
-	 */
-	private addProgressBar(): void {
-		const width = this.cameras.main.width;
-		const height = this.cameras.main.height;
-		/** Customizable. This text color will be used around the progress bar. */
-		const outerTextColor = '#ffffff';
-
-		const progressBar = this.add.graphics();
-		const progressBox = this.add.graphics();
-		progressBox.fillStyle(0x222222, 0.8);
-		progressBox.fillRect(width / 4, height / 2 - 30, width / 2, 50);
-
-		const loadingText = this.make.text({
-			x: width / 2,
-			y: height / 2 - 50,
-			text: "Loading...",
-			style: {
-				font: "20px monospace",
-				color: outerTextColor
-			}
-		});
-		loadingText.setOrigin(0.5, 0.5);
-
-		const percentText = this.make.text({
-			x: width / 2,
-			y: height / 2 - 5,
-			text: "0%",
-			style: {
-				font: "18px monospace",
-				color: "#ffffff"
-			}
-		});
-		percentText.setOrigin(0.5, 0.5);
-
-		const assetText = this.make.text({
-			x: width / 2,
-			y: height / 2 + 50,
-			text: "",
-			style: {
-				font: "18px monospace",
-				color: outerTextColor
-			}
-		});
-
-		assetText.setOrigin(0.5, 0.5);
-
-		this.load.on("progress", (value: number) => {
-			percentText.setText(parseInt(value * 100 + "", 10) + "%");
-			progressBar.clear();
-			progressBar.fillStyle(0xffffff, 1);
-			progressBar.fillRect((width / 4) + 10, (height / 2) - 30 + 10, (width / 2 - 10 - 10) * value, 30);
-		});
-
-		this.load.on("fileprogress", (file: Phaser.Loader.File) => {
-			assetText.setText("Loading asset: " + file.key);
-		});
-
-		this.load.on("complete", () => {
-			progressBar.destroy();
-			progressBox.destroy();
-			loadingText.destroy();
-			percentText.destroy();
-			assetText.destroy();
-		});
 	}
 }

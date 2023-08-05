@@ -1,0 +1,22 @@
+{
+  "type": "fromPhysicsEditor",
+  "isStatic": false,
+  "density": 3,
+  "restitution": 0.00015,
+  "friction": 0.001,
+  "frictionAir": 0.011,
+  "frictionStatic": 0.3,
+  "collisionFilter": { "group": 0, "category": 1, "mask": 255 },
+  "label": "marble",
+  "fixtures": [
+    {
+      "label": "marble",
+      "isSensor": false,
+      "circle": {
+        "x": 13,
+        "y": 13,
+        "radius": 13
+      }
+    }
+  ]
+}
