@@ -61,6 +61,16 @@ import test14 from "../../assets/public/gallery/us/D7BB7B2E-0686-4970-A9F4-E463A
 import test15 from "../../assets/public/gallery/us/FE1AB5A2-AAAA-4164-8F35-A1B678F8AA09_1_105_c.jpeg";
 import test16 from "../../assets/public/gallery/us/IMG_7246.jpg";
 import test17 from "../../assets/public/gallery/us/IMG_7248.jpg";
+import aliciaundtheresa from "../../assets/public/gallery/us/aliciaandtheresa.jpeg";
+import cakes from "../../assets/public/gallery/us/cakes.jpeg";
+import eis from "../../assets/public/gallery/us/eis.jpeg";
+import food from "../../assets/public/gallery/us/food.jpeg";
+import lake from "../../assets/public/gallery/us/lake.jpeg";
+import ospaiens from "../../assets/public/gallery/us/ospaiens.jpeg";
+import saltmine from "../../assets/public/gallery/us/saltmine.jpeg";
+import streetlights from "../../assets/public/gallery/us/streetlights.jpeg";
+import teamlead from "../../assets/public/gallery/us/teamlead.jpeg";
+import seepf from "../../assets/public/gallery/us/seepferdchen.jpeg";
 
 import umbennen from "../../assets/public/gallery/us/umbenennen.jpg";
 import flagge from "../../assets/public/gallery/us/Flagge.jpg";
@@ -72,28 +82,39 @@ import skifaherer from "../../assets/public/gallery/ski-faherer.jpg";
 const images = [
   Bilda,
   flagge,
-  Bild6,
+  //Bild6,
   biggroup,
-  Bild7,
+  //Bild7,
   test16,
+  aliciaundtheresa,
+  cakes,
+  teamlead,
   umbennen,
   test17,
   Bildb,
   test1,
   closeup,
+  eis,
+  food,
+  ,
+  lake,
+  ospaiens,
+  seepf,
   test2,
   test3,
   Bildc,
   skifaherer,
   Bild8,
   Bildd,
-  //Bild9,
+  // Bild9,
   test4,
   test5,
   test6,
   Bilde,
   Bild10,
-  Bild18,
+  //Bild18,
+  saltmine,
+  streetlights,
   Bild15,
   Bild1,
   Bildf,
@@ -102,28 +123,28 @@ const images = [
   test12,
   test13,
   test14,
-  Bild2,
-  Bild3,
+  //Bild2,
+  //Bild3,
   Bildg,
   test15,
-  Bild4,
+  //Bild4,
   Bildh,
-  Bild5,
-  Bild10,
-  Bild11,
+  //Bild5,
+  //Bild10,
+  //Bild11,
   Bildj,
   Bildi,
-  Bild12,
+  //Bild12,
   //Bild13,
-  backgroundImage,
+  //backgroundImage,
   Bildk,
   test7,
   test8,
-  test9,
-  Bild14,
-  Bild16,
-  Bild17,
-  Bild18,
+  //test9,
+  //Bild14,
+  //Bild16,
+  //Bild17,
+  // Bild18,
   Bild19,
 ];
 const SVGComponent1 = () => {
