@@ -19,17 +19,18 @@ import Bild5 from "../../assets/public/gallery/markus-spiske-fH5VEmsewO0-unsplas
 import Bild6 from "../../assets/public/gallery/max-lawton-ZJSe0tL8ZWk-unsplash.jpg";
 import Bild7 from "../../assets/public/gallery/philipp-kammerer-1FJZBOthB8k-unsplash.jpg";
 import Bild8 from "../../assets/public/gallery/sam-arnold-lQoC90sqn8s-unsplash.jpg";
-import Bild9 from "../../assets/public/gallery/austrian-national-library-r4v18AhK8gw-unsplash.jpg";
+//import Bild9 from "../../assets/public/gallery/austrian-national-library-r4v18AhK8gw-unsplash.jpg";
 import Bild10 from "../../assets/public/gallery/benjamin-szabo-QVN5ydW0k1k-unsplash.jpg";
 import Bild11 from "../../assets/public/gallery/carl-raw-8Gdayy2Lhi0-unsplash.jpg";
 import Bild12 from "../../assets/public/gallery/georgie-cobbs-SU35VU5de1o-unsplash.jpg";
-import Bild13 from "../../assets/public/gallery/ian-dooley-aaAllJ6bmac-unsplash.jpg";
+//import Bild13 from "../../assets/public/gallery/ian-dooley-aaAllJ6bmac-unsplash.jpg";
 import Bild14 from "../../assets/public/gallery/johannes-waibel-WdBQHcIiSIw-unsplash.jpg";
 import Bild15 from "../../assets/public/gallery/joshua-bartell-eeX7MYk3HcY-unsplash.jpg";
 import Bild16 from "../../assets/public/gallery/mattias-olsson-nQz49efZEFs-unsplash.jpg";
 import Bild17 from "../../assets/public/gallery/oliver-schwendener-9lcWCCRXiKU-unsplash.jpg";
 import Bild18 from "../../assets/public/gallery/toby-otti-k6-usAW2aFw-unsplash.jpg";
 import Bild19 from "../../assets/public/gallery/xenia-radchenko-ezEn4jYrVYQ-unsplash.jpg";
+import backgroundImage from "../../assets/Timeline_background.jpg";
 
 // BILDER VON UNS
 import Bilda from "../../assets/public/gallery/us/0AA3C7A9-4B8F-467B-99E2-0C531406BA6C_1_105_c.jpeg";
@@ -66,6 +67,7 @@ import flagge from "../../assets/public/gallery/us/Flagge.jpg";
 import closeup from "../../assets/public/gallery/us/close-up.jpg";
 import biggroup from "../../assets/public/gallery/us/big_group.jpg";
 
+import skifaherer from "../../assets/public/gallery/ski-faherer.jpg";
 //----------------------------------------------------------------------------------------------------
 const images = [
   Bilda,
@@ -82,9 +84,10 @@ const images = [
   test2,
   test3,
   Bildc,
+  skifaherer,
   Bild8,
   Bildd,
-  Bild9,
+  //Bild9,
   test4,
   test5,
   test6,
@@ -111,7 +114,8 @@ const images = [
   Bildj,
   Bildi,
   Bild12,
-  Bild13,
+  //Bild13,
+  backgroundImage,
   Bildk,
   test7,
   test8,
