@@ -1,0 +1,13 @@
+{
+  "agents": [
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_newreward135:v",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_newreward1375:v",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_doubletrain_mcts50:v",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_doubletrain_mcts:v",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_newreward1345:v",
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_newreward134:v"
+  ],
+  "skip": [
+    "mtp2023_avalanche/CurriculumVer2Fix/checkpoint_doubletrain_fixed:v99"
+  ]
+}
