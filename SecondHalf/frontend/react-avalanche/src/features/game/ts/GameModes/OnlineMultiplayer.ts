@@ -17,7 +17,6 @@ export class OnlineMultiPlayer extends AbstractGameMode {
     me = 1;
     waitingForConfirmation: boolean = false;
     ws: WebSocket;
-    public gameOverEvent: EventEmitter;
     public moveEvent: EventEmitter;
     public boardEvent: EventEmitter;
     public joinEvent: EventEmitter;
@@ -26,7 +25,6 @@ export class OnlineMultiPlayer extends AbstractGameMode {
 
     public constructor(){
         super();
-        this.gameOverEvent = new EventEmitter();
         this.moveEvent = new EventEmitter();
         this.boardEvent = new EventEmitter();
         this.joinEvent = new EventEmitter();
@@ -40,11 +38,6 @@ export class OnlineMultiPlayer extends AbstractGameMode {
 
     public getPlayerNames(): string[] {
         return [this.player1Name, this.player2Name];
-    }
-
-    gameOver() {
-        // Emit the custom event when the game is over
-        this.gameOverEvent.emit("");
     }
     
     updateScore(score: number) {

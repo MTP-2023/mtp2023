@@ -380,7 +380,6 @@ export default class MainGame extends Phaser.Scene {
 		//Event Handler
 		if(!this.gameMode.isLocal && this.gameMode.isMultiplayer){
 			var onlinegame = this.gameMode as OnlineMultiPlayer;
-			onlinegame.gameOverEvent.on("gameOver", this.handleGameOver, this);
 			onlinegame.moveEvent.on("move", this.handleMove, this);
 			onlinegame.boardEvent.on("emit", this.getChallenge, this);
 			onlinegame.dcEvent.on("dc", this.handleDisconnect, this)
@@ -468,12 +467,7 @@ export default class MainGame extends Phaser.Scene {
 		}
 	}
 
-	// Event handler for the "gameOverEvent"
-	private handleGameOver() {
-	  	console.log("Game Over!");
-	}
-
-	// Event handler for the "boardEvent"
+	// handle new challenge
 	private getChallenge() {
 		console.log("challenge recieved");
     }
@@ -803,7 +797,7 @@ export default class MainGame extends Phaser.Scene {
 	public initButtonsclickable(turn: number): void{
 		if(!this.gameMode.isLocal ){
 			var onlinegame = this.gameMode as OnlineMultiPlayer;
-			if(onlinegame.me == turn){
+			if(onlinegame.me != turn){
 				console.log("blocking", onlinegame.me, "on turn", turn);
 				this.toggleInput(false);
 			} else {

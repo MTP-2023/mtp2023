@@ -150,7 +150,7 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-
+# establish connection for online multiplayer
 @app.websocket("/lobbies/{code}")
 async def websocket_endpoint_create_or_join(code: int, websocket: WebSocket, player: str, marbleSkin: str, operation: str):
     print("create or join")
@@ -162,6 +162,7 @@ async def websocket_endpoint_create_or_join(code: int, websocket: WebSocket, pla
     else:
         raise HTTPException(status_code=404, detail="Invalid operation")
 
+# generate available lobby code
 @app.get("/getCode", tags=["getCode"])
 async def getCode():
     while True:
@@ -173,13 +174,11 @@ async def getCode():
     return False
 
 async def create_lobby(code: int, websocket: WebSocket, player: str, marbleSkin: str = "marble-p1"):
-    # websocket = fastapi.WebSocket("ws://localhost:8000/ws/" + str(code))
     start_board = generate_random_board(3, 2)
     goal1 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
     goal2 = generateGoalState(start_board, 1, 1, 12, 42, 3 * 2, False)
     goal_board = merge(goal1, goal2, 3, 2)
     lobby = Lobby(player, start_board, goal_board, code, websocket, "")
-    print("setting", marbleSkin, "as skin for creator")
     lobby.player1_skin = marbleSkin
     lobbies[code] = lobby
     lobby.messageType = "challenge"
@@ -190,10 +189,12 @@ async def create_lobby(code: int, websocket: WebSocket, player: str, marbleSkin:
             message: Message = await websocket.receive_json()
             print(message)
             if message["type"] == 2:
+                # handle move
                 lobby.recentMove = message["data"]["move"]
                 lobby.messageType = "move"
                 await manager.broadcast(json.dumps(lobby.toDict()))
             elif message["type"] == 3: 
+                # handle game over
                 if message["data"]["winner"] == 1:
                     lobby.player1_wins += 1
                 else:
@@ -208,30 +209,13 @@ async def create_lobby(code: int, websocket: WebSocket, player: str, marbleSkin:
                 print("waiting for confirmation")
                 await manager.broadcast(json.dumps(lobby.toDict()))
             elif message["type"] == 4: 
+                # when the second player agrees to another game
                 lobby.messageType = "confirmed"
                 await manager.broadcast(json.dumps(lobby.toDict()))
-            """elif message.Type == MessageTypes.NEWCHALLENGE:
-                lobby = lobbies[message.data["code"]]
-                start_board = generate_random_board(lobby.width, lobby.height)
-                goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
-                                          lobby.width * 2, False)
-                goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
-                                          lobby.width * 2, False)
-                goal_board = merge(goal1, goal2, lobby.width, lobby.height)
-                lobby.currentBoard = start_board
-                lobby.goalBoard = goal_board
-                await manager.broadcast(lobby)
-            elif message.type == MessageTypes.CHANGESETTINGS:
-                lobby = lobbies[message.data["code"]]
-                lobby.width = message.data["width"]
-                lobby.height = message.data["height"]
-                lobby.minMarbles = message.data["minMarbles"]
-                lobby.maxMarbles = message.data["maxMarbles"]
-                lobby.turnLimit = message.data["turnLimit"]
-                lobby.availableMarbles = message.data["availableMarbles"] """
     except WebSocketDisconnect:
         lobby.messageType = "dc"
         manager.disconnect(websocket)
+        # notify other player of disconntect
         await manager.broadcast(json.dumps(lobby.toDict()))
         
 
@@ -241,9 +225,9 @@ async def join_lobby(code: int, websocket: WebSocket, name: str, marbleSkin: str
         if lobby.isFull:
             return "full"
         else:
+            # finalize join
             lobby.player2_name = name
             lobby.player2_skin = marbleSkin
-            # websocket = lobby.socket
             await manager.connect(websocket)
             lobby.messageType = "join"
             await manager.broadcast(json.dumps(lobby.toDict()))
@@ -253,12 +237,12 @@ async def join_lobby(code: int, websocket: WebSocket, name: str, marbleSkin: str
                 while True:
                     message: Message = await websocket.receive_json()
                     if message["type"] == 2:
-                        #lobby = lobbies[message.data["code"]]
-                        #run(message.data["move"], lobby.currentBoard, message.data["player"], False)
+                        # handle move
                         lobby.recentMove = message["data"]["move"]
                         lobby.messageType = "move"
                         await manager.broadcast(json.dumps(lobby.toDict()))
                     elif message["type"] == 3: 
+                        # handle game over
                         if message["data"]["winner"] == 1:
                             lobby.player1_wins += 1
                         else:
@@ -273,32 +257,13 @@ async def join_lobby(code: int, websocket: WebSocket, name: str, marbleSkin: str
                         print("waiting for confirmation")
                         await manager.broadcast(json.dumps(lobby.toDict()))
                     elif message["type"] == 4: 
+                        # when the second player agrees to another game
                         lobby.messageType = "confirmed"
                         await manager.broadcast(json.dumps(lobby.toDict()))
-                    """elif message.Type == MessageTypes.NEWCHALLENGE:
-                        lobby = lobbies[message.data["code"]]
-                        start_board = generate_random_board(lobby.width, lobby.height)
-                        goal1 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
-                                                  lobby.width * 2,
-                                                  False)
-                        goal2 = generateGoalState(randomBoard, lobby.minMarbles, lobby.maxMarbles, lobby.turnLimit, 42,
-                                                  lobby.width * 2,
-                                                  False)
-                        goal_board = merge(goal1, goal2, lobby.width, lobby.height)
-                        lobby.currentBoard = start_board
-                        lobby.goalBoard = goal_board
-                        await manager.broadcast(lobby)
-                    elif message.type == MessageTypes.CHANGESETTINGS:
-                        lobby = lobbies[message.data["code"]]
-                        lobby.width = message.data["width"]
-                        lobby.height = message.data["height"]
-                        lobby.minMarbles = message.data["minMarbles"]
-                        lobby.maxMarbles = message.data["maxMarbles"]
-                        lobby.turnLimit = message.data["turnLimit"]
-                        lobby.availableMarbles = message.data["availableMarbles"]"""
             except WebSocketDisconnect:
                 manager.disconnect(websocket)
                 lobby.messageType = "dc"
+                # notify other player of disconnect
                 await manager.broadcast(json.dumps(lobby.toDict()))
     else:
         return "not found"
@@ -308,12 +273,6 @@ async def join_lobby(code: int, websocket: WebSocket, name: str, marbleSkin: str
 @app.get("/randomboard", tags=["randomboard"])
 async def randomBoard(width: int = default_width, height: int = default_height):
     return generate_random_board(width, height)
-
-
-@app.post("/updateSettings", tags="changeSettings")
-async def update_settings(width: int = default_width, height: int = default_height,
-                          minMarbles: int = 2, maxMarbles: int = 2, turnLimit: int = 10, availableMarbles: int = 100, ):
-    return
 
 
 # get some fixed board
@@ -400,6 +359,7 @@ async def agentMove(challenge: MultiPlayerChallengeDTO, agent_handle: str):
         move = return_move_multi(agent, paramEnv, obs)
         print(move)
     return int(move)
+
 
 @app.post("/mcts_move/")
 async def mctsMove(challenge: MultiPlayerChallengeDTO):
