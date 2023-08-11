@@ -85,7 +85,6 @@ const PresentationScreen = () => {
                   dynamics of the marbles. Scoring focuses on successful
                   triggers and intricate chain reactions. The player who
                   orchestrates the most captivating ball movements triumphs.
-                  Translated with www.DeepL.com/Translator (free version)
                 </p>
                 <div className="column img"></div>
               </div>
