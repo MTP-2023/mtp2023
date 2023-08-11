@@ -43,3 +43,9 @@ For the game, navigate into the react-avalanche folder and run "npm install". Th
 ### Start the game
 In order to start the server (also required for local modes), it is required to navigate into the gameResources/API folder and start it via "uvicorn cAPI:app" with the activated environment.
 To get the game running, execute "npm run dev" in the react-avalanche frontend folder. Then, open the provided localhost link ("/game") and you can play the game. To simulate online multiplayer, open the game in two different tabs/windows.
+
+
+### Drive
+Artefacts and other data associated with the project can be found in the following Google Drive Folder:
+
+https://drive.google.com/drive/folders/1PgLWJMNvnSesAZkv0Q1Fyz1sceVV4hRL?usp=drive_link

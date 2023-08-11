@@ -52,6 +52,11 @@ parser.add_argument(
 
 parser.add_argument(
     "--last_agent",
+    default=100
+)
+
+parser.add_argument(
+    "--first_agent",
     default=0
 )
 
@@ -62,17 +67,19 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
+
 
 agent_stats = {}
 
-for agent_ver in range(0, int(args.last_agent)):
+for agent_ver in range(int(args.first_agent), int(args.last_agent)):
     print(args.agent_name + "v:" + str(agent_ver))
     try:
         artifact_dir = "artifacts/checkpoint_" + args.agent_name + "-v" + str(agent_ver)
         if not os.path.exists(artifact_dir):
+            run_wandb = setup_wandb(api_key_file="wandb_api_key.txt")
             artifact = run_wandb.use_artifact("mtp2023_avalanche/CurriculumVer2Fix/checkpoint_" + args.agent_name + ":v" + str(agent_ver), type='model')
             artifact_dir = artifact.download()
+            run_wandb.finish()
 
         agent = Policy.from_checkpoint(artifact_dir+'/policies/default_policy')
 
@@ -247,4 +254,4 @@ else:
 
 stats_df.to_csv(file_name+".csv")
 
-#run_wandb.finish()
+
