@@ -1,7 +1,7 @@
 let timelineElements = [
   {
     id: 1,
-    title: "Beginn of Project",
+    title: "Beginning of the Project",
     location: "Germany, Mannheim",
     description:
       "The project commenced with a kick-off meeting on February 13th, followed by an internal meeting on February 15th. During these sessions, the team got acquainted with the project's subject, established objectives, and crafted a work schedule. Noteworthy achievements include setting up computers, defining the project's structure, selecting tools, conducting initial tests, and creating a reinforcement learning guide. The team is now gearing up to welcome Romanian students, with plans for their onboarding and a first online meeting to integrate them into the team.",
