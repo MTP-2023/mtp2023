@@ -45,7 +45,7 @@ In order to start the server (also required for local modes), it is required to 
 To get the game running, execute "npm run dev" in the react-avalanche frontend folder. Then, open the provided localhost link ("/game") and you can play the game. To simulate online multiplayer, open the game in two different tabs/windows.
 
 
-### Drive
+## Drive
 Artefacts and other data associated with the project can be found in the following Google Drive Folder:
 
 https://drive.google.com/drive/folders/1PgLWJMNvnSesAZkv0Q1Fyz1sceVV4hRL?usp=drive_link
