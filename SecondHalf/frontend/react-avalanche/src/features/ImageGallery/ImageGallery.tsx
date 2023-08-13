@@ -173,10 +173,10 @@ const ImageGallery = () => {
   const imgAction = (action: string | undefined) => {
     let i = data.i;
     if (action === "next-img") {
-      setData({ img: images[i + 1], i: i + 1 });
+      setData({ img: images[i + 1]!, i: i + 1 });
     }
     if (action === "previous-img") {
-      setData({ img: images[i - 1], i: i - 1 });
+      setData({ img: images[i - 1]!, i: i - 1 });
     }
     if (action === "close") {
       setData({ img: "", i: 0 });
@@ -240,7 +240,7 @@ const ImageGallery = () => {
                 src={image}
                 style={{ width: "100%", display: "block", cursor: "pointer" }}
                 alt=""
-                onClick={() => viewImage(image, i)}
+                onClick={() => viewImage(image!, i)}
               />
             ))}
           </Masonry>

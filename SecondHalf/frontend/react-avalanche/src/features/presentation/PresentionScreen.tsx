@@ -4,19 +4,8 @@ import { View, Image } from "react-native";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
-//const Spacer = require("react-spacer");
 
-import avalImg from "../../assets/avalanche-game.jpeg";
-
-import present from "../../assets/present.jpeg";
-import sandbox from "../../assets/sandbox.png";
-import challenge from "../../assets/challenge.png";
-import aishowcase from "../../assets/aishowcase.png";
 import video from "../../assets/video/avalanche3.mp4";
-import TestComponent from "../test/TimePage";
-import backgroundImage from "../../assets/Timeline_background.jpg";
-import mountains from "../../assets/public/gallery/mattias-olsson-nQz49efZEFs-unsplash.jpg";
-import background2 from "../../assets/public/gallery/philipp-kammerer-1FJZBOthB8k-unsplash.jpg";
 import glacier1 from "../../assets/public/gallery/kaputte_glacier.jpg";
 import glacier2 from "../../assets/public/gallery/kaputte_glacier2.jpg";
 
@@ -25,8 +14,6 @@ import andre from "../../assets/public/gallery/profiles/andre.png";
 import rot from "../../assets/public/gallery/profiles/rot.png";
 import theresa from "../../assets/public/gallery/profiles/theresa.png";
 import thomas from "../../assets/public/gallery/profiles/thomas.png";
-import { Padding } from "@mui/icons-material";
-import { Divider } from "@mui/material";
 
 const itemData = [
   {

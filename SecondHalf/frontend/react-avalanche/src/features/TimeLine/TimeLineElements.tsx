@@ -6,7 +6,7 @@ let timelineElements = [
     description:
       "The project commenced with a kick-off meeting on February 13th, followed by an internal meeting on February 15th. During these sessions, the team got acquainted with the project's subject, established objectives, and crafted a work schedule. Noteworthy achievements include setting up computers, defining the project's structure, selecting tools, conducting initial tests, and creating a reinforcement learning guide. The team is now gearing up to welcome Romanian students, with plans for their onboarding and a first online meeting to integrate them into the team.",
     //buttonText: "View Frontend Projects",
-    date: "Feburary 15",
+    date: "Feburary",
   },
   {
     id: 2,
@@ -55,7 +55,7 @@ let timelineElements = [
     title: "Final",
     location: "Germany, Mannheim",
     description:
-      "On August 2nd, the momentous occasion of our Final Presentation arrived. With pride and accomplishment, we showcased our ultimate product, outlining our remarkable journey and achievements. As we approach the finish line, we are diligently applying final tweaks and conducting clean-up tasks to ensure our project stands as a testament to our collective efforts. The pinnacle approaches on August 12th, when we will formally submit our completed project. As this captivating chapter of our studies draws to a close, we bid adieu with a mixture of nostalgia and optimism. This captivating journey has enriched our knowledge, skills, and camaraderie. Farewell to this phase, and onward to the next IT adventure.",
+      "On August 2nd, the momentous occasion of our Final Presentation arrived. With pride and accomplishment, we showcased our ultimate product, outlining our remarkable journey and achievements. As we approach the finish line, we are diligently applying final tweaks and conducting clean-up tasks to ensure our project stands as a testament to our collective efforts. The pinnacle approaches on August 13th, when we will formally submit our completed project. As this captivating chapter of our studies draws to a close, we bid adieu with a mixture of nostalgia and optimism. This captivating journey has enriched our knowledge, skills, and camaraderie. Farewell to this phase, and onward to the next IT adventure.",
     date: "August",
   },
 ];

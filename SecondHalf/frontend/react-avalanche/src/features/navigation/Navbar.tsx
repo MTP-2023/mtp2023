@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 
@@ -7,10 +6,10 @@ const Navbar = () => {
     <nav className="navbar" id="navbar">
       <ul className="navbar__items">
         <Link to="/">
-          <div className="logo">SNOWSLIDER</div>
+          <div className="logo">SnowSlider</div>
         </Link>
 
-        <Link to="/test">
+        <Link to="/timeline">
           <div className="logo2">Project Timeline</div>
         </Link>
         <Link to="/gallery">
